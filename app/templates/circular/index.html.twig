@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Circular index{% endblock %}
+
+{% block body %}
+    <h1>Circular index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Target_group</th>
+                <th>Date</th>
+                <th>File_path</th>
+                <th>Created_by</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for circular in circulars %}
+            <tr>
+                <td>{{ circular.id }}</td>
+                <td>{{ circular.title }}</td>
+                <td>{{ circular.content }}</td>
+                <td>{{ circular.targetGroup }}</td>
+                <td>{{ circular.date ? circular.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ circular.filePath }}</td>
+                <td>{{ circular.createdBy }}</td>
+                <td>{{ circular.createdAt ? circular.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ circular.updatedAt ? circular.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_circular_show', {'id': circular.id}) }}">show</a>
+                    <a href="{{ path('app_circular_edit', {'id': circular.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_circular_new') }}">Create new</a>
+{% endblock %}

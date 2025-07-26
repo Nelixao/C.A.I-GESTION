@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Correspondence{% endblock %}
+
+{% block body %}
+    <h1>Correspondence</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ correspondence.id }}</td>
+            </tr>
+            <tr>
+                <th>Subject</th>
+                <td>{{ correspondence.subject }}</td>
+            </tr>
+            <tr>
+                <th>Body</th>
+                <td>{{ correspondence.body }}</td>
+            </tr>
+            <tr>
+                <th>Sender</th>
+                <td>{{ correspondence.sender }}</td>
+            </tr>
+            <tr>
+                <th>Receiver</th>
+                <td>{{ correspondence.receiver }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>File_path</th>
+                <td>{{ correspondence.filePath }}</td>
+            </tr>
+            <tr>
+                <th>Created_by</th>
+                <td>{{ correspondence.createdBy }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_correspondence_index') }}">back to list</a>
+
+    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}">edit</a>
+
+    {{ include('correspondence/_delete_form.html.twig') }}
+{% endblock %}

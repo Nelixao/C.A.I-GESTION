@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Correspondence index{% endblock %}
+
+{% block body %}
+    <h1>Correspondence index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Subject</th>
+                <th>Body</th>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Date</th>
+                <th>File_path</th>
+                <th>Created_by</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for correspondence in correspondences %}
+            <tr>
+                <td>{{ correspondence.id }}</td>
+                <td>{{ correspondence.subject }}</td>
+                <td>{{ correspondence.body }}</td>
+                <td>{{ correspondence.sender }}</td>
+                <td>{{ correspondence.receiver }}</td>
+                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ correspondence.filePath }}</td>
+                <td>{{ correspondence.createdBy }}</td>
+                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
+                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}">show</a>
+                    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_correspondence_new') }}">Create new</a>
+{% endblock %}

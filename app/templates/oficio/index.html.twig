@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Oficio index{% endblock %}
+
+{% block body %}
+    <h1>Oficio index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Sender</th>
+                <th>Recipient</th>
+                <th>Date</th>
+                <th>File_path</th>
+                <th>Created_by</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for oficio in oficios %}
+            <tr>
+                <td>{{ oficio.id }}</td>
+                <td>{{ oficio.title }}</td>
+                <td>{{ oficio.content }}</td>
+                <td>{{ oficio.sender }}</td>
+                <td>{{ oficio.recipient }}</td>
+                <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ oficio.filePath }}</td>
+                <td>{{ oficio.createdBy }}</td>
+                <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}">show</a>
+                    <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_oficio_new') }}">Create new</a>
+{% endblock %}
