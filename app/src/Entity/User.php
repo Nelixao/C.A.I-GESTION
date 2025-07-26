@@ -6,21 +6,23 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use App\Entity\Role;
 use App\Entity\Oficio;
 use App\Entity\Circular;
 use App\Entity\Correspondence;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 55)]
-    private ?string $nombre = null;
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $contrasena = null;
@@ -50,15 +52,31 @@ class User
         return $this->id;
     }
 
-    public function getNombre(): ?string
+    public function getEmail(): ?string
     {
-        return $this->nombre;
+        return $this->email;
     }
 
-    public function setNombre(string $nombre): static
+    public function setEmail(string $email): static
     {
-        $this->nombre = $nombre;
+        $this->email = $email;
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = ['ROLE_USER'];
+
+        if ($this->role && $this->role->getName()) {
+            $roles[] = strtoupper($this->role->getName());
+        }
+
+        return array_unique($roles);
     }
 
     public function getContrasena(): ?string
@@ -70,6 +88,21 @@ class User
     {
         $this->contrasena = $contrasena;
         return $this;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->contrasena ?? '';
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Aquí puedes limpiar datos temporales si los tienes
     }
 
     public function getRole(): ?Role
