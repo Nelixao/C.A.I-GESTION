@@ -1,51 +1,135 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Oficio index{% endblock %}
+{% block title %}Listado de Oficios{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background-color: #E7E7E7;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-oficios {
+            max-width: 95%;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #B2225D;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table.table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        table.table thead {
+            background-color: #B2225D;
+            color: white;
+        }
+
+        table.table th, table.table td {
+            padding: 12px 10px;
+            border: 1px solid #ccc;
+        }
+
+        table.table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        a.button-link {
+            background-color: #C09F65;
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        a.button-link:hover {
+            background-color: #B2225D;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+
+        .create-btn {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            background-color: #B2225D;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .create-btn:hover {
+            background-color: #C09F65;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Oficio index</h1>
+    <div class="container-oficios">
+        <h1>Listado de Oficios</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Content</th>
-                <th>Sender</th>
-                <th>Recipient</th>
-                <th>Date</th>
-                <th>File_path</th>
-                <th>Created_by</th>
-                <th>Created_at</th>
-                <th>Updated_at</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for oficio in oficios %}
-            <tr>
-                <td>{{ oficio.id }}</td>
-                <td>{{ oficio.title }}</td>
-                <td>{{ oficio.content }}</td>
-                <td>{{ oficio.sender }}</td>
-                <td>{{ oficio.recipient }}</td>
-                <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ oficio.filePath }}</td>
-                <td>{{ oficio.createdBy }}</td>
-                <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}">show</a>
-                    <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="11">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Contenido</th>
+                    <th>Remitente</th>
+                    <th>Destinatario</th>
+                    <th>Fecha</th>
+                    <th>Archivo</th>
+                    <th>Creado por</th>
+                    <th>Creado el</th>
+                    <th>Actualizado el</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for oficio in oficios %}
+                <tr>
+                    <td>{{ oficio.id }}</td>
+                    <td>{{ oficio.title }}</td>
+                    <td>{{ oficio.content }}</td>
+                    <td>{{ oficio.sender }}</td>
+                    <td>{{ oficio.recipient }}</td>
+                    <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i') : '' }}</td>
+                    <td>{{ oficio.filePath }}</td>
+                    <td>{{ oficio.createdBy }}</td>
+                    <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i') : '' }}</td>
+                    <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i') : '' }}</td>
+                    <td>
+                        <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="button-link">Ver</a>
+                        <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}" class="button-link">Editar</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="11" class="no-records">No se encontraron registros.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <a href="{{ path('app_oficio_new') }}">Create new</a>
+        <a href="{{ path('app_oficio_new') }}" class="create-btn">+ Crear nuevo oficio</a>
+    </div>
 {% endblock %}

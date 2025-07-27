@@ -190,4 +190,22 @@ class User implements UserInterface
         }
         return $this;
     }
+    public function getFullName(): string
+{
+    return sprintf('%s (%s)', $this->getNombre(), $this->getEmail());
+}
+#[ORM\Column(length: 100)]
+private ?string $nombre = null;
+
+public function getNombre(): ?string
+{
+    return $this->nombre;
+}
+
+public function setNombre(string $nombre): static
+{
+    $this->nombre = $nombre;
+    return $this;
+}
+
 }

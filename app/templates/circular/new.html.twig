@@ -1,11 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Circular{% endblock %}
+{% block title %}Crear Circular{% endblock %}
 
 {% block body %}
-    <h1>Create new Circular</h1>
-
-    {{ include('circular/_form.html.twig') }}
-
-    <a href="{{ path('app_circular_index') }}">back to list</a>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h2 class="mb-0">📄 Nueva Circular</h2>
+        </div>
+        <div class="card-body">
+            {{ include('circular/_form.html.twig') }}
+        </div>
+        <div class="card-footer text-end bg-light rounded-bottom-4">
+            <a href="{{ path('app_circular_index') }}" class="btn btn-outline-secondary">
+                ← Volver al listado
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
