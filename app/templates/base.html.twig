@@ -69,7 +69,136 @@
 
         /* Contenedor principal */
         main {
+            max-width: 1100px;<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sistema de Reportes{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #E7E7E7;
+            color: #333;
+            min-height: 100vh;
+            padding-top: 60px; /* espacio para navbar fija */
+        }
+
+        /* Navbar fija */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(90deg, #B2225D, #C09F65);
+            box-shadow: 0 3px 10px rgba(178, 34, 93, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 9999;
+        }
+
+        nav .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #E7E7E7;
+            text-decoration: none;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 24px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li a {
+            color: #E7E7E7;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: rgba(231, 231, 231, 0.3);
+            color: #B2225D;
+            font-weight: 700;
+        }
+
+        /* Contenedor principal */
+        main {
             max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(178, 34, 93, 0.1);
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Footer simple */
+        footer {
+            text-align: center;
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 40px;
+            user-select: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            nav ul {
+                gap: 12px;
+            }
+            nav .logo {
+                font-size: 1.2rem;
+            }
+            main {
+                padding: 16px;
+                margin: 0 12px;
+                border-radius: 14px;
+            }
+        }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{{ path('app_home') }}" class="logo">ALCALDÍA</a>
+        <ul>
+            <li><a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a></li>
+            <li><a href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a></li>
+            <li><a href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a></li>
+            <li><a href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <footer>
+        &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
+    </footer>
+</body>
+</html>
+
             margin: 0 auto;
             padding: 24px;
             background: white;
