@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Oficio{% endblock %}
+
+{% block body %}
+    <h1>Create new Oficio</h1>
+
+    {{ include('oficio/_form.html.twig') }}
+
+    <a href="{{ path('app_oficio_index') }}">back to list</a>
+{% endblock %}

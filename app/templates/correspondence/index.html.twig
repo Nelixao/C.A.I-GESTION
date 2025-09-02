@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Correspondencia{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background-color: #E7E7E7;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        h1 {
+            color: #B2225D;
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 95%;
+            margin: auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .table thead {
+            background-color: #B2225D;
+            color: white;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            background-color: #C09F65;
+            color: white;
+            padding: 6px 12px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .btn:hover {
+            background-color: #b08f55;
+        }
+
+        .create-link {
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+            background-color: #B2225D;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .create-link:hover {
+            background-color: #941b4a;
+        }
+
+        td[colspan] {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1>Correspondencia</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Asunto</th>
+                <th>Mensaje</th>
+                <th>Remitente</th>
+                <th>Destinatario</th>
+                <th>Fecha</th>
+                <th>Archivo</th>
+                <th>Creado por</th>
+                <th>Creado el</th>
+                <th>Actualizado el</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for correspondence in correspondences %}
+            <tr>
+                <td>{{ correspondence.id }}</td>
+                <td>{{ correspondence.subject }}</td>
+                <td>{{ correspondence.body }}</td>
+                <td>{{ correspondence.sender }}</td>
+                <td>{{ correspondence.receiver }}</td>
+                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i') : '' }}</td>
+                <td>{{ correspondence.filePath }}</td>
+                <td>{{ correspondence.createdBy }}</td>
+                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
+                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}" class="btn">Ver</a>
+                    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="btn">Editar</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">No se encontraron registros</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_correspondence_new') }}" class="create-link">Crear nuevo</a>
+{% endblock %}

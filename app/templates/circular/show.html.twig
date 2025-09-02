@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Detalle de Circular{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">📄 Detalle de Circular</h1>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID</dt>
+                    <dd class="col-sm-8">{{ circular.id }}</dd>
+
+                    <dt class="col-sm-4">Título</dt>
+                    <dd class="col-sm-8">{{ circular.title }}</dd>
+
+                    <dt class="col-sm-4">Contenido</dt>
+                    <dd class="col-sm-8">{{ circular.content }}</dd>
+
+                    <dt class="col-sm-4">Grupo Destino</dt>
+                    <dd class="col-sm-8">{{ circular.targetGroup }}</dd>
+
+                    <dt class="col-sm-4">Fecha</dt>
+                    <dd class="col-sm-8">{{ circular.date ? circular.date|date('Y-m-d H:i') : '' }}</dd>
+
+                    <dt class="col-sm-4">Archivo</dt>
+                    <dd class="col-sm-8">{{ circular.filePath }}</dd>
+
+                    <dt class="col-sm-4">Creado por</dt>
+                    <dd class="col-sm-8">{{ circular.createdBy }}</dd>
+
+                    <dt class="col-sm-4">Creado el</dt>
+                    <dd class="col-sm-8">{{ circular.createdAt ? circular.createdAt|date('Y-m-d H:i') : '' }}</dd>
+
+                    <dt class="col-sm-4">Última actualización</dt>
+                    <dd class="col-sm-8">{{ circular.updatedAt ? circular.updatedAt|date('Y-m-d H:i') : '' }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('app_circular_index') }}" class="btn btn-secondary rounded-pill px-4">← Volver</a>
+
+            <div>
+                <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-primary rounded-pill px-4 me-2">✏️ Editar</a>
+                {{ include('circular/_delete_form.html.twig', { 'class': 'd-inline' }) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Oficio{% endblock %}
+
+{% block body %}
+    <h1>Oficio</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ oficio.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ oficio.title }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ oficio.content }}</td>
+            </tr>
+            <tr>
+                <th>Sender</th>
+                <td>{{ oficio.sender }}</td>
+            </tr>
+            <tr>
+                <th>Recipient</th>
+                <td>{{ oficio.recipient }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>File_path</th>
+                <td>{{ oficio.filePath }}</td>
+            </tr>
+            <tr>
+                <th>Created_by</th>
+                <td>{{ oficio.createdBy }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_oficio_index') }}">back to list</a>
+
+    <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}">edit</a>
+
+    {{ include('oficio/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,20 @@
+{# templates/main/index.html.twig #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Sistema de Reportes</title>
+
+</head>
+<body>
+    <div class="card">
+        <h1>Bienvenida, {{ app.user.name|default('Usuario') }}</h1>
+        <p>Selecciona un reporte para continuar:</p>
+        <div class="link-container">
+            <a href="{{ path('app_circular_index') }}" class="report-link">Reporte de Circulares</a>
+            <a href="{{ path('app_correspondence_index') }}" class="report-link">Reporte de Correspondencia</a>
+            <a href="{{ path('app_oficio_index') }}" class="report-link">Reporte de Oficios</a>
+        </div>
+    </div>
+</body>
+</html>
