@@ -2,182 +2,7 @@
 
 {% block title %}Circulares{% endblock %}
 
-{% block stylesheets %}
-<style>
-  /* Container con glassmorphism más suave */
-  .container-glass {
-    background: rgba(231, 231, 231, 0.6); /* background color claro y translúcido */
-    border-radius: 24px;
-    padding: 40px 30px;
-    box-shadow: 0 16px 40px rgba(178, 34, 93, 0.15);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1.5px solid rgba(192, 159, 101, 0.3);
-    margin-top: 50px;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  /* Título principal */
-  h1.h3.text-primary {
-    color: #B2225D;
-    font-weight: 800;
-    font-size: 2.6rem;
-    letter-spacing: 1px;
-    margin-bottom: 35px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  /* Botón "Nueva Circular" con gradiente suave */
-  .btn-success {
-    background: linear-gradient(135deg, #C09F65, #B28E4F);
-    border: none;
-    font-weight: 700;
-    padding: 12px 28px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(192, 159, 101, 0.4);
-    transition: all 0.35s ease;
-    font-size: 1rem;
-  }
-
-  .btn-success:hover, .btn-success:focus {
-    background: linear-gradient(135deg, #B28E4F, #C09F65);
-    box-shadow: 0 14px 30px rgba(192, 159, 101, 0.65);
-    outline: none;
-    transform: translateY(-3px);
-  }
-
-  /* Tabla: filas con espacio y sombra muy sutil */
-  table {
-    width: 100%;
-    border-collapse: separate !important;
-    border-spacing: 0 16px;
-    background: transparent;
-  }
-
-  thead tr {
-    background-color: transparent;
-  }
-
-  thead th {
-    color: #B2225D;
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 14px 22px;
-    text-align: left;
-    border-bottom: 2px solid #C09F65;
-  }
-
-  tbody tr {
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 20px;
-    box-shadow: 0 6px 14px rgba(178, 34, 93, 0.08);
-    transition: box-shadow 0.3s ease;
-  }
-
-  tbody tr:hover {
-    box-shadow: 0 10px 25px rgba(178, 34, 93, 0.18);
-  }
-
-  tbody td {
-    padding: 18px 22px;
-    vertical-align: middle;
-    color: #3e3e3e;
-    font-size: 0.95rem;
-    border: none;
-  }
-
-  /* Enlaces de archivo */
-  a.file-link {
-    color: #B2225D;
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.25s ease;
-  }
-  a.file-link:hover {
-    color: #7f183c;
-    text-decoration: underline;
-  }
-
-  /* Botones de acción con borde y sombra delicada */
-  .btn-outline-primary, .btn-outline-warning {
-    border-radius: 14px;
-    font-size: 0.95rem;
-    padding: 8px 14px;
-    border-width: 2.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  }
-
-  .btn-outline-primary {
-    border-color: #B2225D;
-    color: #B2225D;
-  }
-  .btn-outline-primary:hover {
-    background-color: #B2225D;
-    color: white;
-    box-shadow: 0 8px 20px rgba(178, 34, 93, 0.5);
-  }
-
-  .btn-outline-warning {
-    border-color: #C09F65;
-    color: #C09F65;
-  }
-  .btn-outline-warning:hover {
-    background-color: #C09F65;
-    color: white;
-    box-shadow: 0 8px 20px rgba(192, 159, 101, 0.5);
-  }
-
-  /* Iconos */
-  i.bi {
-    font-size: 18px;
-    vertical-align: middle;
-  }
-
-  /* Responsive: tabla scroll horizontal */
-  @media (max-width: 768px) {
-    table, thead, tbody, th, td, tr {
-      display: block;
-    }
-    thead tr {
-      display: none;
-    }
-    tbody tr {
-      margin-bottom: 24px;
-      background: rgba(255,255,255,0.9);
-      box-shadow: 0 6px 14px rgba(178, 34, 93, 0.1);
-      border-radius: 18px;
-      padding: 20px;
-    }
-    tbody td {
-      padding: 12px 8px;
-      text-align: right;
-      position: relative;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #ddd;
-    }
-    tbody td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 12px;
-      width: 50%;
-      padding-left: 10px;
-      font-weight: 700;
-      color: #B2225D;
-      text-align: left;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-    }
-    tbody td:last-child {
-      border-bottom: 0;
-      text-align: center;
-      padding-top: 14px;
-    }
-  }
-</style>
-{% endblock %}
+{% block stylesheets %}{% endblock %}
 
 {% block body %}
 <div class="container-glass">
@@ -187,31 +12,41 @@
       <i class="bi bi-plus-circle"></i> Nueva Circular
     </a>
   </div>
+   <div class="js-table-wrapper">
+    <div class="js-table-toolbar" style="display:flex; gap:10px; margin:10px 0; align-items:center; flex-wrap:wrap;">
+      <input type="text" class="js-search" placeholder="Buscar en la tabla..." style="padding:8px 10px; border:1px solid #ddd; border-radius:8px; min-width:240px;">
+      <select class="js-stage" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+        <option value="todos">Todas las etapas</option>
+        <option value="no-revisado">No revisado</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="terminado">Terminado</option>
+      </select>
+    </div>
 
   <div class="table-responsive">
-    <table class="table align-middle">
+    <table class="">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Contenido</th>
-          <th>Grupo objetivo</th>
-          <th>Fecha</th>
-          <th>Archivo</th>
-          <th>Creado por</th>
-          <th>Creado en</th>
-          <th>Actualizado en</th>
-          <th>Acciones</th>
+          <th>FOLIO</th>
+          <th>FECHA</th>
+          <th>DIRIGIDO A</th>
+          <th>ASUNTO</th>
+          <th>ELABORÓ</th>
+          <th>ESTADO</th>
+          <th>ARCHIVO</th>
+          <th>ACCIÓN</th>
         </tr>
       </thead>
       <tbody>
         {% for circular in circulars %}
-          <tr>
-            <td data-label="ID">{{ circular.id }}</td>
-            <td data-label="Título">{{ circular.title }}</td>
-            <td data-label="Contenido">{{ circular.content|length > 50 ? circular.content|slice(0, 50) ~ '...' : circular.content }}</td>
-            <td data-label="Grupo objetivo">{{ circular.targetGroup }}</td>
-            <td data-label="Fecha">{{ circular.date ? circular.date|date('Y-m-d') : '' }}</td>
+          {% set row_text = (circular.id ~ ' ' ~ circular.title ~ ' ' ~ circular.content ~ ' ' ~ circular.targetGroup ~ ' ' ~ (circular.date ? circular.date|date('Y-m-d') : '') ~ ' ' ~ circular.filePath ~ ' ' ~ circular.createdBy)|lower %}
+          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ circular.title|lower }}">
+            <td data-label="Folio">{{ circular.id }}</td>
+            <td data-label="Fecha">{{ circular.date ? circular.date|date('d-m-Y') : '' }}</td>
+            <td data-label="Dirigido a">{{ circular.targetGroup }}</td>
+            <td data-label="Asunto">{{ circular.title }}</td>
+            <td data-label="Elaboró">{{ circular.createdBy }}</td>
+            <td data-label="Estado">{{ 'no-revisado' }}</td>
             <td data-label="Archivo">
               {% if circular.filePath %}
                 <a href="{{ asset(circular.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
@@ -219,10 +54,7 @@
                 -
               {% endif %}
             </td>
-            <td data-label="Creado por">{{ circular.createdBy }}</td>
-            <td data-label="Creado en">{{ circular.createdAt ? circular.createdAt|date('Y-m-d H:i') : '' }}</td>
-            <td data-label="Actualizado en">{{ circular.updatedAt ? circular.updatedAt|date('Y-m-d H:i') : '' }}</td>
-            <td data-label="Acciones">
+            <td data-label="Acción">
               <a href="{{ path('app_circular_show', {'id': circular.id}) }}" class="btn btn-outline-primary" title="Ver">
                 <i class="bi bi-eye"></i>
               </a>
@@ -233,11 +65,18 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="10" class="text-center text-muted py-4">No se encontraron circulares.</td>
+            <td data-label="Folio">—</td>
+            <td data-label="Fecha">{{ "now"|date('d-m-Y') }}</td>
+            <td data-label="Dirigido a">Todos</td>
+            <td data-label="Asunto">Ejemplo: Aviso de mantenimiento</td>
+            <td data-label="Elaboró">admin</td>
+            <td data-label="Archivo">-</td>
+            <td data-label="Acción"><span class="badge outline">ejemplo</span></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+</div>
 </div>
 {% endblock %}

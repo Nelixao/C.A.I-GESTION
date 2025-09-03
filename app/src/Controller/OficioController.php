@@ -22,6 +22,41 @@ final class OficioController extends AbstractController
         ]);
     }
 
+    #[Route('/export', name: 'app_oficio_export', methods: ['GET'])]
+    public function export(OficioRepository $oficioRepository): Response
+    {
+        $oficios = $oficioRepository->findAll();
+        $headers = [
+            'ID','Título','Contenido','Remitente','Destinatario','Fecha','Archivo','Creado por','Creado el','Actualizado el'
+        ];
+        $rows = [];
+        foreach ($oficios as $o) {
+            $rows[] = [
+                $o->getId(),
+                $o->getTitle(),
+                $o->getContent(),
+                $o->getSender(),
+                $o->getRecipient(),
+                $o->getDate()? $o->getDate()->format('Y-m-d H:i') : '',
+                $o->getFilePath(),
+                $o->getCreatedBy(),
+                $o->getCreatedAt()? $o->getCreatedAt()->format('Y-m-d H:i') : '',
+                $o->getUpdatedAt()? $o->getUpdatedAt()->format('Y-m-d H:i') : '',
+            ];
+        }
+        $csv = "\xEF\xBB\xBF"; // UTF-8 BOM for Excel
+        $f = fopen('php://temp', 'r+');
+        fputcsv($f, $headers);
+        foreach ($rows as $r) { fputcsv($f, $r); }
+        rewind($f);
+        $csv .= stream_get_contents($f);
+        fclose($f);
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="oficios.csv"'
+        ]);
+    }
+
     #[Route('/new', name: 'app_oficio_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

@@ -14,22 +14,26 @@ class OficioType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('content')
-            ->add('sender')
-            ->add('recipient')
-            ->add('date')
-            ->add('file_path')
-            ->add('created_by')
+            ->add('title', null, [ 'label' => 'Título' ])
+            ->add('content', null, [ 'label' => 'Contenido' ])
+            ->add('sender', null, [ 'label' => 'Remitente' ])
+            ->add('recipient', null, [ 'label' => 'Destinatario' ])
+            ->add('date', null, [ 'label' => 'Fecha', 'widget' => 'single_text' ])
+            ->add('file_path', null, [ 'label' => 'Archivo' ])
+            ->add('created_by', null, [ 'label' => 'Creado por' ])
             ->add('created_at', null, [
                 'widget' => 'single_text',
+                'label' => 'Creado el',
             ])
             ->add('updated_at', null, [
                 'widget' => 'single_text',
+                'label' => 'Actualizado el',
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
+                'choice_label' => 'fullName',
+                'label' => 'Usuario relacionado',
+                'placeholder' => 'Selecciona un usuario',
             ])
         ;
     }

@@ -22,6 +22,36 @@ final class CorrespondenceController extends AbstractController
         ]);
     }
 
+    #[Route('/export', name: 'app_correspondence_export', methods: ['GET'])]
+    public function export(CorrespondenceRepository $correspondenceRepository): Response
+    {
+        $items = $correspondenceRepository->findAll();
+        $headers = ['ID','Asunto','Mensaje','Remitente','Destinatario','Fecha','Archivo','Creado por','Creado el','Actualizado el'];
+        $f = fopen('php://temp', 'r+');
+        fputcsv($f, $headers);
+        foreach ($items as $c) {
+            fputcsv($f, [
+                $c->getId(),
+                $c->getSubject(),
+                $c->getBody(),
+                $c->getSender(),
+                $c->getReceiver(),
+                $c->getDate()? $c->getDate()->format('Y-m-d H:i') : '',
+                $c->getFilePath(),
+                $c->getCreatedBy(),
+                $c->getCreatedAt()? $c->getCreatedAt()->format('Y-m-d') : '',
+                $c->getUpdatedAt()? $c->getUpdatedAt()->format('Y-m-d H:i') : '',
+            ]);
+        }
+        rewind($f);
+        $csv = "\xEF\xBB\xBF" . stream_get_contents($f);
+        fclose($f);
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="correspondencias.csv"'
+        ]);
+    }
+
     #[Route('/new', name: 'app_correspondence_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

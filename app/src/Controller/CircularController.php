@@ -22,6 +22,35 @@ final class CircularController extends AbstractController
         ]);
     }
 
+    #[Route('/export', name: 'app_circular_export', methods: ['GET'])]
+    public function export(CircularRepository $circularRepository): Response
+    {
+        $items = $circularRepository->findAll();
+        $headers = ['ID','Título','Contenido','Dirigido A','Fecha','Archivo','Creado por','Creado en','Actualizado en'];
+        $f = fopen('php://temp', 'r+');
+        fputcsv($f, $headers);
+        foreach ($items as $c) {
+            fputcsv($f, [
+                $c->getId(),
+                $c->getTitle(),
+                $c->getContent(),
+                $c->getTargetGroup(),
+                $c->getDate()? $c->getDate()->format('Y-m-d') : '',
+                $c->getFilePath(),
+                $c->getCreatedBy(),
+                $c->getCreatedAt()? $c->getCreatedAt()->format('Y-m-d H:i') : '',
+                $c->getUpdatedAt()? $c->getUpdatedAt()->format('Y-m-d H:i') : '',
+            ]);
+        }
+        rewind($f);
+        $csv = "\xEF\xBB\xBF" . stream_get_contents($f);
+        fclose($f);
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="circulares.csv"'
+        ]);
+    }
+
     #[Route('/new', name: 'app_circular_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {

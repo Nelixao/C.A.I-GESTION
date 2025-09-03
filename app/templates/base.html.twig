@@ -1,275 +1,94 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
-=======
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Sistema de Reportes{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ asset('css/stylos.css') }}">
+    <!-- CSS de Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        /* Reset básico */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #E7E7E7;
-            color: #333;
-            min-height: 100vh;
-            padding-top: 60px; /* espacio para navbar fija */
-        }
-
-        /* Navbar fija */
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            background: linear-gradient(90deg, #B2225D, #C09F65);
-            box-shadow: 0 3px 10px rgba(178, 34, 93, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            z-index: 9999;
-        }
-
-        nav .logo {
-            font-weight: 900;
-            font-size: 1.5rem;
-            color: #E7E7E7;
-            text-decoration: none;
-            letter-spacing: 2px;
-            user-select: none;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 24px;
-            margin: 0;
-            padding: 0;
-        }
-
-        nav ul li a {
-            color: #E7E7E7;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-
-        nav ul li a:hover,
-        nav ul li a.active {
-            background-color: rgba(231, 231, 231, 0.3);
-            color: #B2225D;
-            font-weight: 700;
-        }
-
-        /* Contenedor principal */
-        main {
-            max-width: 1100px;<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sistema de Reportes{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-        /* Reset básico */
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #E7E7E7;
-            color: #333;
-            min-height: 100vh;
-            padding-top: 60px; /* espacio para navbar fija */
-        }
-
-        /* Navbar fija */
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            background: linear-gradient(90deg, #B2225D, #C09F65);
-            box-shadow: 0 3px 10px rgba(178, 34, 93, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            z-index: 9999;
-        }
-
-        nav .logo {
-            font-weight: 900;
-            font-size: 1.5rem;
-            color: #E7E7E7;
-            text-decoration: none;
-            letter-spacing: 2px;
-            user-select: none;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 24px;
-            margin: 0;
-            padding: 0;
-        }
-
-        nav ul li a {
-            color: #E7E7E7;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-
-        nav ul li a:hover,
-        nav ul li a.active {
-            background-color: rgba(231, 231, 231, 0.3);
-            color: #B2225D;
-            font-weight: 700;
-        }
-
-        /* Contenedor principal */
-        main {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 24px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(178, 34, 93, 0.1);
-            min-height: calc(100vh - 100px);
-        }
-
-        /* Footer simple */
-        footer {
-            text-align: center;
-            padding: 12px 24px;
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 40px;
-            user-select: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            nav ul {
-                gap: 12px;
-            }
-            nav .logo {
-                font-size: 1.2rem;
-            }
-            main {
-                padding: 16px;
-                margin: 0 12px;
-                border-radius: 14px;
-            }
-        }
-    </style>
+<!-- JavaScript de Bootstrap con Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}{% endblock %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        function normalize(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+        document.querySelectorAll('.js-table-toolbar').forEach(function(toolbar){
+          const wrapper = toolbar.closest('.js-table-wrapper');
+          if(!wrapper) return;
+          const table = wrapper.querySelector('table.js-enhanced-table');
+          const tbody = table? table.tBodies[0]: null;
+          const search = toolbar.querySelector('input.js-search');
+          const stage = toolbar.querySelector('select.js-stage');
+          const counter = wrapper.querySelector('.js-counter');
+          if(!tbody) return;
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+          function apply(){
+            const q = normalize(search? search.value: '');
+            const stg = (stage? stage.value: '') || '';
+            let visible = 0;
+            rows.forEach(tr=>{
+              const asunto = normalize(tr.getAttribute('data-asunto')||'');
+              const text = normalize(tr.getAttribute('data-text')||tr.textContent||'');
+              const rowStage = (tr.getAttribute('data-stage')||'').toLowerCase();
+              const matchesAsunto = !q || asunto.includes(q);
+              const matchesText = !q || text.includes(q);
+              const matchesStage = !stg || stg === 'todos' || rowStage === stg;
+              const show = (matchesAsunto || matchesText) && matchesStage;
+              tr.style.display = show ? '' : 'none';
+              if(show) visible++;
+            });
+            if(counter){
+              const total = rows.length;
+              counter.textContent = `Mostrando ${visible} de ${total}`;
+            }
+          }
+          if(search) search.addEventListener('input', apply);
+          if(stage) stage.addEventListener('change', apply);
+          apply();
+        });
+      });
+    </script>
 </head>
 <body>
-    <nav>
-        <a href="{{ path('app_home') }}" class="logo">ALCALDÍA</a>
-        <ul>
-            <li><a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a></li>
-            <li><a href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a></li>
-            <li><a href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a></li>
-            <li><a href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a></li>
-        </ul>
+    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="sidebar">
+            <div class="logo">ALCALDÍA</div><i class="fi fi-rr-book-alt"></i>
+            <a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"> <i class="fi fi-rr-home"></i>  Inicio</a>
+            <a href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
+            <a href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
+            <a href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
+            <a href="{{ path('app_scanner_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
+        </div>
     </nav>
 
-    <main>
-        {% block body %}{% endblock %}
-    </main>
+    <div class="content">
+        <header class="topbar">
+            <div class="module-title">{% block module_title %}{{ block('title') }}{% endblock %}</div>
+            <div class="spacer"></div>
+            <div class="user-actions">
+                {% if app.user %}
+                    <span class="user-name">{{ app.user.userIdentifier ?? app.user.username ?? 'Usuario' }}</span>
+                    {% if app.request is defined %}
+                        <a class="logout-btn" href="{{ path('app_logout')|default('#') }}" title="Cerrar sesión">Salir</a>
+                    {% else %}
+                        <a class="logout-btn" href="#" title="Cerrar sesión">Salir</a>
+                    {% endif %}
+                {% else %}
 
-    <footer>
-        &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
-    </footer>
+                {% endif %}
+            </div>
+        </header>
+        <main>
+            {% block body %}{% endblock %}
+        </main>
+        <footer>
+            &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
+        </footer>
+    </div>
 </body>
 </html>
 
-            margin: 0 auto;
-            padding: 24px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(178, 34, 93, 0.1);
-            min-height: calc(100vh - 100px);
-        }
-
-        /* Footer simple */
-        footer {
-            text-align: center;
-            padding: 12px 24px;
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 40px;
-            user-select: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            nav ul {
-                gap: 12px;
-            }
-            nav .logo {
-                font-size: 1.2rem;
-            }
-            main {
-                padding: 16px;
-                margin: 0 12px;
-                border-radius: 14px;
-            }
-        }
-    </style>
-
-    {% block stylesheets %}{% endblock %}
-    {% block javascripts %}{% endblock %}
-</head>
-<body>
-    <nav>
-        <a href="{{ path('app_home') }}" class="logo">ALCALDÍA</a>
-        <ul>
-            <li><a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a></li>
-            <li><a href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a></li>
-            <li><a href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a></li>
-            <li><a href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a></li>
-        </ul>
-    </nav>
-
-    <main>
-        {% block body %}{% endblock %}
-    </main>
-
-    <footer>
-        &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
-    </footer>
-</body>
->>>>>>> dev
-</html>

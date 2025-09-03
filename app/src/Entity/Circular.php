@@ -37,6 +37,7 @@ class Circular
     #[ORM\Column]
     private ?\DateTime $updated_at = null;
 
+
     #[ORM\ManyToOne(inversedBy: 'circular_id')]
     private ?User $user = null;
 
@@ -140,6 +141,7 @@ class Circular
 
         return $this;
     }
+
 
     public function getUser(): ?User
     {

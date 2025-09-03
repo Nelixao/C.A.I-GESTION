@@ -6,6 +6,7 @@ use App\Entity\Circular;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,28 +16,21 @@ class CircularType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', null, [
-                'label' => 'Título de la circular',
-            ])
-            ->add('content', null, [
-                'label' => 'Contenido',
-            ])
-            ->add('target_group', null, [
-                'label' => 'Grupo objetivo',
-            ])
             ->add('date', DateTimeType::class, [
                 'widget' => 'single_text',
-                'label' => 'Fecha de publicación',
+                'label' => 'Fecha',
+            ])
+            ->add('title', null, [
+                'label' => 'Asunto',
+            ])
+            ->add('target_group', null, [
+                'label' => 'Dirigido a',
             ])
             ->add('file_path', null, [
                 'label' => 'Archivo adjunto (ruta o nombre)',
             ])
             ->add('created_by', null, [
-                'label' => 'Creado por',
-            ])
-            ->add('created_at', DateTimeType::class, [
-                'widget' => 'single_text',
-                'label' => 'Fecha de creación',
+                'label' => 'Elaboró',
             ])
             ->add('updated_at', DateTimeType::class, [
                 'widget' => 'single_text',
