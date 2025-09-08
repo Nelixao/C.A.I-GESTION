@@ -24,12 +24,21 @@ class User implements UserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
+    // contraseña encriptada
     #[ORM\Column(length: 255)]
     private ?string $contrasena = null;
 
+    // rol interno (tabla roles existente)
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'users')]
     #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
     private ?Role $role = null;
+
+    // rol textual para control rápido
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'Invitado'])]
+    private ?string $rol = 'Invitado';
+
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $fecha_creacion = null;
 
     #[ORM\OneToMany(targetEntity: Oficio::class, mappedBy: 'user')]
     private Collection $oficios;
@@ -40,11 +49,15 @@ class User implements UserInterface
     #[ORM\OneToMany(targetEntity: Correspondence::class, mappedBy: 'user')]
     private Collection $correspondencias;
 
+    #[ORM\OneToMany(targetEntity: Scanner::class, mappedBy: 'user')]
+    private Collection $scanners;
+
     public function __construct()
     {
         $this->oficios = new ArrayCollection();
         $this->circulares = new ArrayCollection();
         $this->correspondencias = new ArrayCollection();
+        $this->scanners = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -104,6 +117,12 @@ class User implements UserInterface
     {
         // Aquí puedes limpiar datos temporales si los tienes
     }
+
+    public function getRol(): ?string { return $this->rol; }
+    public function setRol(string $rol): static { $this->rol = $rol; return $this; }
+
+    public function getFechaCreacion(): ?\DateTimeImmutable { return $this->fecha_creacion; }
+    public function setFechaCreacion(?\DateTimeImmutable $f): static { $this->fecha_creacion = $f; return $this; }
 
     public function getRole(): ?Role
     {
@@ -190,22 +209,49 @@ class User implements UserInterface
         }
         return $this;
     }
+
+    /** @return Collection<int, Scanner> */
+    public function getScanners(): Collection
+    {
+        return $this->scanners;
+    }
+
+    public function addScanner(Scanner $scanner): static
+    {
+        if (!$this->scanners->contains($scanner)) {
+            $this->scanners->add($scanner);
+            $scanner->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeScanner(Scanner $scanner): static
+    {
+        if ($this->scanners->removeElement($scanner)) {
+            if ($scanner->getUser() === $this) {
+                $scanner->setUser(null);
+            }
+        }
+        return $this;
+    }
+
     public function getFullName(): string
-{
-    return sprintf('%s (%s)', $this->getNombre(), $this->getEmail());
-}
-#[ORM\Column(length: 100)]
-private ?string $nombre = null;
+    {
+        return sprintf('%s (%s)', $this->getNombre(), $this->getEmail());
+    }
 
-public function getNombre(): ?string
-{
-    return $this->nombre;
-}
+    #[ORM\Column(length: 100)]
+    private ?string $nombre = null;
 
-public function setNombre(string $nombre): static
-{
-    $this->nombre = $nombre;
-    return $this;
-}
+    public function getNombre(): ?string
+    {
+        return $this->nombre;
+    }
+
+    public function setNombre(string $nombre): static
+    {
+        $this->nombre = $nombre;
+        return $this;
+    }
 
 }

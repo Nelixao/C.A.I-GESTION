@@ -54,14 +54,31 @@
     </script>
 </head>
 <body>
-    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
-        <div class="sidebar">
-            <div class="logo">ALCALDÍA</div><i class="fi fi-rr-book-alt"></i>
-            <a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"> <i class="fi fi-rr-home"></i>  Inicio</a>
-            <a href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
-            <a href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
-            <a href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
-            <a href="{{ path('app_scanner_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ALCALDÍA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_scanner_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 

@@ -100,8 +100,16 @@ final class ScannerController extends AbstractController
             $scanner->setStatus('finalizado');
             $scanner->setCreatedAt(new \DateTimeImmutable());
             $scanner->setUpdatedAt(new \DateTimeImmutable());
+            $scanner->setFechaSubida(new \DateTimeImmutable());
+            // map num_documento si viene del formulario: usa sourceType+sourceId para referencia
+            if ($scanner->getSourceType() && $scanner->getSourceId()) {
+                $scanner->setNumDocumento((string)$scanner->getSourceId());
+            }
 
             // Finalizar entidad origen
+            // map tipo_documento
+            $map = ['oficio' => 'Oficio', 'correspondence' => 'Correspondencia', 'circular' => 'Circular'];
+            $scanner->setTipoDocumento($map[$scanner->getSourceType()] ?? null);
             $sourceType = $scanner->getSourceType();
             $sourceId = $scanner->getSourceId();
             if ($sourceType && $sourceId) {
