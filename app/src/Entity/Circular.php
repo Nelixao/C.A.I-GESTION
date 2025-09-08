@@ -41,6 +41,32 @@ class Circular
     #[ORM\ManyToOne(inversedBy: 'circular_id')]
     private ?User $user = null;
 
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
+    private ?Scanner $scanner = null;
+
+    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
+    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
+
+    // Nuevos campos solicitados por el esquema
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    private ?string $num_circular = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $fecha_emision = null;
+
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $remitente = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $destinatarios = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $asunto = null;
+
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $fecha_registro = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,4 +180,28 @@ class Circular
 
         return $this;
     }
+
+    public function getScanner(): ?Scanner { return $this->scanner; }
+    public function setScanner(?Scanner $scanner): static { $this->scanner = $scanner; return $this; }
+
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getNumCircular(): ?string { return $this->num_circular; }
+    public function setNumCircular(?string $n): static { $this->num_circular = $n; return $this; }
+
+    public function getFechaEmision(): ?\DateTimeInterface { return $this->fecha_emision; }
+    public function setFechaEmision(?\DateTimeInterface $f): static { $this->fecha_emision = $f; return $this; }
+
+    public function getRemitente(): ?string { return $this->remitente; }
+    public function setRemitente(?string $r): static { $this->remitente = $r; return $this; }
+
+    public function getDestinatarios(): ?string { return $this->destinatarios; }
+    public function setDestinatarios(?string $d): static { $this->destinatarios = $d; return $this; }
+
+    public function getAsunto(): ?string { return $this->asunto; }
+    public function setAsunto(?string $a): static { $this->asunto = $a; return $this; }
+
+    public function getFechaRegistro(): ?\DateTimeImmutable { return $this->fecha_registro; }
+    public function setFechaRegistro(?\DateTimeImmutable $f): static { $this->fecha_registro = $f; return $this; }
 }

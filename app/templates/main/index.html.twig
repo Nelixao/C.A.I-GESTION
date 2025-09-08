@@ -6,97 +6,121 @@
 
 {% block body %}
 
-<div class="container">
-
-    <!-- Bienvenida -->
-    <div class="card">
-        <div class="card-header">
-            <h1 class="card-title">Bienvenido al Sistema Administrativo</h1>
-        </div>
+<div class="container-fluid text-center">
+    <div class="">
+    <div class="row">
+        <h1 class="card-title">Bienvenido al Sistema Administrativo</h1>
         <p class="text-muted">Gestiona oficios, correspondencias, circulares y documentos escaneados</p>
     </div>
+    </div>
 
-    <!-- Estadísticas -->
-    <div class="grid">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title"> Total Oficios</span>
+    <div class="row">
+        <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"> Total Oficios</span>
+                </div>
+                <div class="card-body">{{ oficiosCount }}</div>
+                <p class="text-muted">Total registrados</p>
             </div>
-            <div class="card-content">{{ oficiosCount }}</div>
-            <p class="text-muted">Total registrados</p>
         </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title"> Correspondencias</span>
+        <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
+            <div class="card">
+                 <div class="card-header">
+                    <span class="card-title"> Circulares</span>
+                 </div>
+                <div class="card-body">{{ circularesCount }}</div>
+                <p class="text-muted">Total registradas</p>
             </div>
-            <div class="card-content">{{ correspondencesCount }}</div>
-            <p class="text-muted">Internas y externas</p>
         </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title"> Circulares</span>
-            </div>
-            <div class="card-content">{{ circularesCount }}</div>
-            <p class="text-muted">Total registradas</p>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title"> Documentos</span>
-            </div>
-            <div class="card-content">{{ scansCount }}</div>
-            <p class="text-muted">Escaneados</p>
+         <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
+             <div class="card">
+                 <div class="card-header">
+                     <span class="card-title"> Notas Informativas</span>
+                 </div>
+                 <div class="card-body">0</div>
+                 <p class="text-muted">Total registradas</p>
+             </div>
         </div>
     </div>
 
-    <!-- Acciones rápidas -->
+    <div class="row">
+        <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
+            <div class="card">
+                <div class="card-header">
+                      <span class="card-title"> Escaner</span>
+                </div>
+                 <div class="card-body">{{ scansCount }}</div>
+                 <p class="text-muted">Escaneados</p>
+             </div>
+        </div>
+        <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
+            <div class="card">
+                 <div class="card-header">
+                 <span class="card-title"> Correspondencias</span>
+                </div>
+                <div class="card-body">{{ correspondencesCount }}</div>
+                 <p class="text-muted">Internas y externas</p>
+             </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-header">
             <span class="card-title">Acciones Rápidas</span>
         </div>
-        <div class="card-content quick-actions">
-            <a class="button" href="{{ path('app_oficio_new') }}">  Nuevo Oficio</a>
-            <a class="button" href="{{ path('app_correspondence_new') }}"> Nueva Correspondencia</a>
-            <a class="button" href="{{ path('app_circular_new') }}"> Nueva Circular</a>
-            <a class="button" href="{{ path('app_scanner_new') }}"> <svg id="Layer_1" height="25px" viewBox="0 0 24 24" width="25px" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"><path d="m19.95 5.536-3.486-3.486a6.954 6.954 0 0 0 -4.949-2.05h-4.515a5.006 5.006 0 0 0 -5 5v14a5.006 5.006 0 0 0 5 5h10a5.006 5.006 0 0 0 5-5v-8.515a6.954 6.954 0 0 0 -2.05-4.949zm-1.414 1.414a5.018 5.018 0 0 1 .781 1.05h-4.317a1 1 0 0 1 -1-1v-4.317a5.018 5.018 0 0 1 1.05.781zm1.464 12.05a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3-3v-14a3 3 0 0 1 3-3h4.515c.165 0 .323.032.485.047v4.953a3 3 0 0 0 3 3h4.953c.015.162.047.32.047.485zm-3.276-5.689a1 1 0 0 1 -.035 1.413l-3.589 3.414a3 3 0 0 1 -4.226-.017l-1.54-1.374a1 1 0 0 1 1.332-1.494l1.585 1.414a1 1 0 0 0 1.456.04l3.6-3.431a1 1 0 0 1 1.417.035z"/></svg> Escanear Documento</a>
+        <div class="card-content ">
+            <div class="row">
+                <div class="col">
+                    <a class="btn" href="{{ path('app_oficio_new') }}">  Nuevo Oficio</a>
+                </div>
+                <div class="col">
+                    <a class="btn" href="{{ path('app_correspondence_new') }}"> Nueva Correspondencia</a>
+                </div>
+                <div class="col">
+                    <a class="btn" href="{{ path('app_circular_new') }}"> Nueva Circular</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a class="btn" href="{{ path('app_circular_new') }}"> Nueva Circular</a>
+                </div>
+                <div class="col">
+                    <a class="btn" href="{{ path('app_scanner_new') }}">  Escanear Documento</a>
+                </div>
+            </div>
         </div>
     </div>
-
     <!-- Actividad reciente -->
     <div class="activity">
         <div class="card">
             <div class="card-header"><span class="card-title">Oficios Recientes</span></div>
-            <div class="card-content">
+            <div class="card-body">
                 {% for o in recentOficios %}
-                <div class="activity-item">
-                    <div>#{{ o.id }}: {{ o.sender }} → {{ o.recipient }} · {{ o.title|slice(0,40) }}</div>
-                    <span class="badge default">{{ o.date ? o.date|date('Y-m-d') : '' }}</span>
-                </div>
+                    <div class="activity-item">
+                        <div>#{{ o.id }}: {{ o.sender }} → {{ o.recipient }} · {{ o.title|slice(0,40) }}</div>
+                        <span class="badge default">{{ o.date ? o.date|date('Y-m-d') : '' }}</span>
+                    </div>
                 {% else %}
-                <div class="activity-item">
-                    <div>No hay actividad reciente</div>
-                    <span class="badge outline">—</span>
-                </div>
+                    <div class="activity-item">
+                        <div>No hay actividad reciente</div>
+                        <span class="badge outline">—</span>
+                    </div>
                 {% endfor %}
             </div>
         </div>
 
         <div class="card">
             <div class="card-header"><span class="card-title">Circulares Activas</span></div>
-            <div class="card-content">
+            <div class="card-body">
                 {% for c in activeCirculares %}
-                <div class="activity-item">
-                    <div>#{{ c.id }} · {{ c.title|slice(0,48) }}</div>
-                    <span class="badge default">{{ c.date ? c.date|date('Y-m-d') : '' }}</span>
-                </div>
+                    <div class="activity-item">
+                        <div>#{{ c.id }} · {{ c.title|slice(0,48) }}</div>
+                        <span class="badge default">{{ c.date ? c.date|date('Y-m-d') : '' }}</span>
+                    </div>
                 {% else %}
-                <div class="activity-item"><div>No hay circulares</div><span class="badge outline">—</span></div>
+                    <div class="activity-item"><div>No hay circulares</div><span class="badge outline">—</span></div>
                 {% endfor %}
             </div>
         </div>
-    </div>
-
 </div>
 {% endblock %}

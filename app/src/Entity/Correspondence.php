@@ -38,11 +38,31 @@ class Correspondence
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $created_at = null;
 
+    // Nuevos campos solicitados por el esquema
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    private ?string $num_control = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fecha_recepcion = null;
+
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $fecha_registro = null;
+
     #[ORM\Column]
     private ?\DateTime $updated_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'correspondecia_id')]
     private ?User $user = null;
+
+    #[ORM\OneToMany(mappedBy: 'correspondence', targetEntity: Oficio::class)]
+    private $oficios;
+
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
+    private ?Scanner $scanner = null;
+
+    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
+    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
 
     public function getId(): ?int
     {
@@ -168,4 +188,46 @@ class Correspondence
 
         return $this;
     }
+
+    /** @return array<int, Oficio>|\Doctrine\Common\Collections\Collection */
+    public function getOficios()
+    {
+        return $this->oficios;
+    }
+
+    public function addOficio(Oficio $oficio): static
+    {
+        if (!in_array($oficio, (array)$this->oficios, true)) {
+            $this->oficios[] = $oficio;
+            $oficio->setCorrespondence($this);
+        }
+        return $this;
+    }
+
+    public function removeOficio(Oficio $oficio): static
+    {
+        if (is_iterable($this->oficios) && in_array($oficio, (array)$this->oficios, true)) {
+            // remove without strict Collection API to avoid dependency
+            $this->oficios = array_filter((array)$this->oficios, fn($o) => $o !== $oficio);
+            if ($oficio->getCorrespondence() === $this) {
+                $oficio->setCorrespondence(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getScanner(): ?Scanner { return $this->scanner; }
+    public function setScanner(?Scanner $scanner): static { $this->scanner = $scanner; return $this; }
+
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getNumControl(): ?string { return $this->num_control; }
+    public function setNumControl(?string $n): static { $this->num_control = $n; return $this; }
+
+    public function getFechaRecepcion(): ?\DateTime { return $this->fecha_recepcion; }
+    public function setFechaRecepcion(?\DateTime $f): static { $this->fecha_recepcion = $f; return $this; }
+
+    public function getFechaRegistro(): ?\DateTimeImmutable { return $this->fecha_registro; }
+    public function setFechaRegistro(?\DateTimeImmutable $f): static { $this->fecha_registro = $f; return $this; }
 }
