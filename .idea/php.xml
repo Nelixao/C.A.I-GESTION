@@ -91,6 +91,9 @@
       <path value="$PROJECT_DIR$/app/vendor/symfony/security-core" />
       <path value="$PROJECT_DIR$/app/vendor/symfony/security-http" />
       <path value="$PROJECT_DIR$/app/vendor/symfony/var-exporter" />
+      <path value="$PROJECT_DIR$/app/vendor/symfony/mime" />
+      <path value="$PROJECT_DIR$/app/vendor/symfony/polyfill-intl-idn" />
+      <path value="$PROJECT_DIR$/app/vendor/twbs/bootstrap" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

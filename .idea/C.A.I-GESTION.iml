@@ -78,6 +78,9 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/yaml" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/twig/extra-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/twig/twig" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/mime" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/polyfill-intl-idn" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/twbs/bootstrap" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
