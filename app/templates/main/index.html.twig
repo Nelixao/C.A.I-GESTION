@@ -1,126 +1,125 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dasboard{% endblock %}
-
-{% block stylesheets %}{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block body %}
+<div class="container content">
 
-<div class="container-fluid text-center">
-    <div class="">
-    <div class="row">
-        <h1 class="card-title">Bienvenido al Sistema Administrativo</h1>
-        <p class="text-muted">Gestiona oficios, correspondencias, circulares y documentos escaneados</p>
+  {# Encabezado del módulo #}
+  <div class="row mb-3 text-center">
+    <div class="col">
+      <h1 class="card-title mb-1">Bienvenida al Sistema Administrativo</h1>
+      <p class="text-muted">Gestiona oficios, correspondencias, circulares y documentos escaneados</p>
     </div>
-    </div>
+  </div>
 
-    <div class="row">
-        <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"> Total Oficios</span>
-                </div>
-                <div class="card-body">{{ oficiosCount }}</div>
-                <p class="text-muted">Total registrados</p>
-            </div>
-        </div>
-        <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
-            <div class="card">
-                 <div class="card-header">
-                    <span class="card-title"> Circulares</span>
-                 </div>
-                <div class="card-body">{{ circularesCount }}</div>
-                <p class="text-muted">Total registradas</p>
-            </div>
-        </div>
-         <div class="col-sm-5 offset-sm-2 col-md-4 offset-md-0">
-             <div class="card">
-                 <div class="card-header">
-                     <span class="card-title"> Notas Informativas</span>
-                 </div>
-                 <div class="card-body">0</div>
-                 <p class="text-muted">Total registradas</p>
-             </div>
-        </div>
-    </div>
+  {# KPIs / Métricas principales #}
+  <section class="kpi-grid mb-4">
+    <article class="card kpi" aria-live="polite">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-file-earmark-text"></i> Total Oficios</div>
+      </header>
+      <div class="kpi-value">{{ oficiosCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">Total registrados</p>
+    </article>
 
-    <div class="row">
-        <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
-            <div class="card">
-                <div class="card-header">
-                      <span class="card-title"> Escaner</span>
-                </div>
-                 <div class="card-body">{{ scansCount }}</div>
-                 <p class="text-muted">Escaneados</p>
-             </div>
-        </div>
-        <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
-            <div class="card">
-                 <div class="card-header">
-                 <span class="card-title"> Correspondencias</span>
-                </div>
-                <div class="card-body">{{ correspondencesCount }}</div>
-                 <p class="text-muted">Internas y externas</p>
-             </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">Acciones Rápidas</span>
-        </div>
-        <div class="card-content ">
-            <div class="row">
-                <div class="col">
-                    <a class="btn" href="{{ path('app_oficio_new') }}">  Nuevo Oficio</a>
-                </div>
-                <div class="col">
-                    <a class="btn" href="{{ path('app_correspondence_new') }}"> Nueva Correspondencia</a>
-                </div>
-                <div class="col">
-                    <a class="btn" href="{{ path('app_circular_new') }}"> Nueva Circular</a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <a class="btn" href="{{ path('app_circular_new') }}"> Nueva Circular</a>
-                </div>
-                <div class="col">
-                    <a class="btn" href="{{ path('app_scanner_new') }}">  Escanear Documento</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Actividad reciente -->
-    <div class="activity">
-        <div class="card">
-            <div class="card-header"><span class="card-title">Oficios Recientes</span></div>
-            <div class="card-body">
-                {% for o in recentOficios %}
-                    <div class="activity-item">
-                        <div>#{{ o.id }}: {{ o.sender }} → {{ o.recipient }} · {{ o.title|slice(0,40) }}</div>
-                        <span class="badge default">{{ o.date ? o.date|date('Y-m-d') : '' }}</span>
-                    </div>
-                {% else %}
-                    <div class="activity-item">
-                        <div>No hay actividad reciente</div>
-                        <span class="badge outline">—</span>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-arrow-repeat"></i> Circulares</div>
+      </header>
+      <div class="kpi-value">{{ circularesCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">Total registradas</p>
+    </article>
 
-        <div class="card">
-            <div class="card-header"><span class="card-title">Circulares Activas</span></div>
-            <div class="card-body">
-                {% for c in activeCirculares %}
-                    <div class="activity-item">
-                        <div>#{{ c.id }} · {{ c.title|slice(0,48) }}</div>
-                        <span class="badge default">{{ c.date ? c.date|date('Y-m-d') : '' }}</span>
-                    </div>
-                {% else %}
-                    <div class="activity-item"><div>No hay circulares</div><span class="badge outline">—</span></div>
-                {% endfor %}
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-journal-text"></i> Notas Informativas</div>
+      </header>
+      <div class="kpi-value">0</div>
+      <p class="text-muted kpi-sub">Total registradas</p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-upc-scan"></i> Escáner</div>
+      </header>
+      <div class="kpi-value">{{ scansCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">Documentos escaneados</p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-envelope"></i> Correspondencias</div>
+      </header>
+      <div class="kpi-value">{{ correspondencesCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">Internas y externas</p>
+    </article>
+  </section>
+
+  {# Acciones rápidas #}
+  <section class="card mb-4">
+    <header class="card-header d-flex align-items-center justify-content-between">
+      <span class="card-title"><i class="bi bi-lightning-charge"></i> Acciones Rápidas</span>
+    </header>
+  <div class="quick-actions">
+      <a href="{{ path('app_oficio_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nuevo Oficio</a>
+      <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nueva Correspondencia</a>
+      <a href="{{ path('app_circular_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nueva Circular</a>
+      <a href="{{ path('app_scanner_new') }}" class="glass-btn success"><i class="bi bi-upc-scan"></i> Escanear Documento</a>
+    </div>
+  </section>
+
+  {# Actividad reciente #}
+  <section class="activity">
+    <article class="card">
+      <header class="card-header d-flex align-items-center justify-content-between">
+        <span class="card-title"><i class="bi bi-clock-history"></i> Oficios Recientes</span>
+        <a class="btn btn-outline-primary btn-sm" href="{{ path('app_oficio_index') }}">Ver todos</a>
+      </header>
+      <div class="card-body">
+        {% if recentOficios|length > 0 %}
+          {% for o in recentOficios %}
+            <div class="activity-item">
+              <div class="activity-text">
+                <strong>#{{ o.id }}</strong> {{ o.sender|default('—') }} → {{ o.recipient|default('—') }}
+                · {{ o.title|default('Sin título')|slice(0,60) }}{% if o.title and o.title|length > 60 %}…{% endif %}
+              </div>
+              <span class="badge default">{{ o.date ? o.date|date('Y-m-d') : '—' }}</span>
             </div>
-        </div>
+          {% endfor %}
+        {% else %}
+          <div class="activity-item">
+            <div class="activity-text">No hay actividad reciente</div>
+            <span class="badge outline">—</span>
+          </div>
+        {% endif %}
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card-header d-flex align-items-center justify-content-between">
+        <span class="card-title"><i class="bi bi-broadcast"></i> Circulares Activas</span>
+        <a class="btn btn-outline-primary btn-sm" href="{{ path('app_circular_index') }}">Ver todas</a>
+      </header>
+      <div class="card-body">
+        {% if activeCirculares|length > 0 %}
+          {% for c in activeCirculares %}
+            <div class="activity-item">
+              <div class="activity-text">
+                <strong>#{{ c.id }}</strong> · {{ c.title|default('Sin título')|slice(0,72) }}{% if c.title and c.title|length > 72 %}…{% endif %}
+              </div>
+              <span class="badge secondary">{{ c.date ? c.date|date('Y-m-d') : '—' }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="activity-item">
+            <div class="activity-text">No hay circulares</div>
+            <span class="badge outline">—</span>
+          </div>
+        {% endif %}
+      </div>
+    </article>
+  </section>
+
 </div>
 {% endblock %}

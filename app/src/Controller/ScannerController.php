@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+// src/Controller/ScannerController.php
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/scanner')]
 final class ScannerController extends AbstractController
@@ -47,7 +50,7 @@ final class ScannerController extends AbstractController
             ]);
         }
         rewind($f);
-        $csv = "\xEF\xBB\xBF" . stream_get_contents($f);
+        $csv = "\xEF\xBB\xBF" . stream_get_contents($f); // BOM UTF-8 para Excel
         fclose($f);
         return new Response($csv, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -56,64 +59,73 @@ final class ScannerController extends AbstractController
     }
 
     #[Route('/new', name: 'app_scanner_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        SluggerInterface $slugger,
+    ): Response {
         $scanner = new Scanner();
         $form = $this->createForm(ScannerType::class, $scanner);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $file */
+            /** @var UploadedFile|null $file */
             $file = $form->get('upload')->getData();
-            // Prefer project public/uploads/scanner
-            $uploadsDir = rtrim($this->getParameter('kernel.project_dir'), '/').'/public/uploads/scanner';
-            if (!is_dir($uploadsDir)) {
-                @mkdir($uploadsDir, 0775, true);
+            if (!$file) {
+                $this->addFlash('danger', 'No se recibió el archivo.');
+                return $this->redirectToRoute('app_scanner_new');
             }
-            if (!is_writable($uploadsDir)) {
-                @chmod($uploadsDir, 0775);
-            }
-            if (!is_writable($uploadsDir)) {
-                // As a fallback, try app/var/uploads/scanner (will not be web-accessible unless proxied)
-                $fallback = rtrim($this->getParameter('kernel.project_dir'), '/').'/var/uploads/scanner';
-                if (!is_dir($fallback)) { @mkdir($fallback, 0775, true); }
-                if (is_writable($fallback)) {
-                    $uploadsDir = $fallback;
-                } else {
-                    throw new \RuntimeException('No se puede escribir en la carpeta de subidas: '.$uploadsDir.' ni en el fallback. Verifique permisos (www-data) y ownership.');
-                }
-            }
-            $ext = $file->guessExtension() ?: 'bin';
-            $filename = uniqid('scan_') . '.' . $ext;
-            $file->move($uploadsDir, $filename);
 
-            // Build public-relative path only if uploaded under public
-            if (str_contains($uploadsDir, '/public/uploads/scanner')) {
-                $relative = 'uploads/scanner/' . $filename;
-            } else {
-                // stored in var/uploads; still keep a record path
-                $relative = 'var/uploads/scanner/' . $filename;
+            $uploadsDir = (string) $this->getParameter('app.scanner_upload_dir');
+            if (!is_dir($uploadsDir) && !@mkdir($uploadsDir, 0775, true)) {
+                throw new \RuntimeException('No se pudo crear el directorio de subidas: '.$uploadsDir);
             }
+
+            // nombre de archivo seguro
+            $origName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = $slugger->slug($origName)->lower();
+            $ext = $file->guessExtension() ?: ($file->getClientOriginalExtension() ?: 'bin');
+            $newFilename = sprintf('%s-%s.%s', $safeName ?: 'scan', uniqid(), $ext);
+
+            try {
+                $file->move($uploadsDir, $newFilename);
+            } catch (FileException $e) {
+                $this->addFlash('danger', 'Error guardando el archivo: '.$e->getMessage());
+                return $this->redirectToRoute('app_scanner_new');
+            }
+
+            // Ruta relativa pública si está bajo /public
+            $publicRoot = rtrim($this->getParameter('kernel.project_dir'), '/').'/public/';
+            if (str_starts_with($uploadsDir, $publicRoot)) {
+                $relative = ltrim(str_replace($publicRoot, '', $uploadsDir), '/').'/'.$newFilename; // "uploads/scanner/xxx.pdf"
+            } else {
+                // Subida fuera de public: guarda una ruta "lógica"
+                $relative = 'uploads/scanner/'.$newFilename;
+            }
+
             $scanner->setFilePath($relative);
-            $scanner->setMimeType($file->getClientMimeType());
-            $scanner->setSize($file->getSize());
+            $scanner->setMimeType($file->getClientMimeType() ?: 'application/octet-stream');
+            $scanner->setSize($file->getSize() ?: 0);
             $scanner->setStatus('finalizado');
-            $scanner->setCreatedAt(new \DateTimeImmutable());
-            $scanner->setUpdatedAt(new \DateTimeImmutable());
-            $scanner->setFechaSubida(new \DateTimeImmutable());
-            // map num_documento si viene del formulario: usa sourceType+sourceId para referencia
-            if ($scanner->getSourceType() && $scanner->getSourceId()) {
+            $now = new \DateTimeImmutable();
+            $scanner->setCreatedAt($now);
+            $scanner->setUpdatedAt($now);
+            if (method_exists($scanner, 'setFechaSubida')) {
+                $scanner->setFechaSubida($now);
+            }
+
+            // Mapear num_documento si viene el sourceId
+            if ($scanner->getSourceId()) {
                 $scanner->setNumDocumento((string)$scanner->getSourceId());
             }
 
-            // Finalizar entidad origen
-            // map tipo_documento
+            // Tipo de documento legible
             $map = ['oficio' => 'Oficio', 'correspondence' => 'Correspondencia', 'circular' => 'Circular'];
-            $scanner->setTipoDocumento($map[$scanner->getSourceType()] ?? null);
-            $sourceType = $scanner->getSourceType();
-            $sourceId = $scanner->getSourceId();
-            if ($sourceType && $sourceId) {
-                $this->finalizeSource($em, $sourceType, (int)$sourceId);
+            $scanner->setTipoDocumento($map[strtolower((string)$scanner->getSourceType())] ?? null);
+
+            // Actualizar entidad origen (si existe)
+            if ($scanner->getSourceType() && $scanner->getSourceId()) {
+                $this->finalizeSource($em, (string)$scanner->getSourceType(), (int)$scanner->getSourceId());
             }
 
             $em->persist($scanner);
@@ -132,37 +144,25 @@ final class ScannerController extends AbstractController
     private function finalizeSource(EntityManagerInterface $em, string $type, int $id): void
     {
         $type = strtolower($type);
-        if ($type === 'oficio') {
-            $entity = $em->getRepository(Oficio::class)->find($id);
-            if ($entity) {
-                if (method_exists($entity, 'setUpdatedAt')) {
-                    $entity->setUpdatedAt(new \DateTimeImmutable());
-                }
-                if (method_exists($entity, 'setStatus')) {
-                    $entity->setStatus('terminado');
-                }
-            }
-        } elseif ($type === 'correspondence') {
-            $entity = $em->getRepository(Correspondence::class)->find($id);
-            if ($entity) {
-                if (method_exists($entity, 'setUpdatedAt')) {
-                    $entity->setUpdatedAt(new \DateTime());
-                }
-                if (method_exists($entity, 'setStatus')) {
-                    $entity->setStatus('terminado');
-                }
-            }
-        } elseif ($type === 'circular') {
-            $entity = $em->getRepository(Circular::class)->find($id);
-            if ($entity) {
-                if (method_exists($entity, 'setUpdatedAt')) {
-                    $entity->setUpdatedAt(new \DateTime());
-                }
-                if (method_exists($entity, 'setStatus')) {
-                    $entity->setStatus('terminado');
-                }
-            }
+        $now = new \DateTimeImmutable();
+
+        $entity = match ($type) {
+            'oficio'         => $em->getRepository(Oficio::class)->find($id),
+            'correspondence' => $em->getRepository(Correspondence::class)->find($id),
+            'circular'       => $em->getRepository(\App\Entity\Circular::class)->find($id),
+            default          => null,
+        };
+
+        if (!$entity) {
+            return;
         }
-        // Si la entidad fuente tiene campo "status", lo pasamos a 'terminado'.
+
+        if (method_exists($entity, 'setUpdatedAt')) {
+            $entity->setUpdatedAt($now);
+        }
+        if (method_exists($entity, 'setStatus')) {
+            $entity->setStatus('terminado');
+        }
+        // Si quieres, también podrías setear aquí un campo "hasScan = true", etc.
     }
 }

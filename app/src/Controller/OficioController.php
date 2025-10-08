@@ -56,26 +56,46 @@ final class OficioController extends AbstractController
             'Content-Disposition' => 'attachment; filename="oficios.csv"'
         ]);
     }
+#[Route('/new', name: 'app_oficio_new', methods: ['GET', 'POST'])]
+public function new(Request $request, EntityManagerInterface $em): Response
+{
+    $oficio = new Oficio();
 
-    #[Route('/new', name: 'app_oficio_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $oficio = new Oficio();
-        $form = $this->createForm(OficioType::class, $oficio);
-        $form->handleRequest($request);
+    // Metadatos (opcional)
+    $oficio->setCreatedAt(new \DateTimeImmutable());
+    $oficio->setUpdatedAt(new \DateTimeImmutable());
+    if ($this->getUser()) {
+        $oficio->setCreatedBy($this->getUser()->getUserIdentifier() ?? 'sistema');
+        $oficio->setUser($this->getUser()); // si tu relación lo permite
+    }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($oficio);
-            $entityManager->flush();
+    $form = $this->createForm(OficioType::class, $oficio);
+    $form->handleRequest($request);
 
-            return $this->redirectToRoute('app_oficio_index', [], Response::HTTP_SEE_OTHER);
+    if ($form->isSubmitted() && $form->isValid()) {
+
+        // Manejo del archivo (por mapped=false en file_path)
+        $file = $form->get('file_path')->getData();
+        if ($file) {
+            $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+            $file->move($this->getParameter('app.upload_dir'), $new);
+            // Ajusta el setter al nombre real en tu entidad (FilePath vs file_path)
+            $oficio->setFilePath('uploads/'.$new);
         }
 
-        return $this->render('oficio/new.html.twig', [
-            'oficio' => $oficio,
-            'form' => $form,
-        ]);
+        $em->persist($oficio);
+        $em->flush();
+
+        return $this->redirectToRoute('app_oficio_index');
     }
+
+    return $this->render('oficio/new.html.twig', [
+        'oficio' => $oficio,
+        'form' => $form,
+    ]);
+}
+
 
     #[Route('/{id}', name: 'app_oficio_show', methods: ['GET'])]
     public function show(Oficio $oficio): Response
@@ -84,24 +104,34 @@ final class OficioController extends AbstractController
             'oficio' => $oficio,
         ]);
     }
+#[Route('/{id}/edit', name: 'app_oficio_edit', methods: ['GET', 'POST'])]
+public function edit(Request $request, Oficio $oficio, EntityManagerInterface $em): Response
+{
+    $form = $this->createForm(OficioType::class, $oficio);
+    $form->handleRequest($request);
 
-    #[Route('/{id}/edit', name: 'app_oficio_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Oficio $oficio, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(OficioType::class, $oficio);
-        $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_oficio_index', [], Response::HTTP_SEE_OTHER);
+        $file = $form->get('file_path')->getData();
+        if ($file) {
+            $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+            $file->move($this->getParameter('app.upload_dir'), $new);
+            $oficio->setFilePath('uploads/'.$new);
         }
 
-        return $this->render('oficio/edit.html.twig', [
-            'oficio' => $oficio,
-            'form' => $form,
-        ]);
+        $oficio->setUpdatedAt(new \DateTimeImmutable());
+
+        $em->flush();
+        return $this->redirectToRoute('app_oficio_index');
     }
+
+    return $this->render('oficio/edit.html.twig', [
+        'oficio' => $oficio,
+        'form' => $form,
+    ]);
+}
+
 
     #[Route('/{id}', name: 'app_oficio_delete', methods: ['POST'])]
     public function delete(Request $request, Oficio $oficio, EntityManagerInterface $entityManager): Response

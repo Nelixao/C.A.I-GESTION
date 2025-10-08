@@ -1,10 +1,61 @@
-{{ form_start(form) }}
-  <div class="form-group">{{ form_label(form.date) }}{{ form_widget(form.date) }}</div>
-  <div class="form-group">{{ form_label(form.target_group) }}{{ form_widget(form.target_group) }}</div>
-  <div class="form-group">{{ form_label(form.title) }}{{ form_widget(form.title) }}</div>
-  <div class="form-group">{{ form_label(form.file_path) }}{{ form_widget(form.file_path) }}</div>
-  <div class="form-group">{{ form_label(form.created_by) }}{{ form_widget(form.created_by) }}</div>
-  <div class="form-group">{{ form_label(form.updated_at) }}{{ form_widget(form.updated_at) }}</div>
-  <div class="form-group">{{ form_label(form.user) }}{{ form_widget(form.user) }}</div>
-  <button class="create-btn" type="submit">{{ button_label|default('Guardar') }}</button>
+{{ form_start(form, { attr: { class: 'form-glass' } }) }}
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      {{ form_label(form.title, 'Asunto') }}
+      {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.title) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.date, 'Fecha') }}
+      {{ form_widget(form.date, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.date) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.target_group, 'Dirigido a') }}
+      {{ form_widget(form.target_group, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.target_group) }}
+    </div>
+
+    {# Si habilitas 'content' en el FormType:
+    <div class="col-12">
+      {{ form_label(form.content, 'Contenido') }}
+      {{ form_widget(form.content, { attr: { class: 'form-control', rows: 6 } }) }}
+      {{ form_errors(form.content) }}
+    </div>
+    #}
+
+    <div class="col-md-6">
+      {{ form_label(form.file_path, 'Archivo adjunto') }}
+      {{ form_widget(form.file_path, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.file_path) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.created_by, 'Elaboró') }}
+      {{ form_widget(form.created_by, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.created_by) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.user, 'Usuario relacionado') }}
+      {{ form_widget(form.user, { attr: { class: 'form-select' } }) }}
+      {{ form_errors(form.user) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.updated_at, 'Última modificación') }}
+      {{ form_widget(form.updated_at, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.updated_at) }}
+    </div>
+
+  </div>
+
+  <div class="form-actions mt-3">
+    <button class="glass-btn primary" type="submit">
+      <i class="bi bi-save"></i> {{ button_label|default('Guardar') }}
+    </button>
+  </div>
 {{ form_end(form) }}

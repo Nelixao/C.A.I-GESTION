@@ -1,65 +1,89 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Escáner{% endblock %}
-
 {% block body %}
-<div class="container-oficios js-table-wrapper">
+<div class="container-glass js-table-wrapper">
+
+  <!-- Título + acciones -->
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h1 class="page-title">Documentos Escaneados</h1>
-    <div style="display:flex; gap:10px;">
-      <a href="{{ path('app_scanner_export') }}" class="create-btn" style="background-color:#4caf50;">⬇Exportar a Excel</a>
-      <a href="{{ path('app_scanner_new') }}" class="create-btn">+ Subir escaneo</a>
+
+    <div class="glass-actions">
+      <a href="{{ path('app_scanner_export') }}" class="glass-btn success">
+        <i class="bi bi-download"></i> Exportar a Excel
+      </a>
+      <a href="{{ path('app_scanner_new') }}" class="glass-btn primary">
+        <i class="bi bi-plus-circle"></i> Subir escaneo
+      </a>
     </div>
   </div>
 
-  <div class="">
-    <input type="text" class="js-search" placeholder="Buscar en la tabla..." style="padding:8px 10px; border:1px solid #ddd; border-radius:8px; min-width:240px;">
-    <select class="js-stage" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+  <!-- Toolbar (usa tu JS de filtrado) -->
+  <div class="toolbar js-table-toolbar">
+    <input type="text" class="js-search form-input" placeholder="Buscar en la tabla…">
+    <select class="js-stage form-select">
       <option value="todos">Todas las etapas</option>
       <option value="finalizado">Finalizado</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="error">Error</option>
     </select>
   </div>
 
-  <table class="">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Origen</th>
-        <th>ID Origen</th>
-        <th>Archivo</th>
-       
-        <th>Tamaño</th>
-        <th>Estado</th>
-        <th>Creado</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for scan in scanners %}
-      {% set row_text = (scan.id ~ ' ' ~ scan.name ~ ' ' ~ scan.sourceType ~ ' ' ~ (scan.sourceId ?? '') ~ ' ' ~ scan.filePath ~ ' ' ~ scan.mimeType ~ ' ' ~ (scan.size ?? '') ~ ' ' ~ scan.status)|lower %}
-      <tr data-stage="{{ scan.status|lower }}" data-text="{{ row_text }}" data-asunto="{{ scan.name|lower }}">
-        <td>{{ scan.id }}</td>
-        <td>{{ scan.name }}</td>
-        <td>{{ scan.sourceType }}</td>
-        <td>{{ scan.sourceId ?? '-' }}</td>
-        <td>
-          {% if scan.filePath %}
-            <a class="file-link" href="{{ asset(scan.filePath) }}" target="_blank">Ver archivo</a>
-          {% else %}-{% endif %}
-        </td>
-        <td>{{ scan.mimeType }}</td>
-        <td>{{ scan.size ? (scan.size/1024)|number_format(1, '.', ',') ~ ' KB' : '-' }}</td>
-        <td><span class="badge default">{{ scan.status }}</span></td>
-        <td>{{ scan.createdAt ? scan.createdAt|date('Y-m-d H:i') : '' }}</td>
-      </tr>
-    {% else %}
-      <tr>
-        <td>sin info</td>
+  <!-- Tabla glass + responsive -->
+  <div class="table-responsive">
+    <table class="table-glass js-enhanced-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Origen</th>
+          <th>ID Origen</th>
+          <th>Archivo</th>
+          <th>Tipo</th>
+          <th>Tamaño</th>
+          <th>Estado</th>
+          <th>Creado</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for scan in scanners %}
+        {% set estado = (scan.status ?? 'pendiente')|lower %}
+        {% set row_text = (scan.id ~ ' ' ~ scan.name ~ ' ' ~ (scan.sourceType ?? '') ~ ' ' ~ (scan.sourceId ?? '') ~ ' ' ~ (scan.filePath ?? '') ~ ' ' ~ (scan.mimeType ?? '') ~ ' ' ~ (scan.size ?? '') ~ ' ' ~ (scan.status ?? '') ~ ' ' ~ (scan.createdAt ? scan.createdAt|date('Y-m-d H:i') : ''))|lower %}
 
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <div class="js-counter" style="margin-top:8px; color:#555; font-size:0.9rem;">&nbsp;</div>
+        <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ scan.name|lower }}">
+          <td data-label="ID">{{ scan.id }}</td>
+          <td data-label="Nombre">{{ scan.name|default('—') }}</td>
+          <td data-label="Origen">{{ scan.sourceType|default('—') }}</td>
+          <td data-label="ID Origen">{{ scan.sourceId ?? '—' }}</td>
+          <td data-label="Archivo">
+            {% if scan.filePath %}
+              <a class="file-link" href="{{ asset(scan.filePath) }}" target="_blank">Ver archivo</a>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td data-label="Tipo">{{ scan.mimeType|default('—') }}</td>
+          <td data-label="Tamaño">
+            {% if scan.size %}
+              {{ (scan.size/1024)|number_format(1, '.', ',') }} KB
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td data-label="Estado">
+            <span class="pill-badge">{{ estado|capitalize }}</span>
+          </td>
+          <td data-label="Creado">{{ scan.createdAt ? scan.createdAt|date('Y-m-d H:i') : '' }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">Sin información</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="js-counter table-counter">&nbsp;</div>
 </div>
 {% endblock %}

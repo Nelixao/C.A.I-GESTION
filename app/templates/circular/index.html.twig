@@ -7,15 +7,17 @@
 {% block body %}
 <div class="container-glass">
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-    <h1 class="h3 ">Listado de Circulares</h1>
-    <a href="{{ path('app_circular_new') }}" class="btn btn-success mt-3 mt-md-0">
+    <h1 class="page-title">Listado de Circulares</h1>
+
+    <a href="{{ path('app_circular_new') }}" class="glass-btn primary mt-3 mt-md-0">
       <i class="bi bi-plus-circle"></i> Nueva Circular
     </a>
   </div>
-   <div class="js-table-wrapper">
-    <div class="js-table-toolbar" style="display:flex; gap:10px; margin:10px 0; align-items:center; flex-wrap:wrap;">
-      <input type="text" class="js-search" placeholder="Buscar en la tabla..." style="padding:8px 10px; border:1px solid #ddd; border-radius:8px; min-width:240px;">
-      <select class="js-stage" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+
+  <div class="js-table-wrapper">
+    <div class="toolbar">
+      <input type="text" class="js-search form-input" placeholder="Buscar en la tabla...">
+      <select class="js-stage form-select">
         <option value="todos">Todas las etapas</option>
         <option value="no-revisado">No revisado</option>
         <option value="pendiente">Pendiente</option>
@@ -23,54 +25,64 @@
       </select>
     </div>
 
-  <div class="table-responsive">
-    <table class="">
-      <thead>
-        <tr>
-          <th>FOLIO</th>
-          <th>FECHA</th>
-          <th>DIRIGIDO A</th>
-          <th>ASUNTO</th>
-          <th>ELABORÓ</th>
-          <th>ESTADO</th>
-          <th>ARCHIVO</th>
-          <th>ACCIÓN</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for circular in circulars %}
-          {% set row_text = (circular.id ~ ' ' ~ circular.title ~ ' ' ~ circular.content ~ ' ' ~ circular.targetGroup ~ ' ' ~ (circular.date ? circular.date|date('Y-m-d') : '') ~ ' ' ~ circular.filePath ~ ' ' ~ circular.createdBy)|lower %}
-          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ circular.title|lower }}">
-            <td data-label="Folio">{{ circular.id }}</td>
-            <td data-label="Fecha">{{ circular.date ? circular.date|date('d-m-Y') : '' }}</td>
-            <td data-label="Dirigido a">{{ circular.targetGroup }}</td>
-            <td data-label="Asunto">{{ circular.title }}</td>
-            <td data-label="Elaboró">{{ circular.createdBy }}</td>
-            <td data-label="Estado">{{ 'no-revisado' }}</td>
-            <td data-label="Archivo">
-              {% if circular.filePath %}
-                <a href="{{ asset(circular.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
-              {% else %}
-                -
-              {% endif %}
-            </td>
-            <td data-label="Acción">
-              <a href="{{ path('app_circular_show', {'id': circular.id}) }}" class="btn btn-outline-primary" title="Ver">
-                <i class="bi bi-eye"></i>
-              </a>
-              <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-outline-warning" title="Editar">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-            </td>
-          </tr>
-        {% else %}
+    <div class="table-responsive">
+      <table class="table-glass js-enhanced-table">
+        <thead>
           <tr>
-           Sin info
+            <th>FOLIO</th>
+            <th>FECHA</th>
+            <th>DIRIGIDO A</th>
+            <th>ASUNTO</th>
+            <th>ELABORÓ</th>
+            <th>ESTADO</th>
+            <th>ARCHIVO</th>
+            <th class="text-center">ACCIÓN</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for circular in circulars %}
+            {% set estado = (circular.status ?? 'no-revisado')|lower %}
+            {% set row_text = (circular.id ~ ' ' ~ circular.title ~ ' ' ~ circular.content ~ ' ' ~ circular.targetGroup ~ ' ' ~ (circular.date ? circular.date|date('Y-m-d') : '') ~ ' ' ~ circular.filePath ~ ' ' ~ circular.createdBy)|lower %}
+
+            <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ circular.title|lower }}">
+              <td data-label="Folio">#{{ circular.id }}</td>
+              <td data-label="Fecha">{{ circular.date ? circular.date|date('d-m-Y') : '' }}</td>
+              <td data-label="Dirigido a">{{ circular.targetGroup|default('—') }}</td>
+              <td data-label="Asunto">{{ circular.title|default('—') }}</td>
+              <td data-label="Elaboró">{{ circular.createdBy|default('—') }}</td>
+
+              <td data-label="Estado">
+                <span class="pill-badge {{ estado }}">{{ estado|capitalize }}</span>
+              </td>
+
+              <td data-label="Archivo">
+                {% if circular.filePath %}
+                  <a href="{{ asset(circular.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+
+              <td data-label="Acción" class="text-center">
+                <a href="{{ path('app_circular_show', {'id': circular.id}) }}" class="btn btn-outline-primary" title="Ver">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-outline-warning" title="Editar">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4">Sin información</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="js-counter table-counter">&nbsp;</div>
   </div>
 </div>
-</div>
 {% endblock %}
+

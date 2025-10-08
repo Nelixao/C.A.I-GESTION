@@ -6,8 +6,10 @@ use App\Entity\Circular;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+// use Symfony\Component\Form\Extension\Core\Type\TextareaType; // si tienes 'content' en la entidad
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,31 +19,73 @@ class CircularType extends AbstractType
     {
         $builder
             ->add('date', DateTimeType::class, [
-                'widget' => 'single_text',
                 'label' => 'Fecha',
-            ])
-            ->add('title', null, [
-                'label' => 'Asunto',
-            ])
-            ->add('target_group', null, [
-                'label' => 'Dirigido a',
-            ])
-            ->add('file_path', null, [
-                'label' => 'Archivo adjunto (ruta o nombre)',
-            ])
-            ->add('created_by', null, [
-                'label' => 'Elaboró',
-            ])
-            ->add('updated_at', DateTimeType::class, [
                 'widget' => 'single_text',
-                'label' => 'Última modificación',
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
             ])
+
+            ->add('title', TextType::class, [
+                'label' => 'Asunto',
+                'attr' => [
+                    'placeholder' => 'Ej. Circular de lineamientos',
+                    'class' => 'form-control',
+                ],
+            ])
+
+            ->add('target_group', TextType::class, [
+                'label' => 'Dirigido a',
+                'attr' => [
+                    'placeholder' => 'Ej. Todas las áreas / Recursos Humanos',
+                    'class' => 'form-control',
+                ],
+            ])
+
+            // Si realmente subes archivo, usa FileType y mapped=false.
+            // En el controlador mueves el archivo y seteas la ruta en la entidad.
+            ->add('file_path', FileType::class, [
+                'label' => 'Archivo adjunto',
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+            ])
+
+            ->add('created_by', TextType::class, [
+                'label' => 'Elaboró',
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+            ])
+
+            // Suele ser campo de solo lectura o seteado por código
+            ->add('updated_at', DateTimeType::class, [
+                'label' => 'Última modificación',
+                'widget' => 'single_text',
+                'required' => false,
+                'disabled' => true,           // evitar edición manual
+                'attr' => ['class' => 'form-control'],
+            ])
+
             ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => fn(User $user) => $user->getFullName(),
                 'label' => 'Usuario relacionado',
+                'class' => User::class,
+                'choice_label' => function (?User $u) {
+                    if (!$u) return '';
+                    // Ajusta según tus getters reales:
+                    return method_exists($u, 'getFullName') && $u->getFullName()
+                        ? $u->getFullName()
+                        : ($u->getUsername() ?? $u->getEmail() ?? 'ID '.$u->getId());
+                },
                 'placeholder' => 'Selecciona un usuario',
+                'required' => false,
+                'attr' => ['class' => 'form-select'],
             ]);
+
+        // Si tu entidad tiene 'content', descomenta y añade:
+        // ->add('content', TextareaType::class, [
+        //     'label' => 'Contenido',
+        //     'required' => false,
+        //     'attr' => ['class' => 'form-control', 'rows' => 6],
+        // ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

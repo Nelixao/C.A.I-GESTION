@@ -28,22 +28,38 @@ class ScannerType extends AbstractType
                     'Otro' => 'otro',
                 ],
             ])
-            ->add('sourceId', TextType::class, [ 'label' => 'ID del origen (si aplica)', 'required' => false ])
-            ->add('upload', FileType::class, [
-                'label' => 'Archivo (PDF o imagen)',
-                'mapped' => false,
-                'required' => true,
-                'constraints' => [
-                    new File([
-                        'maxSize' => '20M',
-                        'mimeTypes' => [
-                            'application/pdf',
-                            'image/jpeg', 'image/png', 'image/gif', 'image/webp'
-                        ],
-                        'mimeTypesMessage' => 'Sube un PDF o una imagen válida',
-                    ])
-                ],
-            ])
+            // src/Form/ScannerType.php
+->add('sourceId', TextType::class, [
+    'label' => 'ID del origen (si aplica)',
+    'required' => false,
+    'attr' => [
+        'inputmode' => 'numeric',
+        'pattern' => '[0-9]*',
+        'class' => 'form-control',
+        'placeholder' => 'Ej. 123 (ID del oficio/correspondencia/circular)',
+    ],
+    'help' => 'Si quieres vincular el archivo a un documento ya registrado, pon su ID.'
+])
+->add('upload', FileType::class, [
+    'label' => 'Archivo (PDF o imagen)',
+    'mapped' => false,
+    'required' => true,
+    'attr' => [
+        'accept' => '.pdf,image/*',
+        'class' => 'form-control'
+    ],
+    'constraints' => [
+        new File([
+            'maxSize' => '20M',
+            'mimeTypes' => [
+                'application/pdf',
+                'image/jpeg', 'image/png', 'image/gif', 'image/webp'
+            ],
+            'mimeTypesMessage' => 'Sube un PDF o una imagen válida',
+        ])
+    ],
+])
+
         ;
     }
 

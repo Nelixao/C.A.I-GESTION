@@ -1,111 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sistema de Reportes{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/stylos.css') }}">
-    <!-- CSS de Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>{% block title %}Sistema de Reportes{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
 
-<!-- JavaScript de Bootstrap con Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {# Tus estilos glass #}
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-    {% block stylesheets %}{% endblock %}
-    {% block javascripts %}{% endblock %}
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        function normalize(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
-        document.querySelectorAll('.js-table-toolbar').forEach(function(toolbar){
-          const wrapper = toolbar.closest('.js-table-wrapper');
-          if(!wrapper) return;
-          const table = wrapper.querySelector('table.js-enhanced-table');
-          const tbody = table? table.tBodies[0]: null;
-          const search = toolbar.querySelector('input.js-search');
-          const stage = toolbar.querySelector('select.js-stage');
-          const counter = wrapper.querySelector('.js-counter');
-          if(!tbody) return;
-          const rows = Array.from(tbody.querySelectorAll('tr'));
-          function apply(){
-            const q = normalize(search? search.value: '');
-            const stg = (stage? stage.value: '') || '';
-            let visible = 0;
-            rows.forEach(tr=>{
-              const asunto = normalize(tr.getAttribute('data-asunto')||'');
-              const text = normalize(tr.getAttribute('data-text')||tr.textContent||'');
-              const rowStage = (tr.getAttribute('data-stage')||'').toLowerCase();
-              const matchesAsunto = !q || asunto.includes(q);
-              const matchesText = !q || text.includes(q);
-              const matchesStage = !stg || stg === 'todos' || rowStage === stg;
-              const show = (matchesAsunto || matchesText) && matchesStage;
-              tr.style.display = show ? '' : 'none';
-              if(show) visible++;
-            });
-            if(counter){
-              const total = rows.length;
-              counter.textContent = `Mostrando ${visible} de ${total}`;
-            }
-          }
-          if(search) search.addEventListener('input', apply);
-          if(stage) stage.addEventListener('change', apply);
-          apply();
-        });
-      });
-    </script>
+  {# Bootstrap + Icons #}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  {% block stylesheets %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">ALCALDÍA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_oficio_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_correspondence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_circular_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_scanner_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
-                    </li>
-                </ul>
-            </div>
+
+
+  <div class="app-wrap">
+    <!-- Sidebar lateral (glass) -->
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <span class="logo-dot"></span>
+        <span class="label">C.A.I.</span>
+      </div>
+
+      <nav class="nav">
+        <a href="{{ path('app_home') }}"
+           class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">
+          <i class="bi bi-house"></i><span class="label">Inicio</span>
+        </a>
+
+        <a href="{{ path('app_oficio_index') }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">
+          <i class="bi bi-file-earmark-text"></i><span class="label">Oficios</span>
+        </a>
+
+        <a href="{{ path('app_correspondence_index') }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">
+          <i class="bi bi-envelope"></i><span class="label">Correspondencia</span>
+        </a>
+
+        <a href="{{ path('app_circular_index') }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">
+          <i class="bi bi-arrow-repeat"></i><span class="label">Circulares</span>
+        </a>
+
+        <a href="{{ path('app_scanner_index') }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">
+          <i class="bi bi-scanner"></i><span class="label">Escáner</span>
+        </a>
+      </nav>
+
+      <button class="toggle" type="button" id="toggleSidebar">
+        <i class="bi bi-layout-sidebar-inset"></i><span class="txt"></span>
+      </button>
+    </aside>
+
+    <!-- Zona principal -->
+    <div class="main">
+      <header class="topbar glass">
+        <!-- Botón de menú para móvil (si luego agregas offcanvas) -->
+        <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="module-title">{% block module_title %}{{ block('title') }}{% endblock %}</div>
+        <div class="spacer"></div>
+        <div class="user-actions">
+          {% if app.user %}
+            <span class="user-name">{{ app.user.userIdentifier ?? app.user.username ?? 'Usuario' }}</span>
+            <a class="logout-btn" href="{{ path('app_logout')|default('#') }}" title="Cerrar sesión">Salir</a>
+          {% endif %}
         </div>
-    </nav>
+      </header>
 
-    <div class="content">
-        <header class="topbar">
-            <div class="module-title">{% block module_title %}{{ block('title') }}{% endblock %}</div>
-            <div class="spacer"></div>
-            <div class="user-actions">
-                {% if app.user %}
-                    <span class="user-name">{{ app.user.userIdentifier ?? app.user.username ?? 'Usuario' }}</span>
-                    {% if app.request is defined %}
-                        <a class="logout-btn" href="{{ path('app_logout')|default('#') }}" title="Cerrar sesión">Salir</a>
-                    {% else %}
-                        <a class="logout-btn" href="#" title="Cerrar sesión">Salir</a>
-                    {% endif %}
-                {% else %}
+      <main class="content">
+        {% block body %}{% endblock %}
+      </main>
 
-                {% endif %}
-            </div>
-        </header>
-        <main>
-            {% block body %}{% endblock %}
-        </main>
-        <footer>
-            &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
-        </footer>
+      <footer>
+        &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
+      </footer>
     </div>
+  </div>
+
+  {# (Opcional) Offcanvas para móvil: reutiliza los mismos enlaces #}
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="mobileMenuLabel">Menú</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <nav class="nav flex-column gap-1">
+        <a href="{{ path('app_home') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a>
+        <a href="{{ path('app_oficio_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
+        <a href="{{ path('app_correspondence_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
+        <a href="{{ path('app_circular_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
+        <a href="{{ path('app_scanner_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script de tus tablas + toggle de sidebar -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      /* === Filtros de tabla (tu script) === */
+      function normalize(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+      document.querySelectorAll('.js-table-toolbar').forEach(function(toolbar){
+        const wrapper = toolbar.closest('.js-table-wrapper');
+        if(!wrapper) return;
+        const table = wrapper.querySelector('table.js-enhanced-table');
+        const tbody = table? table.tBodies[0]: null;
+        const search = toolbar.querySelector('input.js-search');
+        const stage = toolbar.querySelector('select.js-stage');
+        const counter = wrapper.querySelector('.js-counter');
+        if(!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        function apply(){
+          const q = normalize(search? search.value: '');
+          const stg = (stage? stage.value: '') || '';
+          let visible = 0;
+          rows.forEach(tr=>{
+            const asunto = normalize(tr.getAttribute('data-asunto')||'');
+            const text = normalize(tr.getAttribute('data-text')||tr.textContent||'');
+            const rowStage = (tr.getAttribute('data-stage')||'').toLowerCase();
+            const matchesAsunto = !q || asunto.includes(q);
+            const matchesText = !q || text.includes(q);
+            const matchesStage = !stg || stg === 'todos' || rowStage === stg;
+            const show = (matchesAsunto || matchesText) && matchesStage;
+            tr.style.display = show ? '' : 'none';
+            if(show) visible++;
+          });
+          if(counter){
+            const total = rows.length;
+            counter.textContent = `Mostrando ${visible} de ${total}`;
+          }
+        }
+        if(search) search.addEventListener('input', apply);
+        if(stage) stage.addEventListener('change', apply);
+        apply();
+      });
+
+      /* === Toggle mini sidebar con persistencia === */
+      const sb = document.getElementById('sidebar');
+      const btn = document.getElementById('toggleSidebar');
+      const KEY = 'sidebar-mini';
+      if(localStorage.getItem(KEY)==='1'){ sb.classList.add('mini'); }
+      btn?.addEventListener('click', ()=>{
+        sb.classList.toggle('mini');
+        localStorage.setItem(KEY, sb.classList.contains('mini') ? '1' : '0');
+      });
+    });
+  </script>
+
+  {% block javascripts %}{% endblock %}
 </body>
 </html>
-
