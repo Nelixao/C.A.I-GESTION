@@ -59,9 +59,10 @@ class Scanner
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'scanners')]
-    #[ORM\JoinColumn(name: 'usuario_subio', referencedColumnName: 'id', nullable: true)]
-    private ?User $user = null;
+#[ORM\ManyToOne(targetEntity: User::class, inversedBy: "scanners")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
+
 
     public function getId(): ?int { return $this->id; }
 

@@ -1,95 +1,52 @@
 <?php
 
 namespace App\Form;
-
-use App\Entity\Oficio;
-use App\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\Entity\Area;
+use App\Entity\DocumentoTipo;
+use App\Entity\EstadoTramite;
 
-class OficioType extends AbstractType
-{
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->add('title', TextType::class, [
-                'label' => 'Título / Asunto',
-                'attr' => ['class' => 'form-control', 'placeholder' => 'Ej. Oficio de solicitud']
-            ])
-            ->add('content', TextareaType::class, [
-                'label' => 'Contenido',
-                'attr' => ['class' => 'form-control', 'rows' => 6]
-            ])
-            ->add('sender', TextType::class, [
-                'label' => 'Remitente',
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('recipient', TextType::class, [
-                'label' => 'Destinatario',
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('date', DateTimeType::class, [
-                'label' => 'Fecha',
-                'widget' => 'single_text',
-                'required' => false,
-                'attr' => ['class' => 'form-control']
-            ])
-
-            // Si realmente subes archivo, usa FileType + mapped=false y guarda la ruta en el controller:
-            ->add('file_path', FileType::class, [
-                'label' => 'Archivo adjunto',
-                'mapped' => false,
-                'required' => false,
-                'attr' => ['class' => 'form-control']
-            ])
-
-            // Metadatos: suele ser mejor setearlos por código
-            ->add('created_by', TextType::class, [
-                'label' => 'Creado por',
-                'required' => false,
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('created_at', DateTimeType::class, [
-                'label' => 'Creado el',
-                'widget' => 'single_text',
-                'required' => false,
-                'disabled' => true,
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('updated_at', DateTimeType::class, [
-                'label' => 'Actualizado el',
-                'widget' => 'single_text',
-                'required' => false,
-                'disabled' => true,
-                'attr' => ['class' => 'form-control']
-            ])
-
-            ->add('user', EntityType::class, [
-                'label' => 'Usuario responsable',
-                'class' => User::class,
-                'choice_label' => function (?User $u) {
-                    if (!$u) return '';
-                    // Ajusta según getters reales de tu entidad User:
-                    return method_exists($u, 'getFullName') && $u->getFullName()
-                        ? $u->getFullName()
-                        : ($u->getUsername() ?? $u->getEmail() ?? ('ID '.$u->getId()));
-                },
-                'placeholder' => 'Selecciona un usuario',
-                'required' => false,
-                'attr' => ['class' => 'form-select']
-            ]);
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Oficio::class,
-        ]);
-    }
-}
+// ...
+$builder
+    ->add('num_oficio', TextType::class, [
+        'label' => 'Número de Oficio',
+        'required' => false,
+        'attr' => ['class' => 'form-control', 'placeholder' => 'DG-2025-000123']
+    ])
+    ->add('area', EntityType::class, [
+        'class' => Area::class,
+        'choice_label' => 'nombre',
+        'placeholder' => 'Selecciona área',
+        'label' => 'Área / Dirección',
+        'attr' => ['class' => 'form-select']
+    ])
+    ->add('tipo', EntityType::class, [
+        'class' => DocumentoTipo::class,
+        'choice_label' => 'nombre',
+        'placeholder' => 'Selecciona tipo',
+        'label' => 'Tipo documental',
+        'attr' => ['class' => 'form-select']
+    ])
+    ->add('estado', EntityType::class, [
+        'class' => EstadoTramite::class,
+        'choice_label' => 'nombre',
+        'label' => 'Estado del trámite',
+        'attr' => ['class' => 'form-select']
+    ])
+    ->add('fecha_tramite', DateTimeType::class, [
+        'label' => 'Fecha de trámite',
+        'widget' => 'single_text',
+        'required' => false,
+        'attr' => ['class' => 'form-control']
+    ])
+    ->add('fecha_termino', DateTimeType::class, [
+        'label' => 'Fecha de término (vencimiento)',
+        'widget' => 'single_text',
+        'required' => false,
+        'attr' => ['class' => 'form-control']
+    ])
+    ->add('cisai', CheckboxType::class, [
+        'label' => 'CISAI (documento con término institucional)',
+        'required' => false
+    ]);

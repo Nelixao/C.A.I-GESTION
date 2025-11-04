@@ -4,151 +4,171 @@
   <meta charset="UTF-8">
   <title>{% block title %}Sistema de Reportes{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#B2225D">
 
-  {# Tus estilos glass #}
+  {# Fuentes #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  {# Favicons / Icons #}
+  <link rel="icon" href="{{ asset('images/favicon.ico') }}">
+  <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+  <link rel="icon" type="image/svg+xml" href="{{ asset('images/icon.svg') }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
+
+  {# CSS propio #}
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
   {# Bootstrap + Icons #}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+  {# Hook opcional para CSS extra #}
   {% block stylesheets %}{% endblock %}
 </head>
 <body>
-
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
   <div class="app-wrap">
     <!-- Sidebar lateral (glass) -->
-    <aside id="sidebar" class="sidebar">
+    <aside id="sidebar" class="sidebar" aria-label="Navegación principal">
       <div class="brand">
-        <span class="logo-dot"></span>
+        <span class="logo-dot" aria-hidden="true"></span>
         <span class="label">C.A.I.</span>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" role="navigation">
         <a href="{{ path('app_home') }}"
+           aria-current="{{ app.request.attributes.get('_route') == 'app_home' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">
-          <i class="bi bi-house"></i><span class="label">Inicio</span>
+          <i class="bi bi-house" aria-hidden="true"></i><span class="label">Inicio</span>
+        </a>
+
+        <a href="{{ path('app_dashboard') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
+          <i class="bi bi-speedometer2" aria-hidden="true"></i><span class="label">Dashboard</span>
         </a>
 
         <a href="{{ path('app_oficio_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">
-          <i class="bi bi-file-earmark-text"></i><span class="label">Oficios</span>
+          <i class="bi bi-file-earmark-text" aria-hidden="true"></i><span class="label">Oficios</span>
         </a>
 
         <a href="{{ path('app_correspondence_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">
-          <i class="bi bi-envelope"></i><span class="label">Correspondencia</span>
+          <i class="bi bi-envelope" aria-hidden="true"></i><span class="label">Correspondencia</span>
         </a>
 
         <a href="{{ path('app_circular_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">
-          <i class="bi bi-arrow-repeat"></i><span class="label">Circulares</span>
+          <i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="label">Circulares</span>
         </a>
 
         <a href="{{ path('app_scanner_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">
-          <i class="bi bi-scanner"></i><span class="label">Escáner</span>
+          <i class="bi bi-scanner" aria-hidden="true"></i><span class="label">Escáner</span>
         </a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+          <div class="mt-2 small text-uppercase opacity-75 px-3">Administración</div>
+          <a href="{{ path('app_user_index') }}"
+             aria-current="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'page' : null }}"
+             class="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+            <i class="bi bi-people" aria-hidden="true"></i><span class="label">Usuarios</span>
+          </a>
+          <a href="{{ path('app_role_index') }}"
+             aria-current="{{ app.request.attributes.get('_route') starts with 'app_role' ? 'page' : null }}"
+             class="{{ app.request.attributes.get('_route') starts with 'app_role' ? 'active' : '' }}">
+            <i class="bi bi-shield-lock" aria-hidden="true"></i><span class="label">Roles</span>
+          </a>
+        {% endif %}
+
+        {% block sidebar_extra %}{% endblock %}
       </nav>
 
-      <button class="toggle" type="button" id="toggleSidebar">
-        <i class="bi bi-layout-sidebar-inset"></i><span class="txt"></span>
+      <button class="toggle" type="button" id="toggleSidebar" aria-label="Contraer/expandir menú lateral">
+        <i class="bi bi-layout-sidebar-inset" aria-hidden="true"></i><span class="txt"></span>
       </button>
     </aside>
 
     <!-- Zona principal -->
     <div class="main">
-      <header class="topbar glass">
-        <!-- Botón de menú para móvil (si luego agregas offcanvas) -->
-        <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
-          <i class="bi bi-list"></i>
+      <header class="topbar glass" role="banner">
+        <button class="btn btn-outline-light btn-sm btn-mobile"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#mobileMenu"
+                aria-controls="mobileMenu"
+                aria-label="Abrir menú">
+          <i class="bi bi-list" aria-hidden="true"></i> Menú
         </button>
 
         <div class="module-title">{% block module_title %}{{ block('title') }}{% endblock %}</div>
-        <div class="spacer"></div>
+        <div class="spacer" aria-hidden="true"></div>
+
         <div class="user-actions">
           {% if app.user %}
-            <span class="user-name">{{ app.user.userIdentifier ?? app.user.username ?? 'Usuario' }}</span>
-            <a class="logout-btn" href="{{ path('app_logout')|default('#') }}" title="Cerrar sesión">Salir</a>
+            <span class="user-name">{{ app.user.nombre ?? app.user.userIdentifier ?? 'Usuario' }}</span>
+            <a class="logout-btn" href="{{ path('app_logout') }}" title="Cerrar sesión">Salir</a>
+          {% else %}
+            <a class="login-btn" href="{{ path('app_login') }}" title="Iniciar sesión">Ingresar</a>
           {% endif %}
         </div>
       </header>
 
-      <main class="content">
+      <main id="main-content" class="content" role="main">
+        {% block breadcrumbs %}{% endblock %}
+
+        {% for label, messages in app.flashes %}
+          {% for message in messages %}
+            <div class="alert alert-{{ label }} shadow-sm" role="status">{{ message|raw }}</div>
+          {% endfor %}
+        {% endfor %}
+
         {% block body %}{% endblock %}
       </main>
 
-      <footer>
-        &copy; {{ "now"|date("Y") }} Alcaldía - Todos los derechos reservados
+      <footer role="contentinfo">
+        &copy; {{ "now"|date("Y") }} Alcaldía – Todos los derechos reservados
       </footer>
     </div>
   </div>
 
-  {# (Opcional) Offcanvas para móvil: reutiliza los mismos enlaces #}
+  {# Offcanvas móvil #}
   <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="mobileMenuLabel">Menú</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
     <div class="offcanvas-body">
-      <nav class="nav flex-column gap-1">
+      <nav class="nav flex-column gap-1" role="navigation" aria-label="Menú móvil">
         <a href="{{ path('app_home') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a>
+        <a href="{{ path('app_dashboard') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">Dashboard</a>
         <a href="{{ path('app_oficio_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
         <a href="{{ path('app_correspondence_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
         <a href="{{ path('app_circular_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
         <a href="{{ path('app_scanner_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
+        {% if is_granted('ROLE_ADMIN') %}
+          <div class="mt-2 small text-uppercase opacity-75">Administración</div>
+          <a href="{{ path('app_user_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">Usuarios</a>
+          <a href="{{ path('app_role_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_role' ? 'active' : '' }}">Roles</a>
+        {% endif %}
       </nav>
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
+  {# JS #}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Script de tus tablas + toggle de sidebar -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      /* === Filtros de tabla (tu script) === */
-      function normalize(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
-      document.querySelectorAll('.js-table-toolbar').forEach(function(toolbar){
-        const wrapper = toolbar.closest('.js-table-wrapper');
-        if(!wrapper) return;
-        const table = wrapper.querySelector('table.js-enhanced-table');
-        const tbody = table? table.tBodies[0]: null;
-        const search = toolbar.querySelector('input.js-search');
-        const stage = toolbar.querySelector('select.js-stage');
-        const counter = wrapper.querySelector('.js-counter');
-        if(!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        function apply(){
-          const q = normalize(search? search.value: '');
-          const stg = (stage? stage.value: '') || '';
-          let visible = 0;
-          rows.forEach(tr=>{
-            const asunto = normalize(tr.getAttribute('data-asunto')||'');
-            const text = normalize(tr.getAttribute('data-text')||tr.textContent||'');
-            const rowStage = (tr.getAttribute('data-stage')||'').toLowerCase();
-            const matchesAsunto = !q || asunto.includes(q);
-            const matchesText = !q || text.includes(q);
-            const matchesStage = !stg || stg === 'todos' || rowStage === stg;
-            const show = (matchesAsunto || matchesText) && matchesStage;
-            tr.style.display = show ? '' : 'none';
-            if(show) visible++;
-          });
-          if(counter){
-            const total = rows.length;
-            counter.textContent = `Mostrando ${visible} de ${total}`;
-          }
-        }
-        if(search) search.addEventListener('input', apply);
-        if(stage) stage.addEventListener('change', apply);
-        apply();
-      });
-
-      /* === Toggle mini sidebar con persistencia === */
+      // Toggle mini sidebar con persistencia
       const sb = document.getElementById('sidebar');
       const btn = document.getElementById('toggleSidebar');
       const KEY = 'sidebar-mini';

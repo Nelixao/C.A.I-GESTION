@@ -29,7 +29,7 @@ class Correspondence
     #[ORM\Column]
     private ?\DateTime $date = null;
 
-    #[ORM\Column(length: 68)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $file_path = null;
 
     #[ORM\Column]
@@ -51,8 +51,9 @@ class Correspondence
     #[ORM\Column]
     private ?\DateTime $updated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'correspondecia_id')]
-    private ?User $user = null;
+  #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "correspondencias")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'correspondence', targetEntity: Oficio::class)]
     private $oficios;

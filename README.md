@@ -44,3 +44,49 @@ El proyecto utiliza Docker Compose para orquestar los servicios, incluyendo un c
    ```bash
    git clone https://github.com/Nelixao/C.A.I-GESTION.git
    cd C.A.I-GESTION
+   ```
+
+2. Levantar el entorno con Docker (primera vez puede tardar):
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. Instalar dependencias dentro del contenedor app (si aplica):
+
+   ```bash
+   docker compose exec php composer install
+   ```
+
+4. Ejecutar migraciones y cargar datos iniciales (usuarios demo):
+
+   ```bash
+   docker compose exec php php bin/console doctrine:migrations:migrate -n
+   docker compose exec php php bin/console doctrine:fixtures:load -n
+   ```
+
+   Nota: Si experimentas el error "SQLSTATE[22001]: Data too long for column 'file_path'", asegúrate de haber aplicado todas las migraciones recientes. A partir de la versión 20251015000001, se amplían los campos file_path a VARCHAR(255) para evitar truncamientos.
+
+5. Acceder a la aplicación en el navegador:
+
+   - URL: http://localhost/
+   - Credenciales de prueba:
+     - Administrador: admin@example.com / admin123
+     - Usuario: usuario@example.com / usuario123
+
+### Roles
+- ROLE_USER: acceso general a las secciones de la app.
+- ROLE_ADMIN: acceso adicional a Administración → Usuarios y Roles.
+
+La aplicación fuerza autenticación para todas las rutas excepto /login. El enlace "Ingresar/Salir" aparece en la barra superior. En el menú lateral, las opciones de Administración solo se muestran a usuarios con ROLE_ADMIN.
+
+
+---
+
+## Autenticación: Registro y Recuperación de contraseña
+
+- Registro: disponible en /register. Permite crear un usuario con nombre, correo y contraseña. La contraseña se almacena hasheada y el usuario obtiene acceso con ROLE_USER.
+- Iniciar sesión: /login.
+- Olvidé mi contraseña: /forgot-password. Muestra un formulario para ingresar el correo y confirma la recepción. Implementación mínima: no envía correos todavía.
+
+Visibilidad de rutas sin autenticación (PUBLIC_ACCESS): /login, /register y /forgot-password.

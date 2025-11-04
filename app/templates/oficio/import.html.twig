@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Importar Oficios{% endblock %}
+
+{% block body %}
+<div class="container-glass">
+  <h1 class="page-title mb-3">Importar Oficios desde Excel (CSV)</h1>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="glass-actions mb-3">
+    <a href="{{ path('app_oficio_template') }}" class="glass-btn success">
+      <i class="bi bi-download"></i> Descargar plantilla CSV
+    </a>
+    <a href="{{ path('app_oficio_index') }}" class="glass-btn">
+      <i class="bi bi-arrow-left"></i> Volver al listado
+    </a>
+  </div>
+
+  <div class="card p-3 glass">
+    <form method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label">Archivo CSV</label>
+        <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+        <div class="form-text">Abre tu archivo de Excel y guárdalo como CSV (delimitado por comas). Usa la plantilla para los encabezados.</div>
+      </div>
+      <button class="glass-btn primary" type="submit"><i class="bi bi-upload"></i> Importar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

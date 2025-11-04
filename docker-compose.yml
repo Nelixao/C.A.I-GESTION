@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   php:
     build:
@@ -9,33 +7,37 @@ services:
     volumes:
       - ./app:/var/www/html
     ports:
-      - "8010:80"
+      - "8012:80"              # tu app en http://localhost:8012
     depends_on:
       - db
+    restart: unless-stopped
 
   db:
     image: mysql:8
     container_name: symfony_db
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: seguimiento
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: secret
     volumes:
       - db_data:/var/lib/mysql
-    ports:
-      - "3307:3306"
+    # sin 'ports' → ya no usa el 3308 del host (solo red interna)
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: symfony_phpmyadmin
     environment:
       PMA_HOST: db
+      PMA_PORT: 3306
       PMA_USER: root
       PMA_PASSWORD: root
     ports:
-      - "8080:80"
+      - "8083:80"              # phpMyAdmin en http://localhost:8083
     depends_on:
       - db
+    restart: unless-stopped
 
 volumes:
   db_data:

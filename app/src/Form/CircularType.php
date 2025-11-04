@@ -9,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-// use Symfony\Component\Form\Extension\Core\Type\TextareaType; // si tienes 'content' en la entidad
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -53,6 +53,7 @@ class CircularType extends AbstractType
             ->add('created_by', TextType::class, [
                 'label' => 'Elaboró',
                 'required' => false,
+                'disabled' => true,
                 'attr' => ['class' => 'form-control'],
             ])
 
@@ -65,6 +66,12 @@ class CircularType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
 
+            ->add('content', TextareaType::class, [
+                'label' => 'Contenido',
+                'required' => true,
+                'attr' => ['class' => 'form-control', 'rows' => 6],
+            ])
+
             ->add('user', EntityType::class, [
                 'label' => 'Usuario relacionado',
                 'class' => User::class,
@@ -73,7 +80,7 @@ class CircularType extends AbstractType
                     // Ajusta según tus getters reales:
                     return method_exists($u, 'getFullName') && $u->getFullName()
                         ? $u->getFullName()
-                        : ($u->getUsername() ?? $u->getEmail() ?? 'ID '.$u->getId());
+                        : ($u->getNombre() ?? $u->getEmail() ?? 'ID '.$u->getId());
                 },
                 'placeholder' => 'Selecciona un usuario',
                 'required' => false,

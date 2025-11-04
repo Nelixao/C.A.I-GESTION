@@ -25,7 +25,7 @@ class Circular
     #[ORM\Column]
     private ?\DateTime $date = null;
 
-    #[ORM\Column(length: 47)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $file_path = null;
 
     #[ORM\Column]
@@ -38,8 +38,10 @@ class Circular
     private ?\DateTime $updated_at = null;
 
 
-    #[ORM\ManyToOne(inversedBy: 'circular_id')]
-    private ?User $user = null;
+ #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "circulares")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
+
 
     #[ORM\OneToOne]
     #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]

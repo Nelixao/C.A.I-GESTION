@@ -1,0 +1,682 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 1rem 0;
+    }
+    
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .kpi {
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(178, 34, 93, 0.1) 0%, rgba(178, 34, 93, 0.05) 100%);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .kpi:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(178, 34, 93, 0.15);
+    }
+    
+    .kpi-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      line-height: 1;
+      margin: 0.5rem 0;
+    }
+    
+    .kpi-sub {
+      font-size: 0.875rem;
+      margin: 0;
+    }
+    
+    .glass-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .glass-btn.primary {
+      background: rgba(178, 34, 93, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(178, 34, 93, 0.2);
+    }
+    
+    .glass-btn.success {
+      background: rgba(40, 167, 69, 0.1);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    .glass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .chart-card {
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .chart-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      background: transparent;
+    }
+    
+    .trend-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+    
+    .table-wrap {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    @media (max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      
+      .kpi-value {
+        font-size: 2rem;
+      }
+      
+      .quick-actions {
+        justify-content: center;
+      }
+      
+      .glass-btn {
+        flex: 1;
+        min-width: 140px;
+        justify-content: center;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<div class="container content">
+
+  {# ===== KPIs / Métricas principales ===== #}
+  <section class="kpi-grid">
+    <article class="card kpi" aria-live="polite">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-file-earmark-text"></i> Total Oficios</div>
+      </header>
+      <div class="kpi-value">{{ oficiosCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">
+        {% set oficiosTrend = oficiosTrend|default(0) %}
+        <span class="trend-badge badge {% if oficiosTrend > 0 %}bg-success-subtle text-success-emphasis{% elseif oficiosTrend < 0 %}bg-danger-subtle text-danger-emphasis{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}">
+          {% if oficiosTrend > 0 %}+{% endif %}{{ oficiosTrend }}% esta semana
+        </span>
+      </p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-arrow-repeat"></i> Circulares</div>
+      </header>
+      <div class="kpi-value">{{ circularesCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">
+        {% set circularesTrend = circularesTrend|default(0) %}
+        <span class="trend-badge badge {% if circularesTrend > 0 %}bg-success-subtle text-success-emphasis{% elseif circularesTrend < 0 %}bg-danger-subtle text-danger-emphasis{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}">
+          {% if circularesTrend > 0 %}+{% endif %}{{ circularesTrend }}% esta semana
+        </span>
+      </p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-journal-text"></i> Notas Informativas</div>
+      </header>
+      <div class="kpi-value">{{ notasCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">
+        {% set notasTrend = notasTrend|default(0) %}
+        <span class="trend-badge badge {% if notasTrend > 0 %}bg-success-subtle text-success-emphasis{% elseif notasTrend < 0 %}bg-danger-subtle text-danger-emphasis{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}">
+          {% if notasTrend > 0 %}+{% endif %}{{ notasTrend }}% esta semana
+        </span>
+      </p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-envelope"></i> Correspondencias</div>
+      </header>
+      <div class="kpi-value">{{ correspondencesCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">
+        {% set correspondencesTrend = correspondencesTrend|default(0) %}
+        <span class="trend-badge badge {% if correspondencesTrend > 0 %}bg-success-subtle text-success-emphasis{% elseif correspondencesTrend < 0 %}bg-danger-subtle text-danger-emphasis{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}">
+          {% if correspondencesTrend > 0 %}+{% endif %}{{ correspondencesTrend }}% esta semana
+        </span>
+      </p>
+    </article>
+
+    <article class="card kpi">
+      <header class="card-header">
+        <div class="card-title"><i class="bi bi-upc-scan"></i> Escáner</div>
+      </header>
+      <div class="kpi-value">{{ scansCount|default(0) }}</div>
+      <p class="text-muted kpi-sub">
+        {% set scansTrend = scansTrend|default(0) %}
+        <span class="trend-badge badge {% if scansTrend > 0 %}bg-success-subtle text-success-emphasis{% elseif scansTrend < 0 %}bg-danger-subtle text-danger-emphasis{% else %}bg-secondary-subtle text-secondary-emphasis{% endif %}">
+          {% if scansTrend > 0 %}+{% endif %}{{ scansTrend }}% esta semana
+        </span>
+      </p>
+    </article>
+  </section>
+
+  {# ===== Gráficas Semanales ===== #}
+  <section class="row g-4 mb-4">
+    {# Gráfica 1: Actividad Semanal por Tipo #}
+    <div class="col-12 col-lg-6">
+      <div class="card chart-card h-100">
+        <header class="card-header chart-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="card-title"><i class="bi bi-bar-chart-line"></i> Actividad Semanal</span>
+            <select class="form-select form-select-sm" style="width: auto;" id="weekSelector">
+              <option value="current">Esta semana</option>
+              <option value="last">Semana anterior</option>
+              <option value="2weeks">Hace 2 semanas</option>
+            </select>
+          </div>
+        </header>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="weeklyActivityChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Gráfica 2: Distribución por Estado #}
+    <div class="col-12 col-lg-6">
+      <div class="card chart-card h-100">
+        <header class="card-header chart-header">
+          <span class="card-title"><i class="bi bi-pie-chart"></i> Distribución por Estado</span>
+        </header>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="statusDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Gráfica 3: Tendencias por Día de la Semana #}
+    <div class="col-12 col-lg-8">
+      <div class="card chart-card">
+        <header class="card-header chart-header">
+          <span class="card-title"><i class="bi bi-graph-up"></i> Tendencias por Día</span>
+        </header>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="dailyTrendsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Gráfica 4: Eficiencia por Área #}
+    <div class="col-12 col-lg-4">
+      <div class="card chart-card">
+        <header class="card-header chart-header">
+          <span class="card-title"><i class="bi bi-speedometer2"></i> Eficiencia por Área</span>
+        </header>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="areaEfficiencyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ===== Fila: Estado y Circulares Activas ===== #}
+  <section class="row g-3 mb-4">
+    <article class="col-12 col-lg-6">
+      <div class="card h-100">
+        <header class="card-header d-flex align-items-center justify-content-between">
+          <span class="card-title"><i class="bi bi-traffic-light"></i> Oficios por estado</span>
+          <span class="small text-muted">Fuente: vw_oficios_por_estado</span>
+        </header>
+        <div class="card-body">
+          <div class="table-wrap js-table-wrapper">
+            <div class="js-table-toolbar d-flex gap-2 mb-2">
+              <input type="search" class="form-control form-control-sm js-search" placeholder="Buscar estado…">
+              <span class="js-counter small text-muted ms-auto"></span>
+            </div>
+            <table class="table table-sm table-dark align-middle js-enhanced-table">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in oficiosPorEstado|default([]) %}
+                  <tr data-asunto="{{ row.estado }}" data-stage="{{ row.estado|lower }}">
+                    <td>
+                      {% set badge =
+                        row.estado == 'CERRADO' ? 'bg-success-subtle text-success-emphasis' :
+                        (row.estado == 'EN_PROCESO' ? 'bg-warning-subtle text-warning-emphasis' :
+                        'bg-secondary-subtle text-secondary-emphasis') %}
+                      <span class="badge {{ badge }}">{{ row.estado }}</span>
+                    </td>
+                    <td class="text-end fw-bold">{{ row.total }}</td>
+                  </tr>
+                {% else %}
+                  <tr><td colspan="2" class="text-muted">Sin datos</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="col-12 col-lg-6">
+      <div class="card h-100">
+        <header class="card-header d-flex align-items-center justify-content-between">
+          <span class="card-title"><i class="bi bi-broadcast"></i> Circulares Activas</span>
+          <a class="btn btn-outline-primary btn-sm" href="{{ path('app_circular_index') }}">Ver todas</a>
+        </header>
+        <div class="card-body">
+          {% if activeCirculares|length > 0 %}
+            {% for c in activeCirculares %}
+              <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                <div>
+                  <strong>#{{ c.id }}</strong> · {{ c.title|default('Sin título')|slice(0,72) }}{% if c.title and c.title|length > 72 %}…{% endif %}
+                </div>
+                <span class="badge bg-warning-subtle text-warning">{{ c.date ? c.date|date('Y-m-d') : '—' }}</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="d-flex align-items-center justify-content-between py-2">
+              <div class="text-muted">No hay circulares</div>
+              <span class="badge text-secondary border border-secondary-subtle">—</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+  </section>
+
+  {# ===== CISAI próximos 7 días ===== #}
+  <section class="card mb-4">
+    <header class="card-header d-flex align-items-center justify-content-between">
+      <span class="card-title"><i class="bi bi-exclamation-triangle"></i> CISAI próximos (7 días)</span>
+      <span class="small text-muted">Fuente: vw_cisai_proximos</span>
+    </header>
+    <div class="card-body">
+      <div class="table-wrap js-table-wrapper">
+        <div class="js-table-toolbar d-flex gap-2 mb-2">
+          <input type="search" class="form-control form-control-sm js-search" placeholder="Buscar por #Oficio / Área…">
+          <select class="form-select form-select-sm js-stage" style="max-width:180px">
+            <option value="todos">Todos</option>
+            <option value="abierto">Abierto</option>
+            <option value="en_proceso">En proceso</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+          <span class="js-counter small text-muted ms-auto"></span>
+        </div>
+        <table class="table table-sm table-dark align-middle js-enhanced-table">
+          <thead>
+            <tr>
+              <th># Oficio</th>
+              <th>Área</th>
+              <th>Trámite</th>
+              <th>Vence</th>
+              <th class="text-end">Días</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in cisaiProximos|default([]) %}
+              <tr
+                data-asunto="{{ r.numero_oficio }} {{ r.area }}"
+                data-stage="en_proceso"
+                data-text="{{ r.numero_oficio }} {{ r.area }} {{ r.fecha_termino ? r.fecha_termino|date('Y-m-d') : '' }}"
+              >
+                <td class="fw-bold">{{ r.numero_oficio }}</td>
+                <td>{{ r.area }}</td>
+                <td>{{ r.fecha_tramite ? r.fecha_tramite|date('Y-m-d') : '—' }}</td>
+                <td>
+                  {% set d = r.fecha_termino ? r.fecha_termino|date('Y-m-d') : '—' %}
+                  <span class="fw-semibold {{ r.dias_restantes <= 2 ? 'text-warning' : '' }}">{{ d }}</span>
+                </td>
+                <td class="text-end">
+                  <span class="badge {{ r.dias_restantes <= 2 ? 'bg-warning-subtle text-warning-emphasis' : 'bg-secondary-subtle text-secondary-emphasis' }}">
+                    {{ r.dias_restantes }}
+                  </span>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5" class="text-muted">Sin vencimientos próximos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  {# ===== Oficios recientes ===== #}
+  <section class="card mb-4">
+    <header class="card-header d-flex align-items-center justify-content-between">
+      <span class="card-title"><i class="bi bi-clock-history"></i> Oficios recientes</span>
+      <a class="btn btn-outline-light btn-sm" href="{{ path('app_oficio_index') }}">Ver todos</a>
+    </header>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table class="table table-sm table-dark align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Asunto</th>
+              <th>Remitente</th>
+              <th>Destinatario</th>
+              <th>Fecha</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in recentOficios|default([]) %}
+              <tr>
+                <td class="fw-bold">{{ o.id }}</td>
+                <td>
+                  {% set t = o.title ?? 'Sin título' %}
+                  {{ t|slice(0,70) ~ (t|length > 70 ? '…' : '') }}
+                </td>
+                <td>{{ o.sender|default('—') }}</td>
+                <td>{{ o.recipient|default('—') }}</td>
+                <td>{{ o.date ? o.date|date('Y-m-d') : '—' }}</td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-light" href="{{ path('app_oficio_show', {id:o.id}) }}">Ver</a>
+                  <a class="btn btn-sm btn-primary" href="{{ path('app_oficio_edit', {id:o.id}) }}">Editar</a>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="6" class="text-muted">No hay actividad reciente</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  {# ===== Acciones rápidas ===== #}
+  <section class="card mb-4">
+    <header class="card-header d-flex align-items-center justify-content-between">
+      <span class="card-title"><i class="bi bi-lightning-charge"></i> Acciones Rápidas</span>
+    </header>
+    <div class="quick-actions">
+      <a href="{{ path('app_oficio_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nuevo Oficio</a>
+      <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nueva Correspondencia</a>
+      <a href="{{ path('app_circular_new') }}" class="glass-btn primary"><i class="bi bi-plus-circle"></i> Nueva Circular</a>
+      <a href="{{ path('app_scanner_new') }}" class="glass-btn success"><i class="bi bi-upc-scan"></i> Escanear Documento</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Datos de ejemplo para las gráficas (reemplazar con datos reales del backend)
+      const weeklyData = {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [
+          {
+            label: 'Oficios',
+            data: [12, 19, 8, 15, 22, 3, 7],
+            backgroundColor: 'rgba(178, 34, 93, 0.8)',
+            borderColor: 'rgba(178, 34, 93, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          },
+          {
+            label: 'Correspondencias',
+            data: [8, 12, 6, 10, 15, 2, 4],
+            backgroundColor: 'rgba(40, 167, 69, 0.8)',
+            borderColor: 'rgba(40, 167, 69, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          },
+          {
+            label: 'Circulares',
+            data: [5, 8, 4, 7, 12, 1, 2],
+            backgroundColor: 'rgba(255, 193, 7, 0.8)',
+            borderColor: 'rgba(255, 193, 7, 1)',
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          }
+        ]
+      };
+
+      const statusData = {
+        labels: ['Cerrado', 'En Proceso', 'Abierto', 'Pendiente'],
+        datasets: [{
+          data: [45, 30, 15, 10],
+          backgroundColor: [
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(13, 110, 253, 0.8)',
+            'rgba(108, 117, 125, 0.8)'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      };
+
+      const dailyTrendsData = {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [{
+          label: 'Documentos Procesados',
+          data: [25, 32, 28, 35, 40, 15, 8],
+          borderColor: 'rgba(178, 34, 93, 1)',
+          backgroundColor: 'rgba(178, 34, 93, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      };
+
+      const areaEfficiencyData = {
+        labels: ['Dirección General', 'Recursos Humanos', 'Finanzas', 'Operaciones', 'TI'],
+        datasets: [{
+          label: 'Eficiencia (%)',
+          data: [85, 92, 78, 88, 95],
+          backgroundColor: [
+            'rgba(178, 34, 93, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(13, 110, 253, 0.8)',
+            'rgba(111, 66, 193, 0.8)'
+          ],
+          borderWidth: 0
+        }]
+      };
+
+      // Configuración común para Chart.js
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              padding: 15,
+              usePointStyle: true,
+            }
+          }
+        }
+      };
+
+      // Inicializar gráficas
+      const weeklyActivityChart = new Chart(
+        document.getElementById('weeklyActivityChart'),
+        {
+          type: 'bar',
+          data: weeklyData,
+          options: {
+            ...chartOptions,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            }
+          }
+        }
+      );
+
+      const statusDistributionChart = new Chart(
+        document.getElementById('statusDistributionChart'),
+        {
+          type: 'doughnut',
+          data: statusData,
+          options: {
+            ...chartOptions,
+            cutout: '60%',
+            plugins: {
+              ...chartOptions.plugins,
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.parsed;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = Math.round((value / total) * 100);
+                    return `${label}: ${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        }
+      );
+
+      const dailyTrendsChart = new Chart(
+        document.getElementById('dailyTrendsChart'),
+        {
+          type: 'line',
+          data: dailyTrendsData,
+          options: {
+            ...chartOptions,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            }
+          }
+        }
+      );
+
+      const areaEfficiencyChart = new Chart(
+        document.getElementById('areaEfficiencyChart'),
+        {
+          type: 'bar',
+          data: areaEfficiencyData,
+          options: {
+            ...chartOptions,
+            indexAxis: 'y',
+            scales: {
+              x: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              },
+              y: {
+                grid: {
+                  display: false
+                }
+              }
+            }
+          }
+        }
+      );
+
+      // Selector de semana
+      document.getElementById('weekSelector').addEventListener('change', function(e) {
+        // Aquí iría la lógica para actualizar los datos según la semana seleccionada
+        console.log('Semana seleccionada:', e.target.value);
+        // En una implementación real, harías una petición al servidor para obtener los datos de esa semana
+      });
+
+      // Animaciones para las cards
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+      });
+    });
+  </script>
+{% endblock %}

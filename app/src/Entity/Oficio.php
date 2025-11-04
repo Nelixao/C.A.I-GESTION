@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\OficioRepository;
+use App\Entity\DocumentoTipo;
+
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OficioRepository::class)]
 class Oficio
@@ -28,8 +31,15 @@ class Oficio
     #[ORM\Column]
     private ?\DateTime $date = null;
 
-    #[ORM\Column(length: 45)]
+    #[ORM\Column(length: 1024, nullable: true)]
+    #[Assert\Length(max: 1024)]
     private ?string $file_path = null;
+
+    // Nota: columna file_name no existe en la BD actual; propiedad no mapeada para evitar errores SQL
+    private ?string $file_name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $storage_dir = null;
 
     #[ORM\Column]
     private ?int $created_by = null;
@@ -39,9 +49,10 @@ class Oficio
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
+#[ORM\ManyToOne(targetEntity: User::class, inversedBy: "oficios")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'oficio_id')]
-    private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Correspondence::class, inversedBy: 'oficios')]
     #[ORM\JoinColumn(name: 'id_correspondencia', referencedColumnName: 'id', nullable: true)]
@@ -134,12 +145,17 @@ class Oficio
         return $this->file_path;
     }
 
-    public function setFilePath(string $file_path): static
+    public function setFilePath(?string $file_path): static
     {
         $this->file_path = $file_path;
-
         return $this;
     }
+
+    public function getFileName(): ?string { return $this->file_name; }
+    public function setFileName(?string $fileName): static { $this->file_name = $fileName; return $this; }
+
+    public function getStorageDir(): ?string { return $this->storage_dir; }
+    public function setStorageDir(?string $dir): static { $this->storage_dir = $dir; return $this; }
 
     public function getCreatedBy(): ?int
     {

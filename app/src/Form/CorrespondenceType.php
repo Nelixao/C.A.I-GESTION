@@ -76,6 +76,7 @@ class CorrespondenceType extends AbstractType
                 'label' => 'Creado por',
                 'attr' => ['class' => 'form-control'],
                 'required' => false,
+                'disabled' => true,
             ])
             ->add('created_at', DateTimeType::class, [
                 'label' => 'Fecha de creación',
@@ -99,7 +100,7 @@ class CorrespondenceType extends AbstractType
                 // usa lo que tengas en User (username, email, fullName, etc.)
                 'choice_label' => function (?User $u) {
                     if (!$u) return '';
-                    return $u->getUsername() ?? ($u->getEmail() ?? ('ID '.$u->getId()));
+                    return $u->getNombre() ?? ($u->getEmail() ?? ('ID '.$u->getId()));
                 },
                 'placeholder' => 'Selecciona un usuario',
                 'attr' => ['class' => 'form-select'],

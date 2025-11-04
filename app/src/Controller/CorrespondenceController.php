@@ -60,6 +60,19 @@ final class CorrespondenceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $correspondence->setFilePath('uploads/'.$new);
+            } else {
+                if ($correspondence->getFilePath() === null) {
+                    $correspondence->setFilePath('');
+                }
+            }
+
             $entityManager->persist($correspondence);
             $entityManager->flush();
 
@@ -87,6 +100,19 @@ final class CorrespondenceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo al editar
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $correspondence->setFilePath('uploads/'.$new);
+            } else {
+                if ($correspondence->getFilePath() === null) {
+                    $correspondence->setFilePath('');
+                }
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_correspondence_index', [], Response::HTTP_SEE_OTHER);
