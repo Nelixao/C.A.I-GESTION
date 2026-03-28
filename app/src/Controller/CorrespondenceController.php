@@ -22,6 +22,37 @@ final class CorrespondenceController extends AbstractController
         ]);
     }
 
+    #[Route('/export', name: 'app_correspondence_export', methods: ['GET'])]
+    public function export(CorrespondenceRepository $correspondenceRepository): Response
+    {
+        $items = $correspondenceRepository->findAll();
+        $headers = ['ID','Folio','Asunto','Descripción','Remitente','Área destino','Fecha recepción','Estado','Fecha límite','Creado por','Creado el'];
+        $f = fopen('php://temp', 'r+');
+        fputcsv($f, $headers);
+        foreach ($items as $c) {
+            fputcsv($f, [
+                $c->getId(),
+                $c->getNumControl(),
+                $c->getAsunto(),
+                $c->getDescripcion(),
+                $c->getRemitente(),
+                $c->getAreaDestino(),
+                $c->getFechaRecepcion() ? $c->getFechaRecepcion()->format('Y-m-d') : '',
+                $c->getEstado(),
+                $c->getFechaLimite() ? $c->getFechaLimite()->format('Y-m-d') : '',
+                $c->getUser() ? ($c->getUser()->getNombre() ?? $c->getUser()->getEmail()) : '',
+                $c->getCreatedAt() ? $c->getCreatedAt()->format('Y-m-d') : '',
+            ]);
+        }
+        rewind($f);
+        $csv = "\xEF\xBB\xBF" . stream_get_contents($f);
+        fclose($f);
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="correspondencias.csv"'
+        ]);
+    }
+
     #[Route('/new', name: 'app_correspondence_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -30,6 +61,9 @@ final class CorrespondenceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->getUser()) {
+                $correspondence->setUser($this->getUser());
+            }
             $entityManager->persist($correspondence);
             $entityManager->flush();
 
@@ -71,7 +105,7 @@ final class CorrespondenceController extends AbstractController
     #[Route('/{id}', name: 'app_correspondence_delete', methods: ['POST'])]
     public function delete(Request $request, Correspondence $correspondence, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->request->get('_token'))) {
             $entityManager->remove($correspondence);
             $entityManager->flush();
         }

@@ -1,0 +1,66 @@
+{% extends 'baselogin.html.twig' %}
+
+{% block title %}Iniciar sesión — C.A.I.{% endblock %}
+
+{% block body %}
+    <h1>Bienvenido</h1>
+    <p class="subtitle">Ingresa tus credenciales para continuar</p>
+
+    {% if error %}
+        <div class="auth-error">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="auth-success">
+            <i class="bi bi-info-circle-fill me-1"></i>
+            Ya estás identificado como <strong>{{ app.user.userIdentifier }}</strong>.
+            <a href="{{ path('app_logout') }}" style="color:inherit;font-weight:700;">Salir</a>
+        </div>
+    {% endif %}
+
+    <form method="post" action="{{ path('app_login') }}" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <div class="field">
+            <label for="inputEmail">Correo electrónico</label>
+            <div class="field-wrap">
+                <i class="bi bi-envelope fi"></i>
+                <input type="email" id="inputEmail" name="email"
+                       value="{{ last_username|default('') }}"
+                       placeholder="correo@ejemplo.com"
+                       autocomplete="email" required autofocus>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="inputPassword">Contraseña</label>
+            <div class="field-wrap">
+                <i class="bi bi-lock fi"></i>
+                <input type="password" id="inputPassword" name="password"
+                       placeholder="••••••••"
+                       autocomplete="current-password" required>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <label class="check-label">
+                <input type="checkbox" name="_remember_me" id="remember_me">
+                Recordarme
+            </label>
+        </div>
+
+        <button type="submit" class="btn-auth">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Entrar al sistema
+        </button>
+    </form>
+{% endblock %}
+
+{% block auth_footer %}
+    <p class="auth-footer-link mt-3">
+        ¿No tienes cuenta? <a href="{{ path('app_register') }}">Regístrate aquí</a>
+    </p>
+{% endblock %}

@@ -1,37 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}Usuarios{% endblock %}
 
 {% block body %}
-    <h1>User index</h1>
+<div class="container-glass">
 
-    <table class="table">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title"><i class="bi bi-people me-2"></i>Usuarios del sistema</h1>
+    <div class="glass-actions">
+      <a href="{{ path('app_user_new') }}" class="glass-btn primary">
+        <i class="bi bi-person-plus"></i> Nuevo usuario
+      </a>
+    </div>
+  </div>
+
+  <div class="js-table-wrapper">
+    <div class="toolbar js-table-toolbar">
+      <input type="text" class="js-search form-input" placeholder="Buscar usuario…">
+      <span class="js-counter small text-muted ms-auto"></span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table-glass js-enhanced-table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Contrasena</th>
-                <th>actions</th>
-            </tr>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Creado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.nombre }}</td>
-                <td>{{ user.contrasena }}</td>
-                <td>
-                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
-                </td>
-            </tr>
+          <tr data-text="{{ user.id }} {{ user.nombre }} {{ user.email }} {{ user.rol }}">
+            <td class="fw-bold">{{ user.id }}</td>
+            <td>{{ user.nombre ?? '—' }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ user.rol ?? 'Invitado' }}</span>
+            </td>
+            <td>{{ user.fechaCreacion ? user.fechaCreacion|date('d/m/Y') : '—' }}</td>
+            <td class="text-center">
+              <a href="{{ path('app_user_show', {'id': user.id}) }}"
+                 class="btn btn-outline-primary btn-sm" title="Ver">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ path('app_user_edit', {'id': user.id}) }}"
+                 class="btn btn-outline-warning btn-sm" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </td>
+          </tr>
         {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No hay usuarios registrados</td>
+          </tr>
         {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
 
-    <a href="{{ path('app_user_new') }}">Create new</a>
+    <div class="js-counter table-counter">&nbsp;</div>
+  </div>
+
+</div>
 {% endblock %}

@@ -3,7 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\OficioRepository;
+use App\Entity\Cisae;
+use App\Entity\DocumentoTipo;
+
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OficioRepository::class)]
 class Oficio
@@ -28,8 +32,15 @@ class Oficio
     #[ORM\Column]
     private ?\DateTime $date = null;
 
-    #[ORM\Column(length: 45)]
+    #[ORM\Column(length: 1024, nullable: true)]
+    #[Assert\Length(max: 1024)]
     private ?string $file_path = null;
+
+    // Nota: columna file_name no existe en la BD actual; propiedad no mapeada para evitar errores SQL
+    private ?string $file_name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $storage_dir = null;
 
     #[ORM\Column]
     private ?int $created_by = null;
@@ -39,9 +50,51 @@ class Oficio
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
+#[ORM\ManyToOne(targetEntity: User::class, inversedBy: "oficios")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'oficio_id')]
-    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Correspondence::class, inversedBy: 'oficios')]
+    #[ORM\JoinColumn(name: 'id_correspondencia', referencedColumnName: 'id', nullable: true)]
+    private ?Correspondence $correspondence = null;
+
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
+    private ?Scanner $scanner = null;
+
+    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
+    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
+
+    // Área/dirección de origen del oficio
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $area = null;
+
+    // Marca si el oficio pertenece al expediente CISAE
+    #[ORM\Column(name: 'is_cisae', options: ['default' => false])]
+    private bool $isCisae = false;
+
+    #[ORM\ManyToOne(targetEntity: Cisae::class, inversedBy: 'oficios')]
+    #[ORM\JoinColumn(name: 'cisae_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Cisae $cisae = null;
+
+    // Nuevos campos solicitados por el esquema
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    private ?string $num_oficio = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $fecha_emision = null;
+
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $fecha_registro = null;
+
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+        $this->fecha_registro = $now;
+        $this->created_at     = $now;
+        $this->updated_at     = $now;
+    }
 
     public function getId(): ?int
     {
@@ -113,12 +166,17 @@ class Oficio
         return $this->file_path;
     }
 
-    public function setFilePath(string $file_path): static
+    public function setFilePath(?string $file_path): static
     {
         $this->file_path = $file_path;
-
         return $this;
     }
+
+    public function getFileName(): ?string { return $this->file_name; }
+    public function setFileName(?string $fileName): static { $this->file_name = $fileName; return $this; }
+
+    public function getStorageDir(): ?string { return $this->storage_dir; }
+    public function setStorageDir(?string $dir): static { $this->storage_dir = $dir; return $this; }
 
     public function getCreatedBy(): ?int
     {
@@ -167,4 +225,31 @@ class Oficio
 
         return $this;
     }
+
+    public function getCorrespondence(): ?Correspondence { return $this->correspondence; }
+    public function setCorrespondence(?Correspondence $correspondence): static { $this->correspondence = $correspondence; return $this; }
+
+    public function getScanner(): ?Scanner { return $this->scanner; }
+    public function setScanner(?Scanner $scanner): static { $this->scanner = $scanner; return $this; }
+
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getArea(): ?string { return $this->area; }
+    public function setArea(?string $area): static { $this->area = $area; return $this; }
+
+    public function isIsCisae(): bool { return $this->isCisae; }
+    public function setIsCisae(bool $isCisae): static { $this->isCisae = $isCisae; return $this; }
+
+    public function getCisae(): ?Cisae { return $this->cisae; }
+    public function setCisae(?Cisae $cisae): static { $this->cisae = $cisae; return $this; }
+
+    public function getNumOficio(): ?string { return $this->num_oficio; }
+    public function setNumOficio(?string $n): static { $this->num_oficio = $n; return $this; }
+
+    public function getFechaEmision(): ?\DateTimeInterface { return $this->fecha_emision; }
+    public function setFechaEmision(?\DateTimeInterface $f): static { $this->fecha_emision = $f; return $this; }
+
+    public function getFechaRegistro(): ?\DateTimeImmutable { return $this->fecha_registro; }
+    public function setFechaRegistro(?\DateTimeImmutable $f): static { $this->fecha_registro = $f; return $this; }
 }

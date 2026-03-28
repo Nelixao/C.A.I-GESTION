@@ -22,6 +22,35 @@ final class CircularController extends AbstractController
         ]);
     }
 
+    #[Route('/export', name: 'app_circular_export', methods: ['GET'])]
+    public function export(CircularRepository $circularRepository): Response
+    {
+        $items = $circularRepository->findAll();
+        $headers = ['ID','Folio','Título','Contenido','Estado','Fecha','Fecha límite','Creado por','Creado en'];
+        $f = fopen('php://temp', 'r+');
+        fputcsv($f, $headers);
+        foreach ($items as $c) {
+            fputcsv($f, [
+                $c->getId(),
+                $c->getNumCircular(),
+                $c->getTitulo(),
+                $c->getContenido(),
+                $c->getEstado(),
+                $c->getFecha() ? $c->getFecha()->format('Y-m-d') : '',
+                $c->getFechaLimite() ? $c->getFechaLimite()->format('Y-m-d') : '',
+                $c->getUser() ? ($c->getUser()->getNombre() ?? $c->getUser()->getEmail()) : '',
+                $c->getCreatedAt() ? $c->getCreatedAt()->format('Y-m-d H:i') : '',
+            ]);
+        }
+        rewind($f);
+        $csv = "\xEF\xBB\xBF" . stream_get_contents($f);
+        fclose($f);
+        return new Response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="circulares.csv"'
+        ]);
+    }
+
     #[Route('/new', name: 'app_circular_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -30,6 +59,9 @@ final class CircularController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->getUser()) {
+                $circular->setUser($this->getUser());
+            }
             $entityManager->persist($circular);
             $entityManager->flush();
 
@@ -71,7 +103,7 @@ final class CircularController extends AbstractController
     #[Route('/{id}', name: 'app_circular_delete', methods: ['POST'])]
     public function delete(Request $request, Circular $circular, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$circular->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$circular->getId(), $request->request->get('_token'))) {
             $entityManager->remove($circular);
             $entityManager->flush();
         }

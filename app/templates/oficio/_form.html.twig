@@ -1,4 +1,66 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, { attr: { class: 'form-glass' } }) }}
+  <div class="row g-3">
+
+    <div class="col-md-4">
+      {{ form_row(form.num_oficio) }}
+    </div>
+
+    <div class="col-md-4">
+      {{ form_row(form.area) }}
+    </div>
+
+    <div class="col-md-4">
+      {{ form_row(form.status) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.cisae) }}
+    </div>
+
+    <div class="col-md-6 d-flex align-items-center pt-4">
+      <div class="form-check form-switch ms-2">
+        {{ form_widget(form.isCisae) }}
+        {{ form_label(form.isCisae, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
+      </div>
+    </div>
+
+    <div class="col-12">
+      {{ form_row(form.title) }}
+    </div>
+
+    <div class="col-12">
+      {{ form_row(form.content) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.sender) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.recipient) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.date) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.fecha_emision) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.file_path) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.correspondence) }}
+    </div>
+
+  </div>
+
+  <div class="form-actions mt-4">
+    <button class="glass-btn primary" type="submit">
+      <i class="bi bi-save"></i> {{ button_label|default('Guardar') }}
+    </button>
+  </div>
 {{ form_end(form) }}

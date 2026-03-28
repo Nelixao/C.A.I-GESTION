@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\CircularRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+#[UniqueEntity(fields: ['numCircular'], message: 'Ese folio ya existe.')]
 #[ORM\Entity(repositoryClass: CircularRepository::class)]
 class Circular
 {
@@ -13,131 +16,136 @@ class Circular
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 48)]
-    private ?string $title = null;
+    // Folio/Número de circular (único)
+    #[ORM\Column(length: 60, unique: true)]
+    private ?string $numCircular = null;
 
-    #[ORM\Column(length: 45)]
-    private ?string $content = null;
+    // Fecha de emisión/recepción de la circular
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $fecha = null;
 
-    #[ORM\Column(length: 78)]
-    private ?string $target_group = null;
+    #[ORM\Column(length: 255)]
+    private ?string $titulo = null;
+
+    // Puedes dejarlo obligatorio si así lo quieren, pero para MVP conviene nullable
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $contenido = null;
+
+    // ABIERTA | EN_TRAMITE | CERRADA | ARCHIVADA
+    #[ORM\Column(length: 20)]
+    private ?string $estado = 'ABIERTA';
+
+    // Si aplica término institucional (SISAI o instrucción con fecha)
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fechaLimite = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fechaCierre = null;
 
     #[ORM\Column]
-    private ?\DateTime $date = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 47)]
-    private ?string $file_path = null;
-
-    #[ORM\Column]
-    private ?int $created_by = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\Column]
-    private ?\DateTime $updated_at = null;
-
-    #[ORM\ManyToOne(inversedBy: 'circular_id')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'circulares')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
     private ?User $user = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->estado = 'ABIERTA';
+        $this->fecha = new \DateTime();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getNumCircular(): ?string
     {
-        return $this->title;
+        return $this->numCircular;
     }
 
-    public function setTitle(string $title): static
+    public function setNumCircular(string $numCircular): static
     {
-        $this->title = $title;
-
+        $this->numCircular = $numCircular;
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getFecha(): ?\DateTime
     {
-        return $this->content;
+        return $this->fecha;
     }
 
-    public function setContent(string $content): static
+    public function setFecha(\DateTime $fecha): static
     {
-        $this->content = $content;
-
+        $this->fecha = $fecha;
         return $this;
     }
 
-    public function getTargetGroup(): ?string
+    public function getTitulo(): ?string
     {
-        return $this->target_group;
+        return $this->titulo;
     }
 
-    public function setTargetGroup(string $target_group): static
+    public function setTitulo(string $titulo): static
     {
-        $this->target_group = $target_group;
-
+        $this->titulo = $titulo;
         return $this;
     }
 
-    public function getDate(): ?\DateTime
+    public function getContenido(): ?string
     {
-        return $this->date;
+        return $this->contenido;
     }
 
-    public function setDate(\DateTime $date): static
+    public function setContenido(?string $contenido): static
     {
-        $this->date = $date;
-
+        $this->contenido = $contenido;
         return $this;
     }
 
-    public function getFilePath(): ?string
+    public function getEstado(): ?string
     {
-        return $this->file_path;
+        return $this->estado;
     }
 
-    public function setFilePath(string $file_path): static
+    public function setEstado(string $estado): static
     {
-        $this->file_path = $file_path;
-
+        $this->estado = $estado;
         return $this;
     }
 
-    public function getCreatedBy(): ?int
+    public function getFechaLimite(): ?\DateTime
     {
-        return $this->created_by;
+        return $this->fechaLimite;
     }
 
-    public function setCreatedBy(int $created_by): static
+    public function setFechaLimite(?\DateTime $fechaLimite): static
     {
-        $this->created_by = $created_by;
+        $this->fechaLimite = $fechaLimite;
+        return $this;
+    }
 
+    public function getFechaCierre(): ?\DateTime
+    {
+        return $this->fechaCierre;
+    }
+
+    public function setFechaCierre(?\DateTime $fechaCierre): static
+    {
+        $this->fechaCierre = $fechaCierre;
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTime $updated_at): static
-    {
-        $this->updated_at = $updated_at;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 
@@ -149,7 +157,6 @@ class Circular
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 }

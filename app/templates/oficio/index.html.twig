@@ -1,135 +1,102 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Listado de Oficios{% endblock %}
+{% block title %}Oficios{% endblock %}
 
-{% block stylesheets %}
-    <style>
-        body {
-            background-color: #E7E7E7;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .container-oficios {
-            max-width: 95%;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #B2225D;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        table.table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        table.table thead {
-            background-color: #B2225D;
-            color: white;
-        }
-
-        table.table th, table.table td {
-            padding: 12px 10px;
-            border: 1px solid #ccc;
-        }
-
-        table.table tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        a.button-link {
-            background-color: #C09F65;
-            color: white;
-            padding: 8px 14px;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.3s;
-            margin: 2px;
-            display: inline-block;
-        }
-
-        a.button-link:hover {
-            background-color: #B2225D;
-        }
-
-        .no-records {
-            text-align: center;
-            color: #777;
-            font-style: italic;
-        }
-
-        .create-btn {
-            display: block;
-            width: fit-content;
-            margin: 30px auto 0;
-            background-color: #B2225D;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .create-btn:hover {
-            background-color: #C09F65;
-        }
-    </style>
-{% endblock %}
-
+{% block stylesheets %}{% endblock %}
 {% block body %}
-    <div class="container-oficios">
-        <h1>Listado de Oficios</h1>
+<div class="container-glass">
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Contenido</th>
-                    <th>Remitente</th>
-                    <th>Destinatario</th>
-                    <th>Fecha</th>
-                    <th>Archivo</th>
-                    <th>Creado por</th>
-                    <th>Creado el</th>
-                    <th>Actualizado el</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for oficio in oficios %}
-                <tr>
-                    <td>{{ oficio.id }}</td>
-                    <td>{{ oficio.title }}</td>
-                    <td>{{ oficio.content }}</td>
-                    <td>{{ oficio.sender }}</td>
-                    <td>{{ oficio.recipient }}</td>
-                    <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i') : '' }}</td>
-                    <td>{{ oficio.filePath }}</td>
-                    <td>{{ oficio.createdBy }}</td>
-                    <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i') : '' }}</td>
-                    <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i') : '' }}</td>
-                    <td>
-                        <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="button-link">Ver</a>
-                        <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}" class="button-link">Editar</a>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="11" class="no-records">No se encontraron registros.</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+  <!-- Título + acciones -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Listado de Oficios</h1>
 
-        <a href="{{ path('app_oficio_new') }}" class="create-btn">+ Crear nuevo oficio</a>
+    <div class="glass-actions">
+      <a href="{{ path('app_oficio_export') }}" class="glass-btn success">
+        <i class="bi bi-download"></i> Exportar a Excel
+      </a>
+      <a href="{{ path('app_oficio_template') }}" class="glass-btn">
+        <i class="bi bi-filetype-csv"></i> Plantilla CSV
+      </a>
+      <a href="{{ path('app_oficio_import') }}" class="glass-btn warning">
+        <i class="bi bi-upload"></i> Importar CSV
+      </a>
+      <a href="{{ path('app_oficio_new') }}" class="glass-btn primary">
+        <i class="bi bi-plus-circle"></i> Crear nuevo oficio
+      </a>
     </div>
+  </div>
+
+  <!-- Toolbar (usa tu JS de filtrado) -->
+  <div class="js-table-wrapper">
+    <div class="toolbar js-table-toolbar">
+      <input type="text" class="js-search form-input" placeholder="Buscar por título o texto…">
+      <select class="js-stage form-select">
+        <option value="todos">Todos los estados</option>
+        <option value="abierto">Abierto</option>
+        <option value="en-tramite">En trámite</option>
+        <option value="cerrado">Cerrado</option>
+        <option value="archivado">Archivado</option>
+      </select>
+    </div>
+
+    <!-- Tabla glass + responsive -->
+    <div class="table-responsive">
+      <table class="table-glass js-enhanced-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Núm. Oficio</th>
+            <th>Área</th>
+            <th>Asunto</th>
+            <th>Remitente</th>
+            <th>Fecha Emisión</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for oficio in oficios %}
+          {# texto indexable para tu buscador #}
+          {% set st = oficio.status|lower|replace({' ': '-', 'é': 'e', 'á': 'a', 'í': 'i'}) %}
+          {% set row_text = (oficio.id ~ ' ' ~ oficio.numOficio ~ ' ' ~ oficio.title ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.area)|lower %}
+
+          <tr data-stage="{{ st }}" data-text="{{ row_text }}">
+            <td class="fw-bold">
+              {{ oficio.id }}
+              {% if oficio.isCisae %}
+                <span class="badge bg-danger ms-1" title="CISAE">C</span>
+              {% endif %}
+            </td>
+            <td>{{ oficio.numOficio ?? '—' }}</td>
+            <td>{{ oficio.area ?? '—' }}</td>
+            <td>{{ oficio.title|slice(0,55)|default('—') }}{{ oficio.title|length > 55 ? '…' : '' }}</td>
+            <td>{{ oficio.sender|default('—') }}</td>
+            <td>{{ oficio.fechaEmision ? oficio.fechaEmision|date('d/m/Y') : (oficio.date ? oficio.date|date('d/m/Y') : '—') }}</td>
+            <td><span class="pill-badge {{ st }}">{{ oficio.status }}</span></td>
+            <td class="text-center">
+              <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No hay oficios registrados</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="js-counter table-counter">&nbsp;</div>
+  </div>
+
+  <!-- Botón flotante (opcional) -->
+  <a href="{{ path('app_oficio_new') }}" class="glass-btn primary float-btn">
+    <i class="bi bi-plus-lg"></i> Nuevo oficio
+  </a>
+</div>
 {% endblock %}

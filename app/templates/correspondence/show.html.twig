@@ -1,58 +1,101 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Correspondence{% endblock %}
+{% block title %}Correspondencia — {{ correspondence.numControl }}{% endblock %}
 
 {% block body %}
-    <h1>Correspondence</h1>
+<div class="container-glass">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Correspondencia</h1>
+    <div class="glass-actions">
+      <a href="{{ path('app_correspondence_index') }}" class="glass-btn">
+        <i class="bi bi-arrow-left"></i> Listado
+      </a>
+      <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="glass-btn primary">
+        <i class="bi bi-pencil"></i> Editar
+      </a>
+    </div>
+  </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ correspondence.id }}</td>
-            </tr>
-            <tr>
-                <th>Subject</th>
-                <td>{{ correspondence.subject }}</td>
-            </tr>
-            <tr>
-                <th>Body</th>
-                <td>{{ correspondence.body }}</td>
-            </tr>
-            <tr>
-                <th>Sender</th>
-                <td>{{ correspondence.sender }}</td>
-            </tr>
-            <tr>
-                <th>Receiver</th>
-                <td>{{ correspondence.receiver }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>File_path</th>
-                <td>{{ correspondence.filePath }}</td>
-            </tr>
-            <tr>
-                <th>Created_by</th>
-                <td>{{ correspondence.createdBy }}</td>
-            </tr>
-            <tr>
-                <th>Created_at</th>
-                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Updated_at</th>
-                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+  <div class="glass-card">
+    <div class="row g-3">
 
-    <a href="{{ path('app_correspondence_index') }}">back to list</a>
+      <div class="col-md-4">
+        <div class="detail-label">Folio / Núm. Control</div>
+        <div class="detail-value fw-bold">{{ correspondence.numControl ?? '—' }}</div>
+      </div>
 
-    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}">edit</a>
+      <div class="col-md-4">
+        <div class="detail-label">Fecha de Recepción</div>
+        <div class="detail-value">{{ correspondence.fechaRecepcion ? correspondence.fechaRecepcion|date('d/m/Y') : '—' }}</div>
+      </div>
 
+      <div class="col-md-4">
+        <div class="detail-label">Estado</div>
+        <div class="detail-value">
+          {% set estadoClass =
+            correspondence.estado in ['recibido','recibida'] ? 'badge-recibido' :
+            (correspondence.estado in ['en_tramite','en_proceso'] ? 'badge-tramite' :
+            (correspondence.estado in ['cerrado','cerrada'] ? 'badge-cerrado' : 'badge-default')) %}
+          <span class="badge status-badge {{ estadoClass }}">{{ correspondence.estado }}</span>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="detail-label">Asunto</div>
+        <div class="detail-value">{{ correspondence.asunto ?? '—' }}</div>
+      </div>
+
+      <div class="col-12">
+        <div class="detail-label">Descripción</div>
+        <div class="detail-value">{{ correspondence.descripcion ?? '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Remitente</div>
+        <div class="detail-value">{{ correspondence.remitente ?? '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Área de Origen</div>
+        <div class="detail-value">{{ correspondence.areaOrigen ?? '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Área Destino</div>
+        <div class="detail-value">{{ correspondence.areaDestino ?? '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Fecha Límite</div>
+        <div class="detail-value">{{ correspondence.fechaLimite ? correspondence.fechaLimite|date('d/m/Y') : '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Fecha de Cierre</div>
+        <div class="detail-value">{{ correspondence.fechaCierre ? correspondence.fechaCierre|date('d/m/Y') : '—' }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Registrado por</div>
+        <div class="detail-value">
+          {% if correspondence.user %}
+            {{ correspondence.user.nombre ?? correspondence.user.email }}
+          {% else %}
+            —
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="detail-label">Creado</div>
+        <div class="detail-value">{{ correspondence.createdAt ? correspondence.createdAt|date('d/m/Y H:i') : '—' }}</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mt-3">
     {{ include('correspondence/_delete_form.html.twig') }}
+  </div>
+</div>
 {% endblock %}

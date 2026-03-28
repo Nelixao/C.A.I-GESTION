@@ -1,11 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Correspondence{% endblock %}
+{% block title %}Crear Nueva Correspondencia{% endblock %}
 
 {% block body %}
-    <h1>Create new Correspondence</h1>
+<div class="container-glass">
 
-    {{ include('correspondence/_form.html.twig') }}
+  <!-- Encabezado y acciones -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Registrar Nueva Correspondencia</h1>
 
-    <a href="{{ path('app_correspondence_index') }}">back to list</a>
+    <div class="glass-actions">
+      <a href="{{ path('app_correspondence_index') }}" class="glass-btn">
+        <i class="bi bi-arrow-left"></i> Volver al listado
+      </a>
+    </div>
+  </div>
+
+  <!-- Tarjeta del formulario -->
+  <div class="glass-card">
+    {{ include('correspondence/_form.html.twig', {'button_label': 'Guardar'}) }}
+  </div>
+
+</div>
 {% endblock %}

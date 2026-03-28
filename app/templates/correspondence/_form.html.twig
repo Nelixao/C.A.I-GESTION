@@ -1,4 +1,52 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, { attr: { class: 'form-glass' } }) }}
+  <div class="row g-3">
+    <div class="col-md-6">
+      {{ form_row(form.numControl) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.fechaRecepcion) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.remitente) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.areaOrigen) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.areaDestino) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.estado) }}
+    </div>
+
+    <div class="col-12">
+      {{ form_row(form.asunto) }}
+    </div>
+
+    <div class="col-12">
+      {{ form_row(form.descripcion) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_row(form.fechaLimite) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.user) }}
+    </div>
+
+    <div class="col-12">
+      <div class="form-check form-switch">
+        {{ form_widget(form.urgente) }}
+        {{ form_label(form.urgente, null, {'label_attr': {'class': 'form-check-label ms-2 fw-semibold text-warning'}}) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions mt-3">
+    <button class="glass-btn primary" type="submit">
+      <i class="bi bi-save"></i> {{ button_label|default('Guardar') }}
+    </button>
+  </div>
 {{ form_end(form) }}

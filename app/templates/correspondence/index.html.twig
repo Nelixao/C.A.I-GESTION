@@ -2,130 +2,92 @@
 
 {% block title %}Correspondencia{% endblock %}
 
-{% block stylesheets %}
-    <style>
-        body {
-            background-color: #E7E7E7;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        h1 {
-            color: #B2225D;
-            text-align: center;
-            margin-bottom: 30px;
-            margin-top: 20px;
-        }
-
-        .table {
-            width: 95%;
-            margin: auto;
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        }
-
-        .table th, .table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .table thead {
-            background-color: #B2225D;
-            color: white;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f8f8f8;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .btn {
-            background-color: #C09F65;
-            color: white;
-            padding: 6px 12px;
-            margin: 2px;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
-
-        .btn:hover {
-            background-color: #b08f55;
-        }
-
-        .create-link {
-            display: block;
-            width: fit-content;
-            margin: 30px auto;
-            background-color: #B2225D;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-
-        .create-link:hover {
-            background-color: #941b4a;
-        }
-
-        td[colspan] {
-            text-align: center;
-            color: #888;
-            padding: 20px;
-        }
-    </style>
-{% endblock %}
-
+{% block stylesheets %}{% endblock %}
 {% block body %}
-    <h1>Correspondencia</h1>
+<div class="container-glass">
 
-    <table class="table">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Listado de Correspondencia</h1>
+
+    <div class="glass-actions">
+      <a href="{{ path('app_correspondence_export') }}" class="glass-btn success">
+        <i class="bi bi-download"></i> Exportar a Excel
+      </a>
+      <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary">
+        <i class="bi bi-plus-circle"></i> Crear nueva
+      </a>
+    </div>
+  </div>
+
+  <div class="js-table-wrapper">
+    <div class="toolbar js-table-toolbar">
+      <input type="text" class="js-search form-input" placeholder="Buscar en la tabla...">
+      <select class="js-stage form-select">
+        <option value="todos">Todas las etapas</option>
+        <option value="recibido">Recibido</option>
+      </select>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table-glass js-enhanced-table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Asunto</th>
-                <th>Mensaje</th>
-                <th>Remitente</th>
-                <th>Destinatario</th>
-                <th>Fecha</th>
-                <th>Archivo</th>
-                <th>Creado por</th>
-                <th>Creado el</th>
-                <th>Actualizado el</th>
-                <th>Acciones</th>
-            </tr>
+          <tr>
+            <th>FOLIO</th>
+            <th>ASUNTO</th>
+            <th>REMITENTE</th>
+            <th>ÁREA DESTINO</th>
+            <th>FECHA RECEPCIÓN</th>
+            <th>ESTADO</th>
+            <th>FECHA LÍMITE</th>
+            <th>RESPONSABLE</th>
+            <th>CREADO EL</th>
+            <th class="text-center">ACCIONES</th>
+          </tr>
         </thead>
         <tbody>
         {% for correspondence in correspondences %}
-            <tr>
-                <td>{{ correspondence.id }}</td>
-                <td>{{ correspondence.subject }}</td>
-                <td>{{ correspondence.body }}</td>
-                <td>{{ correspondence.sender }}</td>
-                <td>{{ correspondence.receiver }}</td>
-                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i') : '' }}</td>
-                <td>{{ correspondence.filePath }}</td>
-                <td>{{ correspondence.createdBy }}</td>
-                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
-                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}" class="btn">Ver</a>
-                    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="btn">Editar</a>
-                </td>
-            </tr>
+          {% set estado = correspondence.estado|lower %}
+          {% set row_text = (correspondence.id ~ ' ' ~ correspondence.numControl ~ ' ' ~ correspondence.asunto ~ ' ' ~ correspondence.remitente ~ ' ' ~ correspondence.areaDestino)|lower %}
+          <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ correspondence.asunto|lower }}">
+            <td data-label="Folio">
+              #{{ correspondence.numControl }}
+              {% if correspondence.urgente %}
+                <i class="bi bi-star-fill text-warning ms-1" title="Urgente"></i>
+              {% endif %}
+            </td>
+            <td data-label="Asunto">{{ correspondence.asunto|default('—') }}</td>
+            <td data-label="Remitente">{{ correspondence.remitente|default('—') }}</td>
+            <td data-label="Área destino">{{ correspondence.areaDestino|default('—') }}</td>
+            <td data-label="Fecha recepción">{{ correspondence.fechaRecepcion ? correspondence.fechaRecepcion|date('d-m-Y') : '' }}</td>
+            <td data-label="Estado">
+              <span class="pill-badge {{ estado }}">{{ correspondence.estado|default('—') }}</span>
+            </td>
+            <td data-label="Fecha límite">{{ correspondence.fechaLimite ? correspondence.fechaLimite|date('d-m-Y') : '—' }}</td>
+            <td data-label="Responsable">{{ correspondence.user ? (correspondence.user.nombre ?? correspondence.user.email) : '—' }}</td>
+            <td data-label="Creado el">{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
+            <td data-label="Acciones" class="text-center">
+              <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </td>
+          </tr>
         {% else %}
-            <tr>
-                <td colspan="11">No se encontraron registros</td>
-            </tr>
+          <tr>
+            <td colspan="10" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
+          </tr>
         {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
 
-    <a href="{{ path('app_correspondence_new') }}" class="create-link">Crear nuevo</a>
+    <div class="js-counter table-counter">&nbsp;</div>
+  </div>
+
+  <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary float-btn">
+    <i class="bi bi-plus-lg"></i> Crear nueva
+  </a>
+</div>
 {% endblock %}
