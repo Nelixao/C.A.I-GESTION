@@ -1,64 +1,60 @@
 {{ form_start(form, { attr: { class: 'form-glass' } }) }}
   <div class="row g-3">
-
-    <div class="col-md-4">
-      {{ form_row(form.num_oficio) }}
-    </div>
-
-    <div class="col-md-4">
-      {{ form_row(form.area) }}
-    </div>
-
-    <div class="col-md-4">
-      {{ form_row(form.status) }}
+    <div class="col-md-6">
+      {{ form_label(form.title, 'Título / Asunto') }}
+      {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.title) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.cisae) }}
+      {{ form_label(form.date, 'Fecha') }}
+      {{ form_widget(form.date, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.date) }}
     </div>
 
-    <div class="col-md-6 d-flex align-items-center pt-4">
-      <div class="form-check form-switch ms-2">
-        {{ form_widget(form.isCisae) }}
-        {{ form_label(form.isCisae, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
-      </div>
+    <div class="col-md-6">
+      {{ form_label(form.sender, 'Remitente') }}
+      {{ form_widget(form.sender, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.sender) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.recipient, 'Destinatario') }}
+      {{ form_widget(form.recipient, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.recipient) }}
     </div>
 
     <div class="col-12">
-      {{ form_row(form.title) }}
-    </div>
-
-    <div class="col-12">
-      {{ form_row(form.content) }}
-    </div>
-
-    <div class="col-md-6">
-      {{ form_row(form.sender) }}
+      {{ form_label(form.content, 'Contenido') }}
+      {{ form_widget(form.content, { attr: { class: 'form-control', rows: 6 } }) }}
+      {{ form_errors(form.content) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.recipient) }}
+      {{ form_label(form.file_path, 'Archivo adjunto') }}
+      {{ form_widget(form.file_path, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.file_path) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.date) }}
+      {{ form_label(form.user, 'Usuario responsable') }}
+      {{ form_widget(form.user, { attr: { class: 'form-select' } }) }}
+      {{ form_errors(form.user) }}
     </div>
 
+    {# Metadatos opcionales (si los muestras) #}
     <div class="col-md-6">
-      {{ form_row(form.fecha_emision) }}
+      {{ form_row(form.created_by) }}
     </div>
-
     <div class="col-md-6">
-      {{ form_row(form.file_path) }}
+      {{ form_row(form.created_at) }}
     </div>
-
     <div class="col-md-6">
-      {{ form_row(form.correspondence) }}
+      {{ form_row(form.updated_at) }}
     </div>
-
   </div>
 
-  <div class="form-actions mt-4">
+  <div class="form-actions mt-4 text-center">
     <button class="glass-btn primary" type="submit">
       <i class="bi bi-save"></i> {{ button_label|default('Guardar') }}
     </button>

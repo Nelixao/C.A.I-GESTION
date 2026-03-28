@@ -1,7 +1,2 @@
 .env
 /uploads
-/vendor/
-/var/
-/.idea/
-/.vscode/
-.php-cs-fixer.cache

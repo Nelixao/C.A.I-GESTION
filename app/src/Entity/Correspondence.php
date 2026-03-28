@@ -3,13 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CorrespondenceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
-#[UniqueEntity(fields: ['numControl'], message: 'Ese folio ya existe.')]
 
 #[ORM\Entity(repositoryClass: CorrespondenceRepository::class)]
 class Correspondence
@@ -19,185 +14,169 @@ class Correspondence
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 60, unique: true)]
-    private ?string $numControl = null;
+    #[ORM\Column(length: 45)]
+    private ?string $subject = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $fechaRecepcion = null;
+    #[ORM\Column(length: 60)]
+    private ?string $body = null;
 
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $remitente = null;
+    #[ORM\Column(length: 50)]
+    private ?string $sender = null;
 
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $areaOrigen = null;
-
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $areaDestino = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $asunto = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $descripcion = null;
-
-    #[ORM\Column(length: 20)]
-    private ?string $estado = 'recibido';
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $fechaLimite = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $fechaCierre = null;
+    #[ORM\Column(length: 57)]
+    private ?string $receiver = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTime $date = null;
 
-    #[ORM\Column(options: ['default' => false])]
-    private bool $urgente = false;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $file_path = null;
+
+    #[ORM\Column]
+    private ?int $created_by = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTime $created_at = null;
+
+    // Nuevos campos solicitados por el esquema
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    private ?string $num_control = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fecha_recepcion = null;
+
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $fecha_registro = null;
+
+    #[ORM\Column]
+    private ?\DateTime $updated_at = null;
+
+  #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "correspondencias")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'correspondence', targetEntity: Oficio::class)]
-    private Collection $oficios;
+    private $oficios;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'correspondencias')]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
-    private ?User $user = null;
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
+    private ?Scanner $scanner = null;
 
-    public function __construct()
-    {
-        $this->oficios = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->estado = 'recibido';
-        $this->fechaRecepcion = new \DateTime();
-    }
+    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
+    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNumControl(): ?string
+    public function getSubject(): ?string
     {
-        return $this->numControl;
+        return $this->subject;
     }
 
-    public function setNumControl(string $numControl): static
+    public function setSubject(string $subject): static
     {
-        $this->numControl = $numControl;
+        $this->subject = $subject;
+
         return $this;
     }
 
-    public function getFechaRecepcion(): ?\DateTime
+    public function getBody(): ?string
     {
-        return $this->fechaRecepcion;
+        return $this->body;
     }
 
-    public function setFechaRecepcion(\DateTime $fechaRecepcion): static
+    public function setBody(string $body): static
     {
-        $this->fechaRecepcion = $fechaRecepcion;
+        $this->body = $body;
+
         return $this;
     }
 
-    public function getRemitente(): ?string
+    public function getSender(): ?string
     {
-        return $this->remitente;
+        return $this->sender;
     }
 
-    public function setRemitente(?string $remitente): static
+    public function setSender(string $sender): static
     {
-        $this->remitente = $remitente;
+        $this->sender = $sender;
+
         return $this;
     }
 
-    public function getAreaOrigen(): ?string
+    public function getReceiver(): ?string
     {
-        return $this->areaOrigen;
+        return $this->receiver;
     }
 
-    public function setAreaOrigen(?string $areaOrigen): static
+    public function setReceiver(string $receiver): static
     {
-        $this->areaOrigen = $areaOrigen;
+        $this->receiver = $receiver;
+
         return $this;
     }
 
-    public function getAreaDestino(): ?string
+    public function getDate(): ?\DateTime
     {
-        return $this->areaDestino;
+        return $this->date;
     }
 
-    public function setAreaDestino(?string $areaDestino): static
+    public function setDate(\DateTime $date): static
     {
-        $this->areaDestino = $areaDestino;
+        $this->date = $date;
+
         return $this;
     }
 
-    public function getAsunto(): ?string
+    public function getFilePath(): ?string
     {
-        return $this->asunto;
+        return $this->file_path;
     }
 
-    public function setAsunto(string $asunto): static
+    public function setFilePath(string $file_path): static
     {
-        $this->asunto = $asunto;
+        $this->file_path = $file_path;
+
         return $this;
     }
 
-    public function getDescripcion(): ?string
+    public function getCreatedBy(): ?int
     {
-        return $this->descripcion;
+        return $this->created_by;
     }
 
-    public function setDescripcion(?string $descripcion): static
+    public function setCreatedBy(int $created_by): static
     {
-        $this->descripcion = $descripcion;
+        $this->created_by = $created_by;
+
         return $this;
     }
 
-    public function getEstado(): ?string
+    public function getCreatedAt(): ?\DateTime
     {
-        return $this->estado;
+        return $this->created_at;
     }
 
-    public function setEstado(string $estado): static
+    public function setCreatedAt(\DateTime $created_at): static
     {
-        $this->estado = $estado;
+        $this->created_at = $created_at;
+
         return $this;
     }
 
-    public function getFechaLimite(): ?\DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
-        return $this->fechaLimite;
+        return $this->updated_at;
     }
 
-    public function setFechaLimite(?\DateTime $fechaLimite): static
+    public function setUpdatedAt(\DateTime $updated_at): static
     {
-        $this->fechaLimite = $fechaLimite;
+        $this->updated_at = $updated_at;
+
         return $this;
     }
-
-    public function getFechaCierre(): ?\DateTime
-    {
-        return $this->fechaCierre;
-    }
-
-    public function setFechaCierre(?\DateTime $fechaCierre): static
-    {
-        $this->fechaCierre = $fechaCierre;
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function isUrgente(): bool { return $this->urgente; }
-    public function setUrgente(bool $urgente): static { $this->urgente = $urgente; return $this; }
 
     public function getUser(): ?User
     {
@@ -207,37 +186,49 @@ class Correspondence
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
         return $this;
     }
 
-    /**
-     * @return Collection<int, Oficio>
-     */
-    public function getOficios(): Collection
+    /** @return array<int, Oficio>|\Doctrine\Common\Collections\Collection */
+    public function getOficios()
     {
         return $this->oficios;
     }
 
     public function addOficio(Oficio $oficio): static
     {
-        if (!$this->oficios->contains($oficio)) {
-            $this->oficios->add($oficio);
+        if (!in_array($oficio, (array)$this->oficios, true)) {
+            $this->oficios[] = $oficio;
             $oficio->setCorrespondence($this);
         }
-
         return $this;
     }
 
     public function removeOficio(Oficio $oficio): static
     {
-        if ($this->oficios->removeElement($oficio)) {
-            // set the owning side to null (unless already changed)
+        if (is_iterable($this->oficios) && in_array($oficio, (array)$this->oficios, true)) {
+            // remove without strict Collection API to avoid dependency
+            $this->oficios = array_filter((array)$this->oficios, fn($o) => $o !== $oficio);
             if ($oficio->getCorrespondence() === $this) {
                 $oficio->setCorrespondence(null);
             }
         }
-
         return $this;
     }
 
+    public function getScanner(): ?Scanner { return $this->scanner; }
+    public function setScanner(?Scanner $scanner): static { $this->scanner = $scanner; return $this; }
+
+    public function getStatus(): ?string { return $this->status; }
+    public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getNumControl(): ?string { return $this->num_control; }
+    public function setNumControl(?string $n): static { $this->num_control = $n; return $this; }
+
+    public function getFechaRecepcion(): ?\DateTime { return $this->fecha_recepcion; }
+    public function setFechaRecepcion(?\DateTime $f): static { $this->fecha_recepcion = $f; return $this; }
+
+    public function getFechaRegistro(): ?\DateTimeImmutable { return $this->fecha_registro; }
+    public function setFechaRegistro(?\DateTimeImmutable $f): static { $this->fecha_registro = $f; return $this; }
 }

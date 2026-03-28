@@ -31,11 +31,8 @@
     <div class="toolbar js-table-toolbar">
       <input type="text" class="js-search form-input" placeholder="Buscar por título o texto…">
       <select class="js-stage form-select">
-        <option value="todos">Todos los estados</option>
-        <option value="abierto">Abierto</option>
-        <option value="en-tramite">En trámite</option>
-        <option value="cerrado">Cerrado</option>
-        <option value="archivado">Archivado</option>
+        <option value="todos">Todas las etapas</option>
+        <option value="sin-etapa">Sin etapa</option>
       </select>
     </div>
 
@@ -45,35 +42,27 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Núm. Oficio</th>
-            <th>Área</th>
+            <th>Fecha</th>
+            <th>Dirigido a</th>
             <th>Asunto</th>
-            <th>Remitente</th>
-            <th>Fecha Emisión</th>
-            <th>Estado</th>
+            <th>Contenido</th>
+            <th>Elaborado por</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
         {% for oficio in oficios %}
           {# texto indexable para tu buscador #}
-          {% set st = oficio.status|lower|replace({' ': '-', 'é': 'e', 'á': 'a', 'í': 'i'}) %}
-          {% set row_text = (oficio.id ~ ' ' ~ oficio.numOficio ~ ' ' ~ oficio.title ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.area)|lower %}
+          {% set row_text = (oficio.id ~ ' ' ~ oficio.title ~ ' ' ~ oficio.content ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.recipient ~ ' ' ~ (oficio.date ? oficio.date|date('Y-m-d H:i') : '') ~ ' ' ~ (oficio.filePath ?? '') ~ ' ' ~ (oficio.createdBy ?? ''))|lower %}
 
-          <tr data-stage="{{ st }}" data-text="{{ row_text }}">
-            <td class="fw-bold">
-              {{ oficio.id }}
-              {% if oficio.isCisae %}
-                <span class="badge bg-danger ms-1" title="CISAE">C</span>
-              {% endif %}
-            </td>
-            <td>{{ oficio.numOficio ?? '—' }}</td>
-            <td>{{ oficio.area ?? '—' }}</td>
-            <td>{{ oficio.title|slice(0,55)|default('—') }}{{ oficio.title|length > 55 ? '…' : '' }}</td>
-            <td>{{ oficio.sender|default('—') }}</td>
-            <td>{{ oficio.fechaEmision ? oficio.fechaEmision|date('d/m/Y') : (oficio.date ? oficio.date|date('d/m/Y') : '—') }}</td>
-            <td><span class="pill-badge {{ st }}">{{ oficio.status }}</span></td>
-            <td class="text-center">
+          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ oficio.title|lower }}">
+            <td data-label="#">{{ oficio.id }}</td>
+            <td data-label="Fecha">{{ oficio.date ? oficio.date|date('d-m-Y') : '—' }}</td>
+            <td data-label="Dirigido a">{{ oficio.recipient|default('—') }}</td>
+            <td data-label="Asunto">{{ oficio.title|default('—') }}</td>
+            <td data-label="Contenido">{{ oficio.content|default('—') }}</td>
+            <td data-label="Elaborado por">{{ oficio.sender|default('—') }}</td>
+            <td data-label="Acciones" class="text-center">
               <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                 <i class="bi bi-eye"></i>
               </a>
@@ -84,7 +73,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="8" class="text-center text-muted py-4">No hay oficios registrados</td>
+            <td colspan="7" class="text-center text-muted py-4">No hay oficios registrados</td>
           </tr>
         {% endfor %}
         </tbody>

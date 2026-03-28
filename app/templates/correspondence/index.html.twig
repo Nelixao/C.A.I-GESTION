@@ -6,6 +6,7 @@
 {% block body %}
 <div class="container-glass">
 
+  <!-- Encabezado + acciones -->
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h1 class="page-title">Listado de Correspondencia</h1>
 
@@ -20,51 +21,53 @@
   </div>
 
   <div class="js-table-wrapper">
+    <!-- Toolbar de filtros -->
     <div class="toolbar js-table-toolbar">
       <input type="text" class="js-search form-input" placeholder="Buscar en la tabla...">
       <select class="js-stage form-select">
         <option value="todos">Todas las etapas</option>
-        <option value="recibido">Recibido</option>
+        <option value="sin-etapa">Sin etapa</option>
       </select>
     </div>
 
+    <!-- Tabla -->
     <div class="table-responsive">
       <table class="table-glass js-enhanced-table">
         <thead>
           <tr>
-            <th>FOLIO</th>
+            <th>ID</th>
             <th>ASUNTO</th>
+            <th>MENSAJE</th>
             <th>REMITENTE</th>
-            <th>ÁREA DESTINO</th>
-            <th>FECHA RECEPCIÓN</th>
-            <th>ESTADO</th>
-            <th>FECHA LÍMITE</th>
-            <th>RESPONSABLE</th>
+            <th>DESTINATARIO</th>
+            <th>FECHA</th>
+            <th>ARCHIVO</th>
+            <th>CREADO POR</th>
             <th>CREADO EL</th>
+            <th>ACTUALIZADO EL</th>
             <th class="text-center">ACCIONES</th>
           </tr>
         </thead>
         <tbody>
         {% for correspondence in correspondences %}
-          {% set estado = correspondence.estado|lower %}
-          {% set row_text = (correspondence.id ~ ' ' ~ correspondence.numControl ~ ' ' ~ correspondence.asunto ~ ' ' ~ correspondence.remitente ~ ' ' ~ correspondence.areaDestino)|lower %}
-          <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ correspondence.asunto|lower }}">
-            <td data-label="Folio">
-              #{{ correspondence.numControl }}
-              {% if correspondence.urgente %}
-                <i class="bi bi-star-fill text-warning ms-1" title="Urgente"></i>
+          {% set row_text = (correspondence.id ~ ' ' ~ correspondence.subject ~ ' ' ~ correspondence.body ~ ' ' ~ correspondence.sender ~ ' ' ~ correspondence.receiver ~ ' ' ~ (correspondence.date ? correspondence.date|date('Y-m-d H:i') : '') ~ ' ' ~ correspondence.filePath ~ ' ' ~ correspondence.createdBy)|lower %}
+          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ correspondence.subject|lower }}">
+            <td data-label="ID">{{ correspondence.id }}</td>
+            <td data-label="Asunto">{{ correspondence.subject|default('—') }}</td>
+            <td data-label="Mensaje">{{ correspondence.body|default('—') }}</td>
+            <td data-label="Remitente">{{ correspondence.sender|default('—') }}</td>
+            <td data-label="Destinatario">{{ correspondence.receiver|default('—') }}</td>
+            <td data-label="Fecha">{{ correspondence.date ? correspondence.date|date('Y-m-d H:i') : '' }}</td>
+            <td data-label="Archivo">
+              {% if correspondence.filePath %}
+                <a href="{{ asset(correspondence.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
+              {% else %}
+                <span class="text-muted">—</span>
               {% endif %}
             </td>
-            <td data-label="Asunto">{{ correspondence.asunto|default('—') }}</td>
-            <td data-label="Remitente">{{ correspondence.remitente|default('—') }}</td>
-            <td data-label="Área destino">{{ correspondence.areaDestino|default('—') }}</td>
-            <td data-label="Fecha recepción">{{ correspondence.fechaRecepcion ? correspondence.fechaRecepcion|date('d-m-Y') : '' }}</td>
-            <td data-label="Estado">
-              <span class="pill-badge {{ estado }}">{{ correspondence.estado|default('—') }}</span>
-            </td>
-            <td data-label="Fecha límite">{{ correspondence.fechaLimite ? correspondence.fechaLimite|date('d-m-Y') : '—' }}</td>
-            <td data-label="Responsable">{{ correspondence.user ? (correspondence.user.nombre ?? correspondence.user.email) : '—' }}</td>
+            <td data-label="Creado por">{{ correspondence.createdBy|default('—') }}</td>
             <td data-label="Creado el">{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
+            <td data-label="Actualizado el">{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i') : '' }}</td>
             <td data-label="Acciones" class="text-center">
               <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                 <i class="bi bi-eye"></i>
@@ -76,7 +79,7 @@
           </tr>
         {% else %}
           <tr>
-            <td colspan="10" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
+            <td colspan="11" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -86,6 +89,7 @@
     <div class="js-counter table-counter">&nbsp;</div>
   </div>
 
+  <!-- Botón flotante principal (opcional) -->
   <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary float-btn">
     <i class="bi bi-plus-lg"></i> Crear nueva
   </a>

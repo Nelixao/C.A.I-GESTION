@@ -1,7 +1,0 @@
-<form method="post" action="{{ path('app_cisae_delete', {'id': cisae.id}) }}"
-      onsubmit="return confirm('¿Eliminar este expediente CISAE? Esta acción no se puede deshacer.');">
-  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cisae.id) }}">
-  <button class="glass-btn danger" type="submit">
-    <i class="bi bi-trash3"></i> Eliminar
-  </button>
-</form>

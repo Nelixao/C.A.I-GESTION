@@ -1,41 +1,5 @@
 {% extends 'base.html.twig' %}
 {% block title %}Subir Escaneo{% endblock %}
-
-{% block stylesheets %}
-  {{ parent() }}
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css">
-  <style>
-    /* Adapta Tom Select al tema glass */
-    .ts-wrapper .ts-control {
-      background: rgba(255,255,255,0.09) !important;
-      border: 1px solid rgba(255,255,255,0.11) !important;
-      border-radius: 8px !important;
-      color: rgba(255,255,255,0.90) !important;
-      font-size: .865rem;
-    }
-    .ts-wrapper.focus .ts-control {
-      border-color: rgba(155,34,71,0.55) !important;
-      box-shadow: 0 0 0 3px rgba(155,34,71,0.14) !important;
-    }
-    .ts-dropdown {
-      background: #1f2428 !important;
-      border: 1px solid rgba(255,255,255,0.11) !important;
-      border-radius: 8px !important;
-      color: rgba(255,255,255,0.88) !important;
-    }
-    .ts-dropdown .option { padding: .42rem .85rem; font-size: .855rem; }
-    .ts-dropdown .option:hover,
-    .ts-dropdown .option.active  { background: rgba(155,34,71,0.28) !important; }
-    .ts-dropdown .optgroup-header {
-      font-size: .72rem; font-weight: 700; letter-spacing: .06em;
-      text-transform: uppercase; color: rgba(255,255,255,0.38) !important;
-      padding: .55rem .85rem .2rem; background: transparent !important;
-    }
-    .ts-wrapper .ts-control input::placeholder { color: rgba(255,255,255,0.35); }
-  </style>
-{% endblock %}
-
 {% block body %}
 <div class="container-glass">
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
@@ -50,89 +14,12 @@
   <div class="glass-card">
     {{ form_start(form, { attr: { class: 'form-glass' } }) }}
       <div class="row g-3">
-
-        {# Folio del escaneo #}
-        <div class="col-md-4">
-          {{ form_row(form.folio) }}
-        </div>
-
-        {# Nombre / descripción #}
-        <div class="col-md-8">
-          {{ form_row(form.name) }}
-        </div>
-
-        {# Tipo de documento origen #}
-        <div class="col-md-4">
-          {{ form_label(form.sourceType) }}
-          {{ form_widget(form.sourceType, { attr: { id: 'sourceTypeSelect', class: 'form-select' } }) }}
-          {{ form_errors(form.sourceType) }}
-        </div>
-
-        {# Documento de origen — Tom Select ───────────────────── #}
-        <div class="col-md-8">
-          <label class="form-label" for="sourceIdTomSelect">Documento de origen</label>
-
-          {#
-            Renderizamos el campo Symfony como hidden para que se envíe con el nombre correcto.
-            Tom Select sincroniza su valor hacia este input.
-          #}
-          <div style="display:none">
-            {{ form_widget(form.sourceId, { attr: { id: 'sourceIdHidden' } }) }}
-          </div>
-
-          {# Select personalizado que Tom Select convierte en buscador #}
-          <select id="sourceIdTomSelect" class="form-select" placeholder="Escribe el folio o nombre…">
-            <option value="">— Selecciona documento —</option>
-
-            <optgroup label="Oficios" data-type="oficio">
-              {% for o in oficios %}
-                <option value="{{ o.id }}"
-                        data-type="oficio"
-                        data-folio="{{ o.numOficio ?? '' }}"
-                        data-label="{{ (o.numOficio ?? '#'~o.id) ~ ' — ' ~ (o.title ?? '')|slice(0,55) }}">
-                  {{ (o.numOficio ?? '#'~o.id) }} — {{ (o.title ?? '')|slice(0,55) }}
-                </option>
-              {% endfor %}
-            </optgroup>
-
-            <optgroup label="Correspondencias" data-type="correspondence">
-              {% for c in correspondences %}
-                <option value="{{ c.id }}"
-                        data-type="correspondence"
-                        data-folio="{{ c.numControl }}"
-                        data-label="{{ c.numControl ~ ' — ' ~ (c.asunto ?? '')|slice(0,55) }}">
-                  {{ c.numControl }} — {{ (c.asunto ?? '')|slice(0,55) }}
-                </option>
-              {% endfor %}
-            </optgroup>
-
-            <optgroup label="Circulares" data-type="circular">
-              {% for ci in circulares %}
-                <option value="{{ ci.id }}"
-                        data-type="circular"
-                        data-folio="{{ ci.numCircular }}"
-                        data-label="{{ ci.numCircular ~ ' — ' ~ (ci.titulo ?? '')|slice(0,55) }}">
-                  {{ ci.numCircular }} — {{ (ci.titulo ?? '')|slice(0,55) }}
-                </option>
-              {% endfor %}
-            </optgroup>
-          </select>
-
-          <small class="text-muted mt-1 d-block">
-            Selecciona el tipo de documento arriba para filtrar las opciones.
-          </small>
-        </div>
-
-        <div class="col-12">
-          {{ form_row(form.description) }}
-        </div>
-
-        <div class="col-md-6">
-          {{ form_row(form.upload) }}
-        </div>
-
+        <div class="col-md-6">{{ form_row(form.name) }}</div>
+        <div class="col-md-6">{{ form_row(form.sourceType) }}</div>
+        <div class="col-md-6">{{ form_row(form.sourceId) }}</div>
+        <div class="col-12">{{ form_row(form.description) }}</div>
+        <div class="col-md-6">{{ form_row(form.upload) }}</div>
       </div>
-
       <div class="form-actions mt-3">
         <button class="glass-btn primary" type="submit">
           <i class="bi bi-cloud-upload"></i> Guardar
@@ -141,84 +28,4 @@
     {{ form_end(form) }}
   </div>
 </div>
-{% endblock %}
-
-{% block javascripts %}
-  {{ parent() }}
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-  <script>
-  (function () {
-    const typeSelect   = document.getElementById('sourceTypeSelect');
-    const hiddenInput  = document.getElementById('sourceIdHidden');
-    const tsEl         = document.getElementById('sourceIdTomSelect');
-
-    // Construye el mapa de opciones agrupadas (se usa al filtrar por tipo)
-    const allOptions = {};
-    tsEl.querySelectorAll('option[data-type]').forEach(opt => {
-      const t = opt.dataset.type;
-      if (!allOptions[t]) allOptions[t] = [];
-      allOptions[t].push({
-        value : opt.value,
-        text  : opt.textContent.trim(),
-        type  : t,
-        folio : opt.dataset.folio || '',
-      });
-    });
-
-    // Inicializa Tom Select
-    const ts = new TomSelect('#sourceIdTomSelect', {
-      placeholder     : 'Escribe el folio o nombre…',
-      searchField     : ['text', 'folio'],
-      maxOptions      : 150,
-      plugins         : ['dropdown_input'],
-      render: {
-        option: function (data) {
-          return `<div class="option" data-type="${data.type || ''}">
-                    <strong>${data.folio || data.value}</strong>
-                    <span class="text-muted ms-1" style="font-size:.8rem">${data.text}</span>
-                  </div>`;
-        },
-      },
-      onChange: function (val) {
-        // Sincroniza con el campo hidden de Symfony
-        if (hiddenInput) hiddenInput.value = val;
-
-        // Auto-completa el folio del escaneo si está vacío
-        const folioInput = document.querySelector('input[name="scanner[folio]"]');
-        if (folioInput && !folioInput.value && val) {
-          const opt = tsEl.querySelector(`option[value="${val}"]`);
-          if (opt && opt.dataset.folio) folioInput.value = opt.dataset.folio;
-        }
-      },
-    });
-
-    // Filtra opciones según el tipo de documento seleccionado
-    function filterByType(type) {
-      ts.clear(true);
-      ts.clearOptions();
-
-      if (!type || type === 'otro') {
-        // Sin filtro: muestra todo
-        Object.values(allOptions).flat().forEach(o => ts.addOption(o));
-      } else {
-        const group = allOptions[type] || [];
-        group.forEach(o => ts.addOption(o));
-      }
-
-      ts.refreshOptions(false);
-    }
-
-    // Escucha cambio en sourceType
-    typeSelect?.addEventListener('change', function () {
-      filterByType(this.value);
-    });
-
-    // Aplica filtro inicial si ya hay un valor seleccionado
-    if (typeSelect?.value) filterByType(typeSelect.value);
-
-    // Si el form ya tiene un sourceId (modo edición), selecciónalo
-    const existingVal = hiddenInput?.value;
-    if (existingVal) ts.setValue(existingVal, true);
-  })();
-  </script>
 {% endblock %}

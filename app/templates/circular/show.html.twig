@@ -1,87 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Circular — {{ circular.numCircular }}{% endblock %}
+{% block title %}Detalle de Circular{% endblock %}
 
 {% block body %}
-<div class="container-glass">
-  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-    <h1 class="page-title">Circular</h1>
-    <div class="glass-actions">
-      <a href="{{ path('app_circular_index') }}" class="glass-btn">
-        <i class="bi bi-arrow-left"></i> Listado
-      </a>
-      <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="glass-btn primary">
-        <i class="bi bi-pencil"></i> Editar
-      </a>
-    </div>
-  </div>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4"> Detalle de Circular</h1>
 
-  <div class="glass-card">
-    <div class="row g-3">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID</dt>
+                    <dd class="col-sm-8">{{ circular.id }}</dd>
 
-      <div class="col-md-4">
-        <div class="detail-label">Folio / Núm. Circular</div>
-        <div class="detail-value fw-bold">{{ circular.numCircular ?? '—' }}</div>
-      </div>
+                    <dt class="col-sm-4">Título</dt>
+                    <dd class="col-sm-8">{{ circular.title }}</dd>
 
-      <div class="col-md-4">
-        <div class="detail-label">Fecha</div>
-        <div class="detail-value">{{ circular.fecha ? circular.fecha|date('d/m/Y') : '—' }}</div>
-      </div>
+                    <dt class="col-sm-4">Contenido</dt>
+                    <dd class="col-sm-8">{{ circular.content }}</dd>
 
-      <div class="col-md-4">
-        <div class="detail-label">Estado</div>
-        <div class="detail-value">
-          {% set estadoClass =
-            circular.estado == 'ABIERTA'     ? 'bg-success-subtle text-success-emphasis' :
-            (circular.estado == 'EN_TRAMITE' ? 'bg-warning-subtle text-warning-emphasis' :
-            (circular.estado == 'ARCHIVADA'  ? 'bg-secondary-subtle text-secondary-emphasis' :
-            'bg-secondary-subtle text-secondary-emphasis')) %}
-          <span class="badge {{ estadoClass }}">{{ circular.estado }}</span>
+                    <dt class="col-sm-4">Grupo Destino</dt>
+                    <dd class="col-sm-8">{{ circular.targetGroup }}</dd>
+
+                    <dt class="col-sm-4">Fecha</dt>
+                    <dd class="col-sm-8">{{ circular.date ? circular.date|date('Y-m-d H:i') : '' }}</dd>
+
+                    <dt class="col-sm-4">Archivo</dt>
+                    <dd class="col-sm-8">{{ circular.filePath }}</dd>
+
+                    <dt class="col-sm-4">Creado por</dt>
+                    <dd class="col-sm-8">{{ circular.createdBy }}</dd>
+
+                    <dt class="col-sm-4">Creado el</dt>
+                    <dd class="col-sm-8">{{ circular.createdAt ? circular.createdAt|date('Y-m-d H:i') : '' }}</dd>
+
+                    <dt class="col-sm-4">Última actualización</dt>
+                    <dd class="col-sm-8">{{ circular.updatedAt ? circular.updatedAt|date('Y-m-d H:i') : '' }}</dd>
+                </dl>
+            </div>
         </div>
-      </div>
 
-      <div class="col-12">
-        <div class="detail-label">Título</div>
-        <div class="detail-value fw-semibold">{{ circular.titulo ?? '—' }}</div>
-      </div>
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('app_circular_index') }}" class="btn btn-secondary rounded-pill px-4">← Volver</a>
 
-      <div class="col-12">
-        <div class="detail-label">Contenido</div>
-        <div class="detail-value">{{ circular.contenido ?? '—' }}</div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="detail-label">Fecha Límite</div>
-        <div class="detail-value">{{ circular.fechaLimite ? circular.fechaLimite|date('d/m/Y') : '—' }}</div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="detail-label">Fecha de Cierre</div>
-        <div class="detail-value">{{ circular.fechaCierre ? circular.fechaCierre|date('d/m/Y') : '—' }}</div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="detail-label">Responsable</div>
-        <div class="detail-value">
-          {% if circular.user %}
-            {{ circular.user.nombre ?? circular.user.email }}
-          {% else %}
-            —
-          {% endif %}
+            <div>
+                <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-primary rounded-pill px-4 me-2">✏️ Editar</a>
+                {{ include('circular/_delete_form.html.twig', { 'class': 'd-inline' }) }}
+            </div>
         </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="detail-label">Creado</div>
-        <div class="detail-value">{{ circular.createdAt ? circular.createdAt|date('d/m/Y H:i') : '—' }}</div>
-      </div>
-
     </div>
-  </div>
-
-  <div class="mt-3">
-    {{ include('circular/_delete_form.html.twig') }}
-  </div>
-</div>
 {% endblock %}

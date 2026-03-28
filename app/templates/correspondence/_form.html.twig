@@ -1,46 +1,40 @@
 {{ form_start(form, { attr: { class: 'form-glass' } }) }}
   <div class="row g-3">
     <div class="col-md-6">
-      {{ form_row(form.numControl) }}
+      {{ form_row(form.subject) }}
     </div>
     <div class="col-md-6">
-      {{ form_row(form.fechaRecepcion) }}
-    </div>
-
-    <div class="col-md-6">
-      {{ form_row(form.remitente) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.areaOrigen) }}
+      {{ form_row(form.date) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.areaDestino) }}
+      {{ form_row(form.sender) }}
     </div>
     <div class="col-md-6">
-      {{ form_row(form.estado) }}
+      {{ form_row(form.receiver) }}
     </div>
 
     <div class="col-12">
-      {{ form_row(form.asunto) }}
-    </div>
-
-    <div class="col-12">
-      {{ form_row(form.descripcion) }}
+      {{ form_row(form.body) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.fechaLimite) }}
+      {{ form_row(form.file_path) }}
     </div>
+
     <div class="col-md-6">
       {{ form_row(form.user) }}
     </div>
 
-    <div class="col-12">
-      <div class="form-check form-switch">
-        {{ form_widget(form.urgente) }}
-        {{ form_label(form.urgente, null, {'label_attr': {'class': 'form-check-label ms-2 fw-semibold text-warning'}}) }}
-      </div>
+    {# Solo si decidiste mantenerlos visibles #}
+    <div class="col-md-6">
+      {{ form_row(form.created_by) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.created_at) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.updated_at) }}
     </div>
   </div>
 

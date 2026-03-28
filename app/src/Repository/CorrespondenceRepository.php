@@ -16,41 +16,28 @@ class CorrespondenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Correspondence::class);
     }
 
-    /**
-     * Cuenta correspondencias creadas cada día de la semana dada (Lun–Dom).
-     */
-    public function countByWeek(\DateTime $start, \DateTime $end): array
-    {
-        $startImmutable = \DateTimeImmutable::createFromMutable($start);
-        $endImmutable   = \DateTimeImmutable::createFromMutable($end)->setTime(23, 59, 59);
+    //    /**
+    //     * @return Correspondence[] Returns an array of Correspondence objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('c')
+    //            ->andWhere('c.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('c.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-        $entities = $this->createQueryBuilder('c')
-            ->where('c.createdAt >= :start AND c.createdAt <= :end')
-            ->setParameter('start', $startImmutable)
-            ->setParameter('end', $endImmutable)
-            ->getQuery()
-            ->getResult();
-
-        $counts = array_fill(0, 7, 0);
-        foreach ($entities as $entity) {
-            $createdAt = $entity->getCreatedAt();
-            if ($createdAt) {
-                $dayOfWeek = (int)$createdAt->format('N') - 1;
-                $counts[$dayOfWeek]++;
-            }
-        }
-
-        return $counts;
-    }
-
-    /**
-     * Eventos para el calendario: correspondencias con fechaLimite
-     */
-    public function findForCalendar(): array
-    {
-        return $this->createQueryBuilder('c')
-            ->where('c.fechaLimite IS NOT NULL')
-            ->getQuery()
-            ->getResult();
-    }
+    //    public function findOneBySomeField($value): ?Correspondence
+    //    {
+    //        return $this->createQueryBuilder('c')
+    //            ->andWhere('c.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

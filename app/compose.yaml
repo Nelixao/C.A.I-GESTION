@@ -1,4 +1,4 @@
-ca l
+
 services:
 ###> doctrine/doctrine-bundle ###
   database:

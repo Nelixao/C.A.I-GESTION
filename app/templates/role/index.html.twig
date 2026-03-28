@@ -1,61 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Roles{% endblock %}
+{% block title %}Role index{% endblock %}
 
 {% block body %}
-<div class="container-glass">
+    <h1>Role index</h1>
 
-  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-    <h1 class="page-title"><i class="bi bi-shield-lock me-2"></i>Roles del sistema</h1>
-    <div class="glass-actions">
-      <a href="{{ path('app_role_new') }}" class="glass-btn primary">
-        <i class="bi bi-plus-circle"></i> Nuevo rol
-      </a>
-    </div>
-  </div>
-
-  <div class="js-table-wrapper">
-    <div class="toolbar js-table-toolbar">
-      <input type="text" class="js-search form-input" placeholder="Buscar rol…">
-      <span class="js-counter small text-muted ms-auto"></span>
-    </div>
-
-    <div class="table-responsive">
-      <table class="table-glass js-enhanced-table">
+    <table class="table">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre del Rol</th>
-            <th class="text-center">Acciones</th>
-          </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
         </thead>
         <tbody>
         {% for role in roles %}
-          <tr data-text="{{ role.id }} {{ role.name }}">
-            <td class="fw-bold">{{ role.id }}</td>
-            <td>{{ role.name }}</td>
-            <td class="text-center">
-              <a href="{{ path('app_role_show', {'id': role.id}) }}"
-                 class="btn btn-outline-primary btn-sm" title="Ver">
-                <i class="bi bi-eye"></i>
-              </a>
-              <a href="{{ path('app_role_edit', {'id': role.id}) }}"
-                 class="btn btn-outline-warning btn-sm" title="Editar">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-            </td>
-          </tr>
+            <tr>
+                <td>{{ role.id }}</td>
+                <td>{{ role.name }}</td>
+                <td>
+                    <a href="{{ path('app_role_show', {'id': role.id}) }}">show</a>
+                    <a href="{{ path('app_role_edit', {'id': role.id}) }}">edit</a>
+                </td>
+            </tr>
         {% else %}
-          <tr>
-            <td colspan="3" class="text-center text-muted py-4">No hay roles registrados</td>
-          </tr>
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
         {% endfor %}
         </tbody>
-      </table>
-    </div>
+    </table>
 
-    <div class="js-counter table-counter">&nbsp;</div>
-  </div>
-
-</div>
+    <a href="{{ path('app_role_new') }}">Create new</a>
 {% endblock %}

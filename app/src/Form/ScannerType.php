@@ -17,13 +17,7 @@ class ScannerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('folio', TextType::class, [
-                'label'    => 'Folio del escaneo',
-                'required' => false,
-                'attr'     => ['class' => 'form-control', 'placeholder' => 'SCAN-2025-001'],
-                'help'     => 'Folio o número interno de este registro de escaneo.',
-            ])
-            ->add('name', TextType::class, [ 'label' => 'Nombre / descripción breve' ])
+            ->add('name', TextType::class, [ 'label' => 'Nombre' ])
             ->add('description', TextareaType::class, [ 'label' => 'Descripción', 'required' => false ])
             ->add('sourceType', ChoiceType::class, [
                 'label' => 'Origen',

@@ -8,9 +8,6 @@ use App\Entity\Correspondence;
 use App\Entity\Circular;
 use App\Form\ScannerType;
 use App\Repository\ScannerRepository;
-use App\Repository\OficioRepository;
-use App\Repository\CorrespondenceRepository;
-use App\Repository\CircularRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,9 +63,6 @@ final class ScannerController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        OficioRepository $oficioRepo,
-        CorrespondenceRepository $corrRepo,
-        CircularRepository $circularRepo,
     ): Response {
         $scanner = new Scanner();
         $form = $this->createForm(ScannerType::class, $scanner);
@@ -142,11 +136,8 @@ final class ScannerController extends AbstractController
         }
 
         return $this->render('scanner/new.html.twig', [
-            'scanner'         => $scanner,
-            'form'            => $form,
-            'oficios'         => $oficioRepo->findBy([], ['id' => 'DESC'], 200),
-            'correspondences' => $corrRepo->findBy([], ['id' => 'DESC'], 200),
-            'circulares'      => $circularRepo->findBy([], ['id' => 'DESC'], 200),
+            'scanner' => $scanner,
+            'form' => $form,
         ]);
     }
 
@@ -169,12 +160,9 @@ final class ScannerController extends AbstractController
         if (method_exists($entity, 'setUpdatedAt')) {
             $entity->setUpdatedAt($now);
         }
-        // Cada entidad usa un nombre de método diferente para el estado
-        match ($type) {
-            'oficio'         => $entity->setStatus('ARCHIVADO'),
-            'correspondence' => $entity->setEstado('archivado'),
-            'circular'       => $entity->setEstado('ARCHIVADA'),
-            default          => null,
-        };
+        if (method_exists($entity, 'setStatus')) {
+            $entity->setStatus('terminado');
+        }
+        // Si quieres, también podrías setear aquí un campo "hasScan = true", etc.
     }
 }

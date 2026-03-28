@@ -26,20 +26,20 @@ final class CircularController extends AbstractController
     public function export(CircularRepository $circularRepository): Response
     {
         $items = $circularRepository->findAll();
-        $headers = ['ID','Folio','Título','Contenido','Estado','Fecha','Fecha límite','Creado por','Creado en'];
+        $headers = ['ID','Título','Contenido','Dirigido A','Fecha','Archivo','Creado por','Creado en','Actualizado en'];
         $f = fopen('php://temp', 'r+');
         fputcsv($f, $headers);
         foreach ($items as $c) {
             fputcsv($f, [
                 $c->getId(),
-                $c->getNumCircular(),
-                $c->getTitulo(),
-                $c->getContenido(),
-                $c->getEstado(),
-                $c->getFecha() ? $c->getFecha()->format('Y-m-d') : '',
-                $c->getFechaLimite() ? $c->getFechaLimite()->format('Y-m-d') : '',
-                $c->getUser() ? ($c->getUser()->getNombre() ?? $c->getUser()->getEmail()) : '',
-                $c->getCreatedAt() ? $c->getCreatedAt()->format('Y-m-d H:i') : '',
+                $c->getTitle(),
+                $c->getContent(),
+                $c->getTargetGroup(),
+                $c->getDate()? $c->getDate()->format('Y-m-d') : '',
+                $c->getFilePath(),
+                $c->getCreatedBy(),
+                $c->getCreatedAt()? $c->getCreatedAt()->format('Y-m-d H:i') : '',
+                $c->getUpdatedAt()? $c->getUpdatedAt()->format('Y-m-d H:i') : '',
             ]);
         }
         rewind($f);
@@ -59,9 +59,19 @@ final class CircularController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->getUser()) {
-                $circular->setUser($this->getUser());
+            // Manejo del archivo
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $circular->setFilePath('uploads/'.$new);
+            } else {
+                if ($circular->getFilePath() === null) {
+                    $circular->setFilePath('');
+                }
             }
+
             $entityManager->persist($circular);
             $entityManager->flush();
 
@@ -89,6 +99,19 @@ final class CircularController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo al editar
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $circular->setFilePath('uploads/'.$new);
+            } else {
+                if ($circular->getFilePath() === null) {
+                    $circular->setFilePath('');
+                }
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_circular_index', [], Response::HTTP_SEE_OTHER);
@@ -103,7 +126,7 @@ final class CircularController extends AbstractController
     #[Route('/{id}', name: 'app_circular_delete', methods: ['POST'])]
     public function delete(Request $request, Circular $circular, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$circular->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$circular->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($circular);
             $entityManager->flush();
         }

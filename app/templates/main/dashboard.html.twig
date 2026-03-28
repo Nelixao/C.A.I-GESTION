@@ -4,7 +4,126 @@
 
 {% block stylesheets %}
   {{ parent() }}
-  
+  <style>
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 1rem 0;
+    }
+    
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .kpi {
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(178, 34, 93, 0.1) 0%, rgba(178, 34, 93, 0.05) 100%);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .kpi:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(178, 34, 93, 0.15);
+    }
+    
+    .kpi-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      line-height: 1;
+      margin: 0.5rem 0;
+    }
+    
+    .kpi-sub {
+      font-size: 0.875rem;
+      margin: 0;
+    }
+    
+    .glass-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .glass-btn.primary {
+      background: rgba(178, 34, 93, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(178, 34, 93, 0.2);
+    }
+    
+    .glass-btn.success {
+      background: rgba(40, 167, 69, 0.1);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    .glass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .chart-card {
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .chart-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      background: transparent;
+    }
+    
+    .trend-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+    
+    .table-wrap {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    @media (max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      
+      .kpi-value {
+        font-size: 2rem;
+      }
+      
+      .quick-actions {
+        justify-content: center;
+      }
+      
+      .glass-btn {
+        flex: 1;
+        min-width: 140px;
+        justify-content: center;
+      }
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
@@ -133,7 +252,7 @@
     <div class="col-12 col-lg-4">
       <div class="card chart-card">
         <header class="card-header chart-header">
-          <span class="card-title"><i class="bi bi-bar-chart-steps"></i> Top Remitentes</span>
+          <span class="card-title"><i class="bi bi-speedometer2"></i> Eficiencia por Área</span>
         </header>
         <div class="card-body">
           <div class="chart-container">
@@ -198,9 +317,9 @@
             {% for c in activeCirculares %}
               <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
                 <div>
-                  <strong>#{{ c.id }}</strong> · {{ c.titulo|default('Sin título')|slice(0,72) }}{% if c.titulo and c.titulo|length > 72 %}…{% endif %}
+                  <strong>#{{ c.id }}</strong> · {{ c.title|default('Sin título')|slice(0,72) }}{% if c.title and c.title|length > 72 %}…{% endif %}
                 </div>
-                <span class="badge bg-warning-subtle text-warning">{{ c.fecha ? c.fecha|date('Y-m-d') : '—' }}</span>
+                <span class="badge bg-warning-subtle text-warning">{{ c.date ? c.date|date('Y-m-d') : '—' }}</span>
               </div>
             {% endfor %}
           {% else %}
@@ -338,11 +457,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Datos de ejemplo para las gráficas (reemplazar con datos reales del backend)
       const weeklyData = {
-        labels: {{ weeklyStats.labels|json_encode|raw }},
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
         datasets: [
           {
             label: 'Oficios',
-            data: {{ weeklyStats.oficios|json_encode|raw }},
+            data: [12, 19, 8, 15, 22, 3, 7],
             backgroundColor: 'rgba(178, 34, 93, 0.8)',
             borderColor: 'rgba(178, 34, 93, 1)',
             borderWidth: 2,
@@ -351,7 +470,7 @@
           },
           {
             label: 'Correspondencias',
-            data: {{ weeklyStats.correspondences|json_encode|raw }},
+            data: [8, 12, 6, 10, 15, 2, 4],
             backgroundColor: 'rgba(40, 167, 69, 0.8)',
             borderColor: 'rgba(40, 167, 69, 1)',
             borderWidth: 2,
@@ -360,7 +479,7 @@
           },
           {
             label: 'Circulares',
-            data: {{ weeklyStats.circulares|json_encode|raw }},
+            data: [5, 8, 4, 7, 12, 1, 2],
             backgroundColor: 'rgba(255, 193, 7, 0.8)',
             borderColor: 'rgba(255, 193, 7, 1)',
             borderWidth: 2,
@@ -370,11 +489,10 @@
         ]
       };
 
-      const _statusDist = {{ statusDistribution|json_encode|raw }};
       const statusData = {
-        labels: Object.keys(_statusDist),
+        labels: ['Cerrado', 'En Proceso', 'Abierto', 'Pendiente'],
         datasets: [{
-          data: Object.values(_statusDist),
+          data: [45, 30, 15, 10],
           backgroundColor: [
             'rgba(40, 167, 69, 0.8)',
             'rgba(255, 193, 7, 0.8)',
@@ -387,10 +505,10 @@
       };
 
       const dailyTrendsData = {
-        labels: {{ weeklyStats.labels|json_encode|raw }},
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
         datasets: [{
           label: 'Documentos Procesados',
-          data: {{ dailyTrends|json_encode|raw }},
+          data: [25, 32, 28, 35, 40, 15, 8],
           borderColor: 'rgba(178, 34, 93, 1)',
           backgroundColor: 'rgba(178, 34, 93, 0.1)',
           borderWidth: 3,
@@ -400,10 +518,10 @@
       };
 
       const areaEfficiencyData = {
-        labels: {{ areaEfficiency.labels|json_encode|raw }},
+        labels: ['Dirección General', 'Recursos Humanos', 'Finanzas', 'Operaciones', 'TI'],
         datasets: [{
-          label: 'Oficios por remitente',
-          data: {{ areaEfficiency.efficiency|json_encode|raw }},
+          label: 'Eficiencia (%)',
+          data: [85, 92, 78, 88, 95],
           backgroundColor: [
             'rgba(178, 34, 93, 0.8)',
             'rgba(40, 167, 69, 0.8)',
@@ -516,6 +634,7 @@
             scales: {
               x: {
                 beginAtZero: true,
+                max: 100,
                 grid: {
                   color: 'rgba(0, 0, 0, 0.1)'
                 }

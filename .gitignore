@@ -1,0 +1,12 @@
+# Entorno
+.env
+
+# Symfony / PHP
+/vendor/
+/var/
+
+# IDE
+.idea/
+
+# Otros
+node_modules/

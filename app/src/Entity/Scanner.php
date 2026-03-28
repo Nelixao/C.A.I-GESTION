@@ -13,9 +13,6 @@ class Scanner
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 60, nullable: true)]
-    private ?string $folio = null;
-
     #[ORM\Column(length: 120)]
     private ?string $name = null;
 
@@ -68,9 +65,6 @@ private ?User $user = null;
 
 
     public function getId(): ?int { return $this->id; }
-
-    public function getFolio(): ?string { return $this->folio; }
-    public function setFolio(?string $folio): static { $this->folio = $folio; return $this; }
 
     public function getName(): ?string { return $this->name; }
     public function setName(string $name): static { $this->name = $name; return $this; }

@@ -26,22 +26,21 @@ final class CorrespondenceController extends AbstractController
     public function export(CorrespondenceRepository $correspondenceRepository): Response
     {
         $items = $correspondenceRepository->findAll();
-        $headers = ['ID','Folio','Asunto','Descripción','Remitente','Área destino','Fecha recepción','Estado','Fecha límite','Creado por','Creado el'];
+        $headers = ['ID','Asunto','Mensaje','Remitente','Destinatario','Fecha','Archivo','Creado por','Creado el','Actualizado el'];
         $f = fopen('php://temp', 'r+');
         fputcsv($f, $headers);
         foreach ($items as $c) {
             fputcsv($f, [
                 $c->getId(),
-                $c->getNumControl(),
-                $c->getAsunto(),
-                $c->getDescripcion(),
-                $c->getRemitente(),
-                $c->getAreaDestino(),
-                $c->getFechaRecepcion() ? $c->getFechaRecepcion()->format('Y-m-d') : '',
-                $c->getEstado(),
-                $c->getFechaLimite() ? $c->getFechaLimite()->format('Y-m-d') : '',
-                $c->getUser() ? ($c->getUser()->getNombre() ?? $c->getUser()->getEmail()) : '',
-                $c->getCreatedAt() ? $c->getCreatedAt()->format('Y-m-d') : '',
+                $c->getSubject(),
+                $c->getBody(),
+                $c->getSender(),
+                $c->getReceiver(),
+                $c->getDate()? $c->getDate()->format('Y-m-d H:i') : '',
+                $c->getFilePath(),
+                $c->getCreatedBy(),
+                $c->getCreatedAt()? $c->getCreatedAt()->format('Y-m-d') : '',
+                $c->getUpdatedAt()? $c->getUpdatedAt()->format('Y-m-d H:i') : '',
             ]);
         }
         rewind($f);
@@ -61,9 +60,19 @@ final class CorrespondenceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->getUser()) {
-                $correspondence->setUser($this->getUser());
+            // Manejo del archivo
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $correspondence->setFilePath('uploads/'.$new);
+            } else {
+                if ($correspondence->getFilePath() === null) {
+                    $correspondence->setFilePath('');
+                }
             }
+
             $entityManager->persist($correspondence);
             $entityManager->flush();
 
@@ -91,6 +100,19 @@ final class CorrespondenceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo al editar
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('app.upload_dir'), $new);
+                $correspondence->setFilePath('uploads/'.$new);
+            } else {
+                if ($correspondence->getFilePath() === null) {
+                    $correspondence->setFilePath('');
+                }
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_correspondence_index', [], Response::HTTP_SEE_OTHER);
@@ -105,7 +127,7 @@ final class CorrespondenceController extends AbstractController
     #[Route('/{id}', name: 'app_correspondence_delete', methods: ['POST'])]
     public function delete(Request $request, Correspondence $correspondence, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($correspondence);
             $entityManager->flush();
         }
