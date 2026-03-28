@@ -6,7 +6,6 @@
 {% block body %}
 <div class="container-glass">
 
-  <!-- Encabezado + acciones -->
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h1 class="page-title">Listado de Correspondencia</h1>
 
@@ -21,53 +20,51 @@
   </div>
 
   <div class="js-table-wrapper">
-    <!-- Toolbar de filtros -->
     <div class="toolbar js-table-toolbar">
       <input type="text" class="js-search form-input" placeholder="Buscar en la tabla...">
       <select class="js-stage form-select">
-        <option value="todos">Todas las etapas</option>
-        <option value="sin-etapa">Sin etapa</option>
+        <option value="todos">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en trámite">En trámite</option>
+        <option value="concluido">Concluido</option>
+        <option value="archivado">Archivado</option>
       </select>
     </div>
 
-    <!-- Tabla -->
     <div class="table-responsive">
       <table class="table-glass js-enhanced-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>ASUNTO</th>
-            <th>MENSAJE</th>
-            <th>REMITENTE</th>
-            <th>DESTINATARIO</th>
-            <th>FECHA</th>
-            <th>ARCHIVO</th>
-            <th>CREADO POR</th>
-            <th>CREADO EL</th>
-            <th>ACTUALIZADO EL</th>
-            <th class="text-center">ACCIONES</th>
+            <th>Folio</th>
+            <th>Área / Departamento</th>
+            <th>Estado</th>
+            <th>Usuario responsable</th>
+            <th>Fecha límite</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
         {% for correspondence in correspondences %}
-          {% set row_text = (correspondence.id ~ ' ' ~ correspondence.subject ~ ' ' ~ correspondence.body ~ ' ' ~ correspondence.sender ~ ' ' ~ correspondence.receiver ~ ' ' ~ (correspondence.date ? correspondence.date|date('Y-m-d H:i') : '') ~ ' ' ~ correspondence.filePath ~ ' ' ~ correspondence.createdBy)|lower %}
-          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ correspondence.subject|lower }}">
-            <td data-label="ID">{{ correspondence.id }}</td>
-            <td data-label="Asunto">{{ correspondence.subject|default('—') }}</td>
-            <td data-label="Mensaje">{{ correspondence.body|default('—') }}</td>
-            <td data-label="Remitente">{{ correspondence.sender|default('—') }}</td>
-            <td data-label="Destinatario">{{ correspondence.receiver|default('—') }}</td>
-            <td data-label="Fecha">{{ correspondence.date ? correspondence.date|date('Y-m-d H:i') : '' }}</td>
-            <td data-label="Archivo">
-              {% if correspondence.filePath %}
-                <a href="{{ asset(correspondence.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
+          {% set estado = (correspondence.status ?? 'pendiente')|lower %}
+          {% set row_text = ((correspondence.numControl ?? correspondence.id) ~ ' ' ~ correspondence.subject ~ ' ' ~ correspondence.sender ~ ' ' ~ correspondence.status)|lower %}
+
+          <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
+            <td data-label="Folio">
+              <strong>{{ correspondence.numControl ?? ('#' ~ correspondence.id) }}</strong>
+              <div class="text-muted small">{{ correspondence.subject|default('') }}</div>
+            </td>
+            <td data-label="Área">{{ correspondence.sender|default('—') }}</td>
+            <td data-label="Estado">
+              <span class="pill-badge {{ estado }}">{{ correspondence.status|default('Pendiente') }}</span>
+            </td>
+            <td data-label="Usuario">
+              {% if correspondence.user %}
+                {{ correspondence.user.nombre ?? correspondence.user.email }}
               {% else %}
                 <span class="text-muted">—</span>
               {% endif %}
             </td>
-            <td data-label="Creado por">{{ correspondence.createdBy|default('—') }}</td>
-            <td data-label="Creado el">{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
-            <td data-label="Actualizado el">{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i') : '' }}</td>
+            <td data-label="Fecha límite">{{ correspondence.date ? correspondence.date|date('d/m/Y') : '—' }}</td>
             <td data-label="Acciones" class="text-center">
               <a href="{{ path('app_correspondence_show', {'id': correspondence.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                 <i class="bi bi-eye"></i>
@@ -75,11 +72,21 @@
               <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
                 <i class="bi bi-pencil-square"></i>
               </a>
+              {% if is_granted('ROLE_ADMIN') %}
+                <form method="post" action="{{ path('app_correspondence_delete', {'id': correspondence.id}) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('¿Eliminar esta correspondencia?')">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ correspondence.id) }}">
+                  <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              {% endif %}
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="11" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
+            <td colspan="6" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -89,7 +96,6 @@
     <div class="js-counter table-counter">&nbsp;</div>
   </div>
 
-  <!-- Botón flotante principal (opcional) -->
   <a href="{{ path('app_correspondence_new') }}" class="glass-btn primary float-btn">
     <i class="bi bi-plus-lg"></i> Crear nueva
   </a>

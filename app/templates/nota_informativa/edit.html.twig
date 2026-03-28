@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% block title %}Editar Nota Informativa{% endblock %}
+{% block body %}
+<div class="container-glass">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Editar Nota Informativa</h1>
+    <div class="glass-actions">
+      <a href="{{ path('app_nota_informativa_show', {'id': nota.id}) }}" class="glass-btn">
+        <i class="bi bi-eye"></i> Ver
+      </a>
+      <a href="{{ path('app_nota_informativa_index') }}" class="glass-btn">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+    </div>
+  </div>
+  <div class="glass-card">
+    {{ form_start(form, { attr: { class: 'form-glass' } }) }}
+      {{ include('nota_informativa/_form.html.twig') }}
+      <div class="form-actions mt-3">
+        <button class="glass-btn primary" type="submit">
+          <i class="bi bi-save"></i> Guardar cambios
+        </button>
+      </div>
+    {{ form_end(form) }}
+  </div>
+  {% if is_granted('ROLE_ADMIN') %}
+    <div class="mt-3">
+      <form method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}"
+            onsubmit="return confirm('¿Eliminar esta nota informativa?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nota.id) }}">
+        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Eliminar</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -4,10 +4,9 @@
 {% block body %}
 <div class="container-glass js-table-wrapper">
 
-  <!-- Título + acciones -->
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h1 class="page-title">Documentos Escaneados</h1>
- 
+
     <div class="glass-actions">
       <a href="{{ path('app_scanner_export') }}" class="glass-btn success">
         <i class="bi bi-download"></i> Exportar a Excel
@@ -18,7 +17,6 @@
     </div>
   </div>
 
-  <!-- Toolbar (usa tu JS de filtrado) -->
   <div class="toolbar js-table-toolbar">
     <input type="text" class="js-search form-input" placeholder="Buscar en la tabla…">
     <select class="js-stage form-select">
@@ -29,55 +27,61 @@
     </select>
   </div>
 
-  <!-- Tabla glass + responsive -->
   <div class="table-responsive">
     <table class="table-glass js-enhanced-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Origen</th>
-          <th>ID Origen</th>
-          <th>Archivo</th>
-          <th>Tipo</th>
-          <th>Tamaño</th>
+          <th>Folio</th>
+          <th>Área / Departamento</th>
           <th>Estado</th>
-          <th>Creado</th>
+          <th>Usuario responsable</th>
+          <th>Fecha subida</th>
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
       {% for scan in scanners %}
         {% set estado = (scan.status ?? 'pendiente')|lower %}
-        {% set row_text = (scan.id ~ ' ' ~ scan.name ~ ' ' ~ (scan.sourceType ?? '') ~ ' ' ~ (scan.sourceId ?? '') ~ ' ' ~ (scan.filePath ?? '') ~ ' ' ~ (scan.mimeType ?? '') ~ ' ' ~ (scan.size ?? '') ~ ' ' ~ (scan.status ?? '') ~ ' ' ~ (scan.createdAt ? scan.createdAt|date('Y-m-d H:i') : ''))|lower %}
+        {% set row_text = ((scan.numDocumento ?? scan.id) ~ ' ' ~ scan.name ~ ' ' ~ (scan.tipoDocumento ?? scan.sourceType ?? '') ~ ' ' ~ scan.status)|lower %}
 
-        <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ scan.name|lower }}">
-          <td data-label="ID">{{ scan.id }}</td>
-          <td data-label="Nombre">{{ scan.name|default('—') }}</td>
-          <td data-label="Origen">{{ scan.sourceType|default('—') }}</td>
-          <td data-label="ID Origen">{{ scan.sourceId ?? '—' }}</td>
-          <td data-label="Archivo">
-            {% if scan.filePath %}
-              <a class="file-link" href="{{ asset(scan.filePath) }}" target="_blank">Ver archivo</a>
+        <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
+          <td data-label="Folio">
+            <strong>{{ scan.numDocumento ?? ('#' ~ scan.id) }}</strong>
+            <div class="text-muted small">{{ scan.name|default('') }}</div>
+          </td>
+          <td data-label="Área">{{ scan.tipoDocumento ?? scan.sourceType|default('—') }}</td>
+          <td data-label="Estado">
+            <span class="pill-badge {{ estado }}">{{ estado|capitalize }}</span>
+          </td>
+          <td data-label="Usuario">
+            {% if scan.user %}
+              {{ scan.user.nombre ?? scan.user.email }}
             {% else %}
               <span class="text-muted">—</span>
             {% endif %}
           </td>
-          <td data-label="Tipo">{{ scan.mimeType|default('—') }}</td>
-          <td data-label="Tamaño">
-            {% if scan.size %}
-              {{ (scan.size/1024)|number_format(1, '.', ',') }} KB
-            {% else %}
-              —
+          <td data-label="Fecha subida">{{ scan.createdAt ? scan.createdAt|date('d/m/Y') : '—' }}</td>
+          <td data-label="Acciones" class="text-center">
+            {% if scan.filePath %}
+              <a href="{{ asset(scan.filePath) }}" target="_blank" class="btn btn-outline-primary btn-sm" title="Ver archivo">
+                <i class="bi bi-file-earmark-pdf"></i>
+              </a>
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') %}
+              <form method="post" action="{{ path('app_scanner_delete', {'id': scan.id}) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('¿Eliminar este escaneo?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ scan.id) }}">
+                <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
             {% endif %}
           </td>
-          <td data-label="Estado">
-            <span class="pill-badge">{{ estado|capitalize }}</span>
-          </td>
-          <td data-label="Creado">{{ scan.createdAt ? scan.createdAt|date('Y-m-d H:i') : '' }}</td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="9" class="text-center text-muted py-4">Sin información</td>
+          <td colspan="6" class="text-center text-muted py-4">Sin información</td>
         </tr>
       {% endfor %}
       </tbody>

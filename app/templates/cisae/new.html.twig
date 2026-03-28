@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nuevo trámite CISAE{% endblock %}
+{% block body %}
+<div class="container-glass">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Nuevo Trámite CISAE</h1>
+    <a href="{{ path('app_cisae_index') }}" class="glass-btn">
+      <i class="bi bi-arrow-left"></i> Volver
+    </a>
+  </div>
+  <div class="glass-card">
+    {{ form_start(form, { attr: { class: 'form-glass' } }) }}
+      {{ include('cisae/_form.html.twig') }}
+      <div class="form-actions mt-3">
+        <button class="glass-btn primary" type="submit">
+          <i class="bi bi-save"></i> Guardar
+        </button>
+      </div>
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}

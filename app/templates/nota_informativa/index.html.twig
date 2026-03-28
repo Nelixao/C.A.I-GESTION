@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notas Informativas{% endblock %}
+{% block body %}
+<div class="container-glass js-table-wrapper">
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Notas Informativas</h1>
+    <div class="glass-actions">
+      <a href="{{ path('app_nota_informativa_new') }}" class="glass-btn primary">
+        <i class="bi bi-plus-circle"></i> Nueva nota
+      </a>
+    </div>
+  </div>
+
+  <div class="toolbar js-table-toolbar">
+    <input type="text" class="js-search form-input" placeholder="Buscar en la tabla…">
+    <select class="js-stage form-select">
+      <option value="todos">Todos los estados</option>
+      <option value="no-revisado">No revisado</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="terminado">Terminado</option>
+    </select>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table-glass js-enhanced-table">
+      <thead>
+        <tr>
+          <th>Folio</th>
+          <th>Área / Departamento</th>
+          <th>Estado</th>
+          <th>Usuario responsable</th>
+          <th>Fecha límite</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for nota in notas %}
+        {% set estado = (nota.status ?? 'no-revisado')|lower %}
+        {% set row_text = ((nota.folio ?? nota.id) ~ ' ' ~ nota.title ~ ' ' ~ (nota.area ?? '') ~ ' ' ~ nota.status)|lower %}
+
+        <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
+          <td data-label="Folio">
+            <strong>{{ nota.folio ?? ('#' ~ nota.id) }}</strong>
+            <div class="text-muted small">{{ nota.title }}</div>
+          </td>
+          <td data-label="Área">{{ nota.area|default('—') }}</td>
+          <td data-label="Estado">
+            <span class="pill-badge {{ estado }}">{{ nota.status|capitalize }}</span>
+          </td>
+          <td data-label="Usuario">
+            {% if nota.user %}
+              {{ nota.user.nombre ?? nota.user.email }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td data-label="Fecha límite">
+            {{ nota.fechaLimite ? nota.fechaLimite|date('d/m/Y') : '—' }}
+          </td>
+          <td data-label="Acciones" class="text-center">
+            <a href="{{ path('app_nota_informativa_show', {'id': nota.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="{{ path('app_nota_informativa_edit', {'id': nota.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+              <form method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('¿Eliminar esta nota informativa?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nota.id) }}">
+                <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">Sin notas informativas registradas</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="js-counter table-counter">&nbsp;</div>
+</div>
+{% endblock %}

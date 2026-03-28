@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CISAE{% endblock %}
+
+{% block body %}
+<div class="container-glass js-table-wrapper">
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <div>
+      <h1 class="page-title">Trámites CISAE</h1>
+      <p class="text-muted small mb-0">Control de vencimientos y seguimiento</p>
+    </div>
+    <div class="glass-actions">
+      <a href="{{ path('app_cisae_new') }}" class="glass-btn primary">
+        <i class="bi bi-plus-circle"></i> Nuevo trámite
+      </a>
+    </div>
+  </div>
+
+  <div class="toolbar js-table-toolbar">
+    <input type="text" class="js-search form-input" placeholder="Buscar trámite…">
+    <select class="js-stage form-select">
+      <option value="todos">Todos los estados</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="en trámite">En trámite</option>
+      <option value="concluido">Concluido</option>
+      <option value="archivado">Archivado</option>
+    </select>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table-glass js-enhanced-table cisae-table">
+      <thead>
+        <tr>
+          <th>Folio</th>
+          <th>Área / Departamento</th>
+          <th>Estado</th>
+          <th>Usuario responsable</th>
+          <th>Fecha límite</th>
+          <th>Días restantes</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in cisaeData %}
+        {% set cisae = row.cisae %}
+        {% set dias = row.diasRestantes %}
+        {% set estado = (cisae.status ?? 'Pendiente')|lower %}
+        {% set row_text = (cisae.folio ~ ' ' ~ cisae.titulo ~ ' ' ~ cisae.area ~ ' ' ~ cisae.status)|lower %}
+
+        {% if dias is not null and dias < 0 %}
+          {% set rowClass = 'cisae-vencido' %}
+          {% set badgeClass = 'badge-vencido' %}
+          {% set badgeText = 'Vencido hace ' ~ (dias * -1) ~ ' día(s)' %}
+        {% elseif dias is not null and dias < 3 %}
+          {% set rowClass = 'cisae-critico' %}
+          {% set badgeClass = 'badge-critico' %}
+          {% set badgeText = dias ~ ' día(s)' %}
+        {% elseif dias is not null and dias < 7 %}
+          {% set rowClass = 'cisae-alerta' %}
+          {% set badgeClass = 'badge-alerta' %}
+          {% set badgeText = dias ~ ' día(s)' %}
+        {% else %}
+          {% set rowClass = '' %}
+          {% set badgeClass = 'badge-normal' %}
+          {% set badgeText = dias is not null ? (dias ~ ' día(s)') : '—' %}
+        {% endif %}
+
+        <tr class="cisae-row {{ rowClass }}" data-stage="{{ estado }}" data-text="{{ row_text }}">
+          <td data-label="Folio">
+            <strong>{{ cisae.folio ?? ('#' ~ cisae.id) }}</strong>
+            <div class="text-muted small cisae-titulo">{{ cisae.titulo }}</div>
+          </td>
+          <td data-label="Área">{{ cisae.area|default('—') }}</td>
+          <td data-label="Estado">
+            <span class="pill-badge {{ estado }}">{{ cisae.status }}</span>
+          </td>
+          <td data-label="Usuario">
+            {% if cisae.user %}
+              {{ cisae.user.nombre ?? cisae.user.email }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td data-label="Fecha límite">
+            {{ cisae.fechaLimite ? cisae.fechaLimite|date('d/m/Y') : '—' }}
+          </td>
+          <td data-label="Días restantes">
+            <span class="dias-badge {{ badgeClass }}">
+              <i class="bi bi-clock{% if dias is not null and dias < 3 %}-fill{% endif %}"></i>
+              {{ badgeText }}
+            </span>
+          </td>
+          <td data-label="Acciones" class="text-center">
+            <a href="{{ path('app_cisae_show', {'id': cisae.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="{{ path('app_cisae_edit', {'id': cisae.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+              <form method="post" action="{{ path('app_cisae_delete', {'id': cisae.id}) }}"
+                    style="display:inline"
+                    onsubmit="return confirm('¿Eliminar este trámite CISAE?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cisae.id) }}">
+                <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">Sin trámites CISAE registrados</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="js-counter table-counter">&nbsp;</div>
+</div>
+
+<style>
+.cisae-table .cisae-titulo { font-size: .78rem; margin-top: 2px; }
+
+.cisae-row.cisae-vencido td { background: rgba(220,53,69,.08); }
+.cisae-row.cisae-vencido td:first-child { border-left: 4px solid #dc3545; }
+
+.cisae-row.cisae-critico td { background: rgba(220,53,69,.05); }
+.cisae-row.cisae-critico td:first-child { border-left: 4px solid #fd7e14; }
+
+.cisae-row.cisae-alerta td { background: rgba(255,193,7,.07); }
+.cisae-row.cisae-alerta td:first-child { border-left: 4px solid #ffc107; }
+
+.dias-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .55rem;
+  border-radius: 20px;
+  font-size: .8rem;
+  font-weight: 600;
+}
+.badge-vencido  { background: rgba(220,53,69,.15); color: #dc3545; border: 1px solid rgba(220,53,69,.3); }
+.badge-critico  { background: rgba(253,126,20,.15); color: #e85d04; border: 1px solid rgba(253,126,20,.3); }
+.badge-alerta   { background: rgba(255,193,7,.2);   color: #9a6700; border: 1px solid rgba(255,193,7,.4); }
+.badge-normal   { background: rgba(25,135,84,.12);  color: #146c43; border: 1px solid rgba(25,135,84,.25); }
+</style>
+{% endblock %}

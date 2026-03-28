@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\PathNormalizer;
 
 #[Route('/oficio')]
@@ -272,6 +273,7 @@ final class OficioController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_oficio_delete', methods: ['POST'])]
     public function delete(Request $request, Oficio $oficio, EntityManagerInterface $entityManager): Response
     {

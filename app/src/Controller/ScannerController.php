@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-// src/Controller/ScannerController.php
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/scanner')]
 final class ScannerController extends AbstractController
@@ -87,6 +87,10 @@ final class ScannerController extends AbstractController
             $ext = $file->guessExtension() ?: ($file->getClientOriginalExtension() ?: 'bin');
             $newFilename = sprintf('%s-%s.%s', $safeName ?: 'scan', uniqid(), $ext);
 
+            // Leer tamaño ANTES de mover (después el archivo temporal desaparece)
+            $fileSize = $file->getSize() ?: 0;
+            $fileMime = $file->getClientMimeType() ?: 'application/octet-stream';
+
             try {
                 $file->move($uploadsDir, $newFilename);
             } catch (FileException $e) {
@@ -104,8 +108,8 @@ final class ScannerController extends AbstractController
             }
 
             $scanner->setFilePath($relative);
-            $scanner->setMimeType($file->getClientMimeType() ?: 'application/octet-stream');
-            $scanner->setSize($file->getSize() ?: 0);
+            $scanner->setMimeType($fileMime);
+            $scanner->setSize($fileSize);
             $scanner->setStatus('finalizado');
             $now = new \DateTimeImmutable();
             $scanner->setCreatedAt($now);
@@ -139,6 +143,19 @@ final class ScannerController extends AbstractController
             'scanner' => $scanner,
             'form' => $form,
         ]);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/{id}', name: 'app_scanner_delete', methods: ['POST'])]
+    public function delete(Request $request, Scanner $scanner, EntityManagerInterface $em): Response
+    {
+        $token = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete' . $scanner->getId(), $token)) {
+            $em->remove($scanner);
+            $em->flush();
+            $this->addFlash('success', 'Escaneo eliminado.');
+        }
+        return $this->redirectToRoute('app_scanner_index', [], Response::HTTP_SEE_OTHER);
     }
 
     private function finalizeSource(EntityManagerInterface $em, string $type, int $id): void

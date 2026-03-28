@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nota Informativa — {{ nota.folio ?? nota.id }}{% endblock %}
+{% block body %}
+<div class="container-glass">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="page-title">Nota Informativa — {{ nota.folio ?? ('#' ~ nota.id) }}</h1>
+    <div class="glass-actions">
+      <a href="{{ path('app_nota_informativa_edit', {'id': nota.id}) }}" class="glass-btn warning">
+        <i class="bi bi-pencil-square"></i> Editar
+      </a>
+      <a href="{{ path('app_nota_informativa_index') }}" class="glass-btn">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <table class="table table-borderless">
+      <tbody>
+        <tr><th style="width:200px">Folio</th><td>{{ nota.folio ?? '—' }}</td></tr>
+        <tr><th>Título</th><td>{{ nota.title }}</td></tr>
+        <tr><th>Área / Departamento</th><td>{{ nota.area|default('—') }}</td></tr>
+        <tr><th>Estado</th><td><span class="pill-badge {{ nota.status|lower }}">{{ nota.status }}</span></td></tr>
+        <tr><th>Usuario responsable</th>
+          <td>{% if nota.user %}{{ nota.user.nombre ?? nota.user.email }}{% else %}—{% endif %}</td>
+        </tr>
+        <tr><th>Fecha límite</th><td>{{ nota.fechaLimite ? nota.fechaLimite|date('d/m/Y') : '—' }}</td></tr>
+        <tr><th>Contenido</th><td>{{ nota.content|default('—')|nl2br }}</td></tr>
+        <tr><th>Archivo</th>
+          <td>
+            {% if nota.filePath %}
+              <a href="{{ asset(nota.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        <tr><th>Creado el</th><td>{{ nota.createdAt ? nota.createdAt|date('d/m/Y H:i') : '—' }}</td></tr>
+        <tr><th>Actualizado el</th><td>{{ nota.updatedAt ? nota.updatedAt|date('d/m/Y H:i') : '—' }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_granted('ROLE_ADMIN') %}
+    <div class="mt-3">
+      <form method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}"
+            onsubmit="return confirm('¿Eliminar esta nota informativa?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nota.id) }}">
+        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Eliminar</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

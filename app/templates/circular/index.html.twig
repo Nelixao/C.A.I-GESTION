@@ -18,10 +18,11 @@
     <div class="toolbar js-table-toolbar">
       <input type="text" class="js-search form-input" placeholder="Buscar en la tabla...">
       <select class="js-stage form-select">
-        <option value="todos">Todas las etapas</option>
-        <option value="no-revisado">No revisado</option>
+        <option value="todos">Todos los estados</option>
         <option value="pendiente">Pendiente</option>
-        <option value="terminado">Terminado</option>
+        <option value="en trámite">En trámite</option>
+        <option value="concluido">Concluido</option>
+        <option value="archivado">Archivado</option>
       </select>
     </div>
 
@@ -29,52 +30,58 @@
       <table class="table-glass js-enhanced-table">
         <thead>
           <tr>
-            <th>FOLIO</th>
-            <th>FECHA</th>
-            <th>DIRIGIDO A</th>
-            <th>ASUNTO</th>
-            <th>ELABORÓ</th>
-            <th>ESTADO</th>
-            <th>ARCHIVO</th>
-            <th class="text-center">ACCIÓN</th>
+            <th>Folio</th>
+            <th>Área / Departamento</th>
+            <th>Estado</th>
+            <th>Usuario responsable</th>
+            <th>Fecha límite</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {% for circular in circulars %}
-            {% set estado = (circular.status ?? 'no-revisado')|lower %}
-            {% set row_text = (circular.id ~ ' ' ~ circular.title ~ ' ' ~ circular.content ~ ' ' ~ circular.targetGroup ~ ' ' ~ (circular.date ? circular.date|date('Y-m-d') : '') ~ ' ' ~ circular.filePath ~ ' ' ~ circular.createdBy)|lower %}
+            {% set estado = (circular.status ?? 'pendiente')|lower %}
+            {% set row_text = ((circular.numCircular ?? circular.id) ~ ' ' ~ circular.title ~ ' ' ~ circular.targetGroup ~ ' ' ~ circular.status)|lower %}
 
-            <tr data-stage="{{ estado }}" data-text="{{ row_text }}" data-asunto="{{ circular.title|lower }}">
-              <td data-label="Folio">#{{ circular.id }}</td>
-              <td data-label="Fecha">{{ circular.date ? circular.date|date('d-m-Y') : '' }}</td>
-              <td data-label="Dirigido a">{{ circular.targetGroup|default('—') }}</td>
-              <td data-label="Asunto">{{ circular.title|default('—') }}</td>
-              <td data-label="Elaboró">{{ circular.createdBy|default('—') }}</td>
-
-              <td data-label="Estado">
-                <span class="pill-badge {{ estado }}">{{ estado|capitalize }}</span>
+            <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
+              <td data-label="Folio">
+                <strong>{{ circular.numCircular ?? ('#' ~ circular.id) }}</strong>
+                <div class="text-muted small">{{ circular.title|default('') }}</div>
               </td>
-
-              <td data-label="Archivo">
-                {% if circular.filePath %}
-                  <a href="{{ asset(circular.filePath) }}" target="_blank" class="file-link">Ver archivo</a>
+              <td data-label="Área">{{ circular.targetGroup|default('—') }}</td>
+              <td data-label="Estado">
+                <span class="pill-badge {{ estado }}">{{ circular.status|default('Pendiente') }}</span>
+              </td>
+              <td data-label="Usuario">
+                {% if circular.user %}
+                  {{ circular.user.nombre ?? circular.user.email }}
                 {% else %}
                   <span class="text-muted">—</span>
                 {% endif %}
               </td>
-
-              <td data-label="Acción" class="text-center">
+              <td data-label="Fecha límite">{{ circular.date ? circular.date|date('d/m/Y') : '—' }}</td>
+              <td data-label="Acciones" class="text-center">
                 <a href="{{ path('app_circular_show', {'id': circular.id}) }}" class="btn btn-outline-primary" title="Ver">
                   <i class="bi bi-eye"></i>
                 </a>
                 <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-outline-warning" title="Editar">
                   <i class="bi bi-pencil-square"></i>
                 </a>
+                {% if is_granted('ROLE_ADMIN') %}
+                  <form method="post" action="{{ path('app_circular_delete', {'id': circular.id}) }}"
+                        style="display:inline"
+                        onsubmit="return confirm('¿Eliminar esta circular?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ circular.id) }}">
+                    <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                {% endif %}
               </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="8" class="text-center text-muted py-4">Sin información</td>
+              <td colspan="6" class="text-center text-muted py-4">Sin información</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -85,4 +92,3 @@
   </div>
 </div>
 {% endblock %}
-

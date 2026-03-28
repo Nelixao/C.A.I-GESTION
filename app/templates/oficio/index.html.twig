@@ -6,7 +6,6 @@
 {% block body %}
 <div class="container-glass">
 
-  <!-- Título + acciones -->
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <h1 class="page-title">Listado de Oficios</h1>
 
@@ -26,42 +25,52 @@
     </div>
   </div>
 
-  <!-- Toolbar (usa tu JS de filtrado) -->
   <div class="js-table-wrapper">
     <div class="toolbar js-table-toolbar">
       <input type="text" class="js-search form-input" placeholder="Buscar por título o texto…">
       <select class="js-stage form-select">
-        <option value="todos">Todas las etapas</option>
-        <option value="sin-etapa">Sin etapa</option>
+        <option value="todos">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en trámite">En trámite</option>
+        <option value="concluido">Concluido</option>
+        <option value="archivado">Archivado</option>
       </select>
     </div>
 
-    <!-- Tabla glass + responsive -->
     <div class="table-responsive">
       <table class="table-glass js-enhanced-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Fecha</th>
-            <th>Dirigido a</th>
-            <th>Asunto</th>
-            <th>Contenido</th>
-            <th>Elaborado por</th>
+            <th>Folio</th>
+            <th>Área / Departamento</th>
+            <th>Estado</th>
+            <th>Usuario responsable</th>
+            <th>Fecha límite</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
         {% for oficio in oficios %}
-          {# texto indexable para tu buscador #}
-          {% set row_text = (oficio.id ~ ' ' ~ oficio.title ~ ' ' ~ oficio.content ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.recipient ~ ' ' ~ (oficio.date ? oficio.date|date('Y-m-d H:i') : '') ~ ' ' ~ (oficio.filePath ?? '') ~ ' ' ~ (oficio.createdBy ?? ''))|lower %}
+          {% set estado = (oficio.status ?? 'pendiente')|lower %}
+          {% set row_text = ((oficio.numOficio ?? oficio.id) ~ ' ' ~ oficio.title ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.status)|lower %}
 
-          <tr data-stage="sin-etapa" data-text="{{ row_text }}" data-asunto="{{ oficio.title|lower }}">
-            <td data-label="#">{{ oficio.id }}</td>
-            <td data-label="Fecha">{{ oficio.date ? oficio.date|date('d-m-Y') : '—' }}</td>
-            <td data-label="Dirigido a">{{ oficio.recipient|default('—') }}</td>
-            <td data-label="Asunto">{{ oficio.title|default('—') }}</td>
-            <td data-label="Contenido">{{ oficio.content|default('—') }}</td>
-            <td data-label="Elaborado por">{{ oficio.sender|default('—') }}</td>
+          <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
+            <td data-label="Folio">
+              <strong>{{ oficio.numOficio ?? ('#' ~ oficio.id) }}</strong>
+              <div class="text-muted small">{{ oficio.title|default('') }}</div>
+            </td>
+            <td data-label="Área">{{ oficio.sender|default('—') }}</td>
+            <td data-label="Estado">
+              <span class="pill-badge {{ estado }}">{{ oficio.status|default('Pendiente') }}</span>
+            </td>
+            <td data-label="Usuario">
+              {% if oficio.user %}
+                {{ oficio.user.nombre ?? oficio.user.email }}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td data-label="Fecha límite">{{ oficio.date ? oficio.date|date('d/m/Y') : '—' }}</td>
             <td data-label="Acciones" class="text-center">
               <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                 <i class="bi bi-eye"></i>
@@ -69,11 +78,21 @@
               <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
                 <i class="bi bi-pencil-square"></i>
               </a>
+              {% if is_granted('ROLE_ADMIN') %}
+                <form method="post" action="{{ path('app_oficio_delete', {'id': oficio.id}) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('¿Eliminar este oficio?')">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ oficio.id) }}">
+                  <button class="btn btn-outline-danger btn-sm" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              {% endif %}
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">No hay oficios registrados</td>
+            <td colspan="6" class="text-center text-muted py-4">No hay oficios registrados</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -83,7 +102,6 @@
     <div class="js-counter table-counter">&nbsp;</div>
   </div>
 
-  <!-- Botón flotante (opcional) -->
   <a href="{{ path('app_oficio_new') }}" class="glass-btn primary float-btn">
     <i class="bi bi-plus-lg"></i> Nuevo oficio
   </a>
