@@ -25,7 +25,7 @@ class Cisae
     #[ORM\Column(length: 100)]
     private ?string $area = null;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTime $fechaLimite = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
