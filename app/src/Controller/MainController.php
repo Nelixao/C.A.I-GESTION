@@ -1,10 +1,12 @@
 <?php
-// src/Controller/MainController.php
+
 namespace App\Controller;
 
-use App\Repository\OficioRepository;
-use App\Repository\CorrespondenceRepository;
+use App\Repository\CisaeRepository;
 use App\Repository\CircularRepository;
+use App\Repository\CorrespondenceRepository;
+use App\Repository\NotaInformativaRepository;
+use App\Repository\OficioRepository;
 use App\Repository\ScannerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,93 +21,106 @@ class MainController extends AbstractController
         CircularRepository $circularRepo,
         ScannerRepository $scannerRepo
     ): Response {
-        $oficiosCount = $oficioRepo->countAll();
-        $correspondencesCount = $correspondenceRepo->count([]);
-        $circularesCount = $circularRepo->count([]);
-        $scansCount = $scannerRepo->count([]);
-
-        $recentOficios = $oficioRepo->findRecent(5);
-        $activeCirculares = $circularRepo->findBy([], ['id' => 'DESC'], 5);
-
         return $this->render('main/index.html.twig', [
-            'oficiosCount' => $oficiosCount,
-            'correspondencesCount' => $correspondencesCount,
-            'circularesCount' => $circularesCount,
-            'scansCount' => $scansCount,
-            'recentOficios' => $recentOficios,
-            'activeCirculares' => $activeCirculares,
+            'oficiosCount'         => $oficioRepo->countAll(),
+            'correspondencesCount' => $correspondenceRepo->count([]),
+            'circularesCount'      => $circularRepo->count([]),
+            'scansCount'           => $scannerRepo->count([]),
+            'recentOficios'        => $oficioRepo->findRecent(5),
+            'activeCirculares'     => $circularRepo->findBy([], ['id' => 'DESC'], 5),
         ]);
     }
 
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(
-        OficioRepository $oficioRepo,
-        CorrespondenceRepository $correspondenceRepo,
-        CircularRepository $circularRepo,
-        ScannerRepository $scannerRepo
+        OficioRepository          $oficioRepo,
+        CorrespondenceRepository  $correspondenceRepo,
+        CircularRepository        $circularRepo,
+        ScannerRepository         $scannerRepo,
+        CisaeRepository           $cisaeRepo,
+        NotaInformativaRepository $notaRepo
     ): Response {
         // Totales
-        $oficiosCount = $oficioRepo->countAll();
+        $oficiosCount         = $oficioRepo->countAll();
         $correspondencesCount = $correspondenceRepo->count([]);
-        $circularesCount = $circularRepo->count([]);
-        $notasCount = 0; // Si tienes entidad Nota, actualiza esto
-        $scansCount = $scannerRepo->count([]);
+        $circularesCount      = $circularRepo->count([]);
+        $notasCount           = $notaRepo->count([]);
+        $scansCount           = $scannerRepo->count([]);
 
-        // Datos para el dashboard
-        $oficiosPorEstado = $oficioRepo->countByStatus();
-        $cisaiProximos = $oficioRepo->findUpcomingDeadlines(7);
-        $recentOficios = $oficioRepo->findRecent(10);
-        $activeCirculares = $circularRepo->findBy([], ['id' => 'DESC'], 5);
-
-        // Datos para gráficas
-        $startOfWeek = new \DateTime('monday this week');
-        $endOfWeek = new \DateTime('sunday this week');
-        
-        $weeklyStats = [
-            'labels' => ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-            'oficios' => $oficioRepo->countByWeek($startOfWeek, $endOfWeek),
-            'correspondences' => [8, 12, 6, 10, 15, 2, 4], // Datos de ejemplo
-            'circulares' => [5, 8, 4, 7, 12, 1, 2], // Datos de ejemplo
-        ];
-
-        $statusDistribution = $oficioRepo->getStatusDistribution();
-        $areaEfficiency = $oficioRepo->getAreaEfficiency();
-
-        // Tendencias (datos de ejemplo)
+        // Tendencias (% vs mes anterior)
         $trends = [
-            'oficios' => rand(-10, 20),
-            'correspondences' => rand(-5, 15),
-            'circulares' => rand(-8, 12),
-            'notas' => rand(-3, 10),
-            'scans' => rand(5, 30),
+            'oficios'         => $this->trendPercent($oficioRepo->countThisMonth(),         $oficioRepo->countLastMonth()),
+            'correspondences' => $this->trendPercent($correspondenceRepo->countThisMonth(), $correspondenceRepo->countLastMonth()),
+            'circulares'      => $this->trendPercent($circularRepo->countThisMonth(),        $circularRepo->countLastMonth()),
+            'notas'           => $this->trendPercent($notaRepo->countThisMonth(),            $notaRepo->countLastMonth()),
+            'scans'           => 0,
         ];
+
+        // Gráfica semanal (Lun-Dom de la semana actual)
+        $monday = new \DateTimeImmutable('monday this week');
+        $weeklyStats = [
+            'labels'          => ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            'oficios'         => $oficioRepo->countByDaysOfWeek($monday),
+            'correspondences' => $correspondenceRepo->countByDaysOfWeek($monday),
+            'circulares'      => $circularRepo->countByDaysOfWeek($monday),
+        ];
+
+        // Distribución de estados combinada (todos los módulos)
+        $allStatuses = [];
+        foreach ([
+            $oficioRepo->countByStatus(),
+            $circularRepo->countByStatus(),
+            $correspondenceRepo->countByStatus(),
+            $cisaeRepo->countByStatus(),
+            $notaRepo->countByStatus(),
+        ] as $rows) {
+            foreach ($rows as $r) {
+                $k = $r['estado'] ?? 'Sin estado';
+                $allStatuses[$k] = ($allStatuses[$k] ?? 0) + (int) $r['total'];
+            }
+        }
+        arsort($allStatuses);
+
+        // Top remitentes / áreas (Oficio)
+        $senderRows = $oficioRepo->countBySender();
+        $areaLabels = array_column($senderRows, 'area');
+        $areaTotals = array_map('intval', array_column($senderRows, 'total'));
+
+        // Próximos vencimientos CISAE (14 días)
+        $cisaeProximos = $cisaeRepo->findUpcoming(14);
 
         return $this->render('main/dashboard.html.twig', [
-            // KPIs principales
-            'oficiosCount' => $oficiosCount,
+            // KPIs
+            'oficiosCount'         => $oficiosCount,
             'correspondencesCount' => $correspondencesCount,
-            'circularesCount' => $circularesCount,
-            'notasCount' => $notasCount,
-            'scansCount' => $scansCount,
-            
+            'circularesCount'      => $circularesCount,
+            'notasCount'           => $notasCount,
+            'scansCount'           => $scansCount,
+
             // Tendencias
-            'oficiosTrend' => $trends['oficios'],
+            'oficiosTrend'         => $trends['oficios'],
             'correspondencesTrend' => $trends['correspondences'],
-            'circularesTrend' => $trends['circulares'],
-            'notasTrend' => $trends['notas'],
-            'scansTrend' => $trends['scans'],
-            
-            // Datos para gráficas
-            'weeklyStats' => $weeklyStats,
-            'statusDistribution' => $statusDistribution,
-            'dailyTrends' => $oficioRepo->countByWeek($startOfWeek, $endOfWeek),
-            'areaEfficiency' => $areaEfficiency,
-            
-            // Datos para tablas
-            'oficiosPorEstado' => $oficiosPorEstado,
-            'cisaiProximos' => $cisaiProximos,
-            'recentOficios' => $recentOficios,
-            'activeCirculares' => $activeCirculares,
+            'circularesTrend'      => $trends['circulares'],
+            'notasTrend'           => $trends['notas'],
+            'scansTrend'           => $trends['scans'],
+
+            // Gráficas
+            'weeklyStats'          => $weeklyStats,
+            'statusDistribution'   => $allStatuses,
+            'areaEfficiency'       => ['labels' => $areaLabels, 'efficiency' => $areaTotals],
+
+            // Tablas
+            'cisaiProximos'        => $cisaeProximos,
+            'recentOficios'        => $oficioRepo->findRecent(10),
+            'activeCirculares'     => $circularRepo->findBy([], ['id' => 'DESC'], 5),
         ]);
+    }
+
+    private function trendPercent(int $current, int $last): int
+    {
+        if ($last === 0) {
+            return $current > 0 ? 100 : 0;
+        }
+        return (int) round(($current - $last) / $last * 100);
     }
 }

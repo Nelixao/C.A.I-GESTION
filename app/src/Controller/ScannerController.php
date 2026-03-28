@@ -101,9 +101,8 @@ final class ScannerController extends AbstractController
             // Ruta relativa pública si está bajo /public
             $publicRoot = rtrim($this->getParameter('kernel.project_dir'), '/').'/public/';
             if (str_starts_with($uploadsDir, $publicRoot)) {
-                $relative = ltrim(str_replace($publicRoot, '', $uploadsDir), '/').'/'.$newFilename; // "uploads/scanner/xxx.pdf"
+                $relative = ltrim(str_replace($publicRoot, '', $uploadsDir), '/').'/'.$newFilename;
             } else {
-                // Subida fuera de public: guarda una ruta "lógica"
                 $relative = 'uploads/scanner/'.$newFilename;
             }
 
@@ -180,6 +179,5 @@ final class ScannerController extends AbstractController
         if (method_exists($entity, 'setStatus')) {
             $entity->setStatus('terminado');
         }
-        // Si quieres, también podrías setear aquí un campo "hasScan = true", etc.
     }
 }

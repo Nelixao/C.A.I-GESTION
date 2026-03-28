@@ -15,4 +15,13 @@ class ScannerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Scanner::class);
     }
+
+    public function countByStatus(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.status as estado, COUNT(s.id) as total')
+            ->groupBy('s.status')
+            ->getQuery()
+            ->getResult();
+    }
 }
