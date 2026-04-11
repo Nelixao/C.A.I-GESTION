@@ -16,7 +16,7 @@ class Cisae
     #[ORM\Column(length: 30, unique: true, nullable: true)]
     private ?string $folio = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(length: 500)]
     private ?string $titulo = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -34,6 +34,9 @@ class Cisae
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $createdBy = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -63,6 +66,9 @@ class Cisae
 
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): static { $this->user = $user; return $this; }
+
+    public function getCreatedBy(): ?int { return $this->createdBy; }
+    public function setCreatedBy(?int $createdBy): static { $this->createdBy = $createdBy; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }

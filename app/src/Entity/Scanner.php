@@ -64,6 +64,14 @@ class Scanner
 private ?User $user = null;
 
 
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+        $this->fecha_subida = $now;
+        $this->created_at   = $now;
+        $this->status       = 'finalizado';
+    }
+
     public function getId(): ?int { return $this->id; }
 
     public function getName(): ?string { return $this->name; }

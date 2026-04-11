@@ -3,10 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Correspondence;
-use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -54,57 +53,30 @@ class CorrespondenceType extends AbstractType
             ])
 
             // Fecha principal
-            ->add('date', DateTimeType::class, [
-                'label' => 'Fecha',
-                'widget' => 'single_text', // calendario nativo
-                'attr' => ['class' => 'form-control'],
+            ->add('date', DateType::class, [
+                'label'    => 'Fecha',
+                'widget'   => 'single_text',
+                'html5'    => true,
+                'format'   => 'yyyy-MM-dd',
+                'attr'     => ['class' => 'form-control', 'data-provide' => 'datepicker'],
                 'required' => false,
             ])
 
-            // Subida de archivo (si tu entidad guarda una ruta tipo string)
-            // - Si en tu entidad el campo se llama filePath (camelCase), ajusta a 'filePath'
-            // - unmapped=true si vas a manejar el movimiento del archivo en el Controller
+            ->add('status', ChoiceType::class, [
+                'label'   => 'Estado',
+                'choices' => [
+                    'Pendiente'   => 'Pendiente',
+                    'En Trámite'  => 'En Trámite',
+                    'Concluido'   => 'Concluido',
+                    'Archivado'   => 'Archivado',
+                ],
+                'attr' => ['class' => 'form-select'],
+            ])
             ->add('file_path', FileType::class, [
                 'label' => 'Archivo adjunto',
-                'mapped' => false,      // no se asigna automáticamente al entity
+                'mapped' => false,
                 'required' => false,
                 'attr' => ['class' => 'form-control'],
-            ])
-
-            // Metadatos (si quieres mostrarlos y que sean solo lectura)
-            ->add('created_by', TextType::class, [
-                'label' => 'Creado por',
-                'attr' => ['class' => 'form-control'],
-                'required' => false,
-                'disabled' => true,
-            ])
-            ->add('created_at', DateTimeType::class, [
-                'label' => 'Fecha de creación',
-                'widget' => 'single_text',
-                'attr' => ['class' => 'form-control'],
-                'disabled' => true,     // solo lectura en el formulario
-                'required' => false,
-            ])
-            ->add('updated_at', DateTimeType::class, [
-                'label' => 'Última actualización',
-                'widget' => 'single_text',
-                'attr' => ['class' => 'form-control'],
-                'disabled' => true,
-                'required' => false,
-            ])
-
-            // Usuario responsable
-            ->add('user', EntityType::class, [
-                'label' => 'Usuario responsable',
-                'class' => User::class,
-                // usa lo que tengas en User (username, email, fullName, etc.)
-                'choice_label' => function (?User $u) {
-                    if (!$u) return '';
-                    return $u->getNombre() ?? ($u->getEmail() ?? ('ID '.$u->getId()));
-                },
-                'placeholder' => 'Selecciona un usuario',
-                'attr' => ['class' => 'form-select'],
-                'required' => false,
             ]);
     }
 

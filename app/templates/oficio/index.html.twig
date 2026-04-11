@@ -13,12 +13,6 @@
       <a href="{{ path('app_oficio_export') }}" class="glass-btn success">
         <i class="bi bi-download"></i> Exportar a Excel
       </a>
-      <a href="{{ path('app_oficio_template') }}" class="glass-btn">
-        <i class="bi bi-filetype-csv"></i> Plantilla CSV
-      </a>
-      <a href="{{ path('app_oficio_import') }}" class="glass-btn warning">
-        <i class="bi bi-upload"></i> Importar CSV
-      </a>
       <a href="{{ path('app_oficio_new') }}" class="glass-btn primary">
         <i class="bi bi-plus-circle"></i> Crear nuevo oficio
       </a>
@@ -27,13 +21,12 @@
 
   <div class="js-table-wrapper">
     <div class="toolbar js-table-toolbar">
-      <input type="text" class="js-search form-input" placeholder="Buscar por título o texto…">
+      <input type="text" class="js-search form-input" placeholder="Buscar por folio, asunto, remitente…">
       <select class="js-stage form-select">
         <option value="todos">Todos los estados</option>
-        <option value="pendiente">Pendiente</option>
-        <option value="en trámite">En trámite</option>
-        <option value="concluido">Concluido</option>
-        <option value="archivado">Archivado</option>
+        <option value="abierto">Abierto</option>
+        <option value="en trámite">En Trámite</option>
+        <option value="cerrado">Cerrado</option>
       </select>
     </div>
 
@@ -42,35 +35,32 @@
         <thead>
           <tr>
             <th>Folio</th>
-            <th>Área / Departamento</th>
+            <th>Asunto</th>
+            <th>Remitente</th>
+            <th>Dirigido a</th>
+            <th>Recibido por</th>
+            <th>Fecha</th>
             <th>Estado</th>
-            <th>Usuario responsable</th>
-            <th>Fecha límite</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
         {% for oficio in oficios %}
-          {% set estado = (oficio.status ?? 'pendiente')|lower %}
-          {% set row_text = ((oficio.numOficio ?? oficio.id) ~ ' ' ~ oficio.title ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.status)|lower %}
+          {% set estado = (oficio.status ?? 'abierto')|lower %}
+          {% set row_text = (oficio.folio ~ ' ' ~ oficio.asunto ~ ' ' ~ oficio.sender ~ ' ' ~ oficio.recipient ~ ' ' ~ oficio.recibidoPor ~ ' ' ~ oficio.status)|lower %}
 
           <tr data-stage="{{ estado }}" data-text="{{ row_text }}">
             <td data-label="Folio">
-              <strong>{{ oficio.numOficio ?? ('#' ~ oficio.id) }}</strong>
-              <div class="text-muted small">{{ oficio.title|default('') }}</div>
+              <strong>{{ oficio.folio ?? ('#' ~ oficio.id) }}</strong>
             </td>
-            <td data-label="Área">{{ oficio.sender|default('—') }}</td>
+            <td data-label="Asunto">{{ oficio.asunto|default(oficio.title)|default('—') }}</td>
+            <td data-label="Remitente">{{ oficio.sender|default('—') }}</td>
+            <td data-label="Dirigido a">{{ oficio.recipient|default('—') }}</td>
+            <td data-label="Recibido por">{{ oficio.recibidoPor|default('—') }}</td>
+            <td data-label="Fecha">{{ oficio.date ? oficio.date|date('d/m/Y') : '—' }}</td>
             <td data-label="Estado">
-              <span class="pill-badge {{ estado }}">{{ oficio.status|default('Pendiente') }}</span>
+              <span class="pill-badge {{ estado }}">{{ oficio.status|default('Abierto') }}</span>
             </td>
-            <td data-label="Usuario">
-              {% if oficio.user %}
-                {{ oficio.user.nombre ?? oficio.user.email }}
-              {% else %}
-                <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-            <td data-label="Fecha límite">{{ oficio.date ? oficio.date|date('d/m/Y') : '—' }}</td>
             <td data-label="Acciones" class="text-center">
               <a href="{{ path('app_oficio_show', {'id': oficio.id}) }}" class="btn btn-outline-primary btn-sm" title="Ver">
                 <i class="bi bi-eye"></i>
@@ -79,20 +69,23 @@
                 <i class="bi bi-pencil-square"></i>
               </a>
               {% if is_granted('ROLE_ADMIN') %}
-                <form method="post" action="{{ path('app_oficio_delete', {'id': oficio.id}) }}"
-                      style="display:inline"
-                      onsubmit="return confirm('¿Eliminar este oficio?')">
+                <form id="del-oficio-{{ oficio.id }}" method="post" action="{{ path('app_oficio_delete', {'id': oficio.id}) }}" style="display:none">
                   <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ oficio.id) }}">
-                  <button class="btn btn-outline-danger btn-sm" title="Eliminar">
-                    <i class="bi bi-trash"></i>
-                  </button>
                 </form>
+                <button type="button" class="btn btn-outline-danger btn-sm" title="Eliminar"
+                        data-delete-form="del-oficio-{{ oficio.id }}"
+                        data-confirm-msg="¿Eliminar el oficio {{ oficio.folio ?? '#' ~ oficio.id }}?">
+                  <i class="bi bi-trash"></i>
+                </button>
               {% endif %}
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="6" class="text-center text-muted py-4">No hay oficios registrados</td>
+            <td colspan="8" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
+              No hay oficios aún. <a href="{{ path('app_oficio_new') }}" class="text-decoration-none">¡Crea el primero!</a>
+            </td>
           </tr>
         {% endfor %}
         </tbody>

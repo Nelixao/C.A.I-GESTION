@@ -53,9 +53,14 @@ final class CircularController extends AbstractController
     }
 
     #[Route('/new', name: 'app_circular_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, CircularRepository $circularRepository): Response
     {
         $circular = new Circular();
+
+        // Pre-generate folio as next consecutive number
+        $nextNum = $circularRepository->count([]) + 1;
+        $circular->setFolio(str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT));
+
         $form = $this->createForm(CircularType::class, $circular);
         $form->handleRequest($request);
 
@@ -72,6 +77,15 @@ final class CircularController extends AbstractController
                     $circular->setFilePath('');
                 }
             }
+
+            $now = new \DateTimeImmutable();
+            $circular->setFechaRegistro($now);
+            $circular->setCreatedBy($this->getUser()?->getId() ?? 0);
+            $circular->setCreatedAt($now);
+            $circular->setUpdatedAt(new \DateTime());
+            $circular->setUser($this->getUser());
+            // Keep title in sync for backward compat
+            $circular->setTitle($circular->getAsunto() ?? '');
 
             $entityManager->persist($circular);
             $entityManager->flush();

@@ -81,7 +81,10 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="6" class="text-center text-muted py-4">Sin información</td>
+          <td colspan="6" class="text-center text-muted py-4">
+            <i class="bi bi-printer fs-3 d-block mb-2 opacity-50"></i>
+            No hay documentos escaneados aún. <a href="{{ path('app_scanner_new') }}" class="text-decoration-none">¡Sube el primero!</a>
+          </td>
         </tr>
       {% endfor %}
       </tbody>

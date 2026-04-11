@@ -28,7 +28,7 @@ final class CisaeController extends AbstractController
                 $diff = $today->diff($fechaLimite);
                 $dias = (int) $diff->days;
                 if ($today > $fechaLimite) {
-                    $dias = -$dias; // vencido
+                    $dias = -$dias;
                 }
             } else {
                 $dias = null;
@@ -40,9 +40,14 @@ final class CisaeController extends AbstractController
     }
 
     #[Route('/new', name: 'app_cisae_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CisaeRepository $repo): Response
     {
         $cisae = new Cisae();
+
+        // Folio automático consecutivo
+        $nextNum = $repo->count([]) + 1;
+        $cisae->setFolio(str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT));
+
         $form = $this->createForm(CisaeType::class, $cisae);
         $form->handleRequest($request);
 
@@ -50,10 +55,7 @@ final class CisaeController extends AbstractController
             $now = new \DateTimeImmutable();
             $cisae->setCreatedAt($now);
             $cisae->setUpdatedAt($now);
-
-            if ($this->getUser() && $cisae->getUser() === null) {
-                $cisae->setUser($this->getUser());
-            }
+            $cisae->setCreatedBy($this->getUser()?->getId() ?? 0);
 
             $em->persist($cisae);
             $em->flush();
@@ -105,8 +107,7 @@ final class CisaeController extends AbstractController
     #[Route('/{id}', name: 'app_cisae_delete', methods: ['POST'])]
     public function delete(Request $request, Cisae $cisae, EntityManagerInterface $em): Response
     {
-        $token = $request->request->get('_token');
-        if ($this->isCsrfTokenValid('delete' . $cisae->getId(), $token)) {
+        if ($this->isCsrfTokenValid('delete'.$cisae->getId(), $request->request->get('_token'))) {
             $em->remove($cisae);
             $em->flush();
             $this->addFlash('success', 'Trámite CISAE eliminado.');

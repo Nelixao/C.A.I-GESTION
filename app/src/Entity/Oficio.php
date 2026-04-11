@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\OficioRepository;
-use App\Entity\DocumentoTipo;
-
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -16,16 +14,25 @@ class Oficio
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 46)]
+    #[ORM\Column(length: 10, unique: true, nullable: true)]
+    private ?string $folio = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 67)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $asunto = null;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $recibidoPor = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 45)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $sender = null;
 
-    #[ORM\Column(length: 56)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $recipient = null;
 
     #[ORM\Column]
@@ -62,8 +69,8 @@ private ?User $user = null;
     #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
     private ?Scanner $scanner = null;
 
-    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
-    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
+    #[ORM\Column(length: 20, options: ['default' => 'Abierto'])]
+    private ?string $status = 'Abierto'; // valores: Abierto, En Trámite, Cerrado
 
     // Nuevos campos solicitados por el esquema
     #[ORM\Column(length: 20, unique: true, nullable: true)]
@@ -74,6 +81,16 @@ private ?User $user = null;
 
     #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeImmutable $fecha_registro = null;
+
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+        $this->fecha_registro = $now;
+        $this->created_at     = $now;
+        $this->updated_at     = $now;
+        $this->created_by     = 0;
+        $this->status         = 'Abierto';
+    }
 
     public function getId(): ?int
     {
@@ -213,6 +230,15 @@ private ?User $user = null;
 
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
+
+    public function getFolio(): ?string { return $this->folio; }
+    public function setFolio(?string $folio): static { $this->folio = $folio; return $this; }
+
+    public function getAsunto(): ?string { return $this->asunto; }
+    public function setAsunto(?string $a): static { $this->asunto = $a; return $this; }
+
+    public function getRecibidoPor(): ?string { return $this->recibidoPor; }
+    public function setRecibidoPor(?string $r): static { $this->recibidoPor = $r; return $this; }
 
     public function getNumOficio(): ?string { return $this->num_oficio; }
     public function setNumOficio(?string $n): static { $this->num_oficio = $n; return $this; }

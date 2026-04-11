@@ -14,16 +14,16 @@ class Correspondence
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 45)]
+    #[ORM\Column(length: 500)]
     private ?string $subject = null;
 
-    #[ORM\Column(length: 60)]
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $body = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $sender = null;
 
-    #[ORM\Column(length: 57)]
+    #[ORM\Column(length: 255)]
     private ?string $receiver = null;
 
     #[ORM\Column]
@@ -50,6 +50,16 @@ class Correspondence
 
     #[ORM\Column]
     private ?\DateTime $updated_at = null;
+
+    public function __construct()
+    {
+        $now = new \DateTime();
+        $this->fecha_registro = new \DateTimeImmutable();
+        $this->created_at     = $now;
+        $this->updated_at     = $now;
+        $this->created_by     = 0;
+        $this->status         = 'Pendiente';
+    }
 
   #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "correspondencias")]
 #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]

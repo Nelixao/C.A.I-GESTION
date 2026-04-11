@@ -1,12 +1,26 @@
 # Entorno
 .env
+/app/.env.local
 
 # Symfony / PHP
 /vendor/
 /var/
+/app/var/
+/app/vendor/
 
 # IDE
 .idea/
+.vscode/
+
+# Subidas de usuarios
+/app/public/uploads/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
 
 # Otros
 node_modules/

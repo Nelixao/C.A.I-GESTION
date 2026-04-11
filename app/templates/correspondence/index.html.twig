@@ -25,7 +25,7 @@
       <select class="js-stage form-select">
         <option value="todos">Todos los estados</option>
         <option value="pendiente">Pendiente</option>
-        <option value="en trámite">En trámite</option>
+        <option value="en trámite">En Trámite</option>
         <option value="concluido">Concluido</option>
         <option value="archivado">Archivado</option>
       </select>
@@ -73,20 +73,23 @@
                 <i class="bi bi-pencil-square"></i>
               </a>
               {% if is_granted('ROLE_ADMIN') %}
-                <form method="post" action="{{ path('app_correspondence_delete', {'id': correspondence.id}) }}"
-                      style="display:inline"
-                      onsubmit="return confirm('¿Eliminar esta correspondencia?')">
+                <form id="del-corr-{{ correspondence.id }}" method="post" action="{{ path('app_correspondence_delete', {'id': correspondence.id}) }}" style="display:none">
                   <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ correspondence.id) }}">
-                  <button class="btn btn-outline-danger btn-sm" title="Eliminar">
-                    <i class="bi bi-trash"></i>
-                  </button>
                 </form>
+                <button type="button" class="btn btn-outline-danger btn-sm" title="Eliminar"
+                        data-delete-form="del-corr-{{ correspondence.id }}"
+                        data-confirm-msg="¿Eliminar esta correspondencia?">
+                  <i class="bi bi-trash"></i>
+                </button>
               {% endif %}
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="6" class="text-center text-muted py-4">SIN INFORMACIÓN</td>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
+              No hay correspondencia aún. <a href="{{ path('app_correspondence_new') }}" class="text-decoration-none">¡Crea la primera!</a>
+            </td>
           </tr>
         {% endfor %}
         </tbody>

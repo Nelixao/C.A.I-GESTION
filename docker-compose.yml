@@ -23,7 +23,8 @@ services:
       MYSQL_PASSWORD: secret
     volumes:
       - db_data:/var/lib/mysql
-    # sin 'ports' → ya no usa el 3308 del host (solo red interna)
+    ports:
+      - "3308:3306"              # MySQL Workbench → localhost:3308
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

@@ -18,27 +18,28 @@ class CisaeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('folio', TextType::class, [
-                'label' => 'Folio',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ej. CISAE-2026-001'],
-            ])
             ->add('titulo', TextType::class, [
-                'label' => 'Título',
-                'attr' => ['placeholder' => 'Título del trámite'],
+                'label' => 'Título <span class="text-danger">*</span>',
+                'label_html' => true,
+                'attr' => ['placeholder' => 'Ej. Solicitud de certificado', 'class' => 'form-control'],
             ])
             ->add('descripcion', TextareaType::class, [
                 'label' => 'Descripción',
                 'required' => false,
-                'attr' => ['rows' => 4, 'placeholder' => 'Descripción detallada'],
+                'attr' => ['rows' => 4, 'placeholder' => 'Descripción detallada del trámite', 'class' => 'form-control'],
             ])
             ->add('area', TextType::class, [
-                'label' => 'Área / Departamento',
-                'attr' => ['placeholder' => 'Ej. Dirección Académica'],
+                'label' => 'Área / Departamento <span class="text-danger">*</span>',
+                'label_html' => true,
+                'attr' => ['placeholder' => 'Ej. Dirección Académica', 'class' => 'form-control'],
             ])
             ->add('fechaLimite', DateType::class, [
-                'label' => 'Fecha límite',
-                'widget' => 'single_text',
+                'label'    => 'Fecha límite',
+                'widget'   => 'single_text',
+                'html5'    => true,
+                'format'   => 'yyyy-MM-dd',
+                'required' => false,
+                'attr'     => ['class' => 'form-control', 'data-provide' => 'datepicker'],
             ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Estado',
@@ -48,6 +49,7 @@ class CisaeType extends AbstractType
                     'Concluido'   => 'Concluido',
                     'Archivado'   => 'Archivado',
                 ],
+                'attr' => ['class' => 'form-select'],
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
@@ -55,6 +57,7 @@ class CisaeType extends AbstractType
                 'choice_label' => fn(User $u) => $u->getNombre() ?? $u->getEmail(),
                 'required' => false,
                 'placeholder' => '— Sin asignar —',
+                'attr' => ['class' => 'form-select'],
             ])
         ;
     }

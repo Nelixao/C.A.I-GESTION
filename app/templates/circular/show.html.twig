@@ -3,49 +3,64 @@
 {% block title %}Detalle de Circular{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1 class="text-center mb-4"> Detalle de Circular</h1>
+<div class="container-glass">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Circular {{ circular.folio ?? ('#' ~ circular.id) }}</h1>
+        <span class="pill-badge {{ (circular.status ?? 'abierta')|lower }}">{{ circular.status|default('Abierta') }}</span>
+    </div>
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">ID</dt>
-                    <dd class="col-sm-8">{{ circular.id }}</dd>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Folio</dt>
+                <dd class="col-sm-8"><strong>{{ circular.folio ?? '—' }}</strong></dd>
 
-                    <dt class="col-sm-4">Título</dt>
-                    <dd class="col-sm-8">{{ circular.title }}</dd>
+                <dt class="col-sm-4">Fecha del documento</dt>
+                <dd class="col-sm-8">{{ circular.date ? circular.date|date('d/m/Y') : '—' }}</dd>
 
-                    <dt class="col-sm-4">Contenido</dt>
-                    <dd class="col-sm-8">{{ circular.content }}</dd>
+                <dt class="col-sm-4">Dirigido a</dt>
+                <dd class="col-sm-8">{{ circular.targetGroup|default('—') }}</dd>
 
-                    <dt class="col-sm-4">Grupo Destino</dt>
-                    <dd class="col-sm-8">{{ circular.targetGroup }}</dd>
+                <dt class="col-sm-4">Asunto</dt>
+                <dd class="col-sm-8">{{ circular.asunto|default('—') }}</dd>
 
-                    <dt class="col-sm-4">Fecha</dt>
-                    <dd class="col-sm-8">{{ circular.date ? circular.date|date('Y-m-d H:i') : '' }}</dd>
+                <dt class="col-sm-4">Contenido</dt>
+                <dd class="col-sm-8">{{ circular.content|default('—') }}</dd>
 
-                    <dt class="col-sm-4">Archivo</dt>
-                    <dd class="col-sm-8">{{ circular.filePath }}</dd>
+                <dt class="col-sm-4">Recibido por</dt>
+                <dd class="col-sm-8">{{ circular.recibidoPor|default('—') }}</dd>
 
-                    <dt class="col-sm-4">Creado por</dt>
-                    <dd class="col-sm-8">{{ circular.createdBy }}</dd>
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">{{ circular.status|default('Abierta') }}</dd>
 
-                    <dt class="col-sm-4">Creado el</dt>
-                    <dd class="col-sm-8">{{ circular.createdAt ? circular.createdAt|date('Y-m-d H:i') : '' }}</dd>
+                {% if circular.filePath %}
+                <dt class="col-sm-4">Archivo adjunto</dt>
+                <dd class="col-sm-8">
+                    <a href="{{ asset(circular.filePath) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-file-earmark"></i> Ver archivo
+                    </a>
+                </dd>
+                {% endif %}
 
-                    <dt class="col-sm-4">Última actualización</dt>
-                    <dd class="col-sm-8">{{ circular.updatedAt ? circular.updatedAt|date('Y-m-d H:i') : '' }}</dd>
-                </dl>
-            </div>
-        </div>
+                <dt class="col-sm-4">Registrado por</dt>
+                <dd class="col-sm-8">{{ circular.user ? (circular.user.nombre ?? circular.user.email) : '—' }}</dd>
 
-        <div class="d-flex justify-content-between">
-            <a href="{{ path('app_circular_index') }}" class="btn btn-secondary rounded-pill px-4">← Volver</a>
-
-            <div>
-                <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="btn btn-primary rounded-pill px-4 me-2">✏️ Editar</a>
-                {{ include('circular/_delete_form.html.twig', { 'class': 'd-inline' }) }}
-            </div>
+                <dt class="col-sm-4">Fecha de registro</dt>
+                <dd class="col-sm-8">{{ circular.createdAt ? circular.createdAt|date('d/m/Y H:i') : '—' }}</dd>
+            </dl>
         </div>
     </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_circular_index') }}" class="glass-btn" style="border-color:#B28E5C;color:#B28E5C">
+          <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+        <div>
+            <a href="{{ path('app_circular_edit', {'id': circular.id}) }}" class="glass-btn primary me-2">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+            {{ include('circular/_delete_form.html.twig', { 'class': 'd-inline' }) }}
+        </div>
+    </div>
+</div>
 {% endblock %}

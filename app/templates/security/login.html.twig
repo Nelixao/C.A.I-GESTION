@@ -65,16 +65,73 @@
 
 {# ===== EXTRAS mínimos para esta pantalla (van con tu CSS Glass UI) ===== #}
 <style>
-  .login-split{ background:
-      radial-gradient(60% 80% at 10% 0%, rgba(178,34,93,0.10), transparent 60%),
-      radial-gradient(60% 80% at 100% 10%, rgba(192,159,101,0.10), transparent 60%),
-      var(--bg); }
-  .welcome-pane{
-    background: linear-gradient(135deg, #910f25ff 0%, #331b09ff 100%);
+  body { background: #9D2148; font-family: 'Roboto', sans-serif; }
+  .login-split {
+    background: linear-gradient(135deg, #9D2148 0%, #7a1935 60%, #4a0f20 100%);
+    min-height: 100vh;
   }
-  .welcome-pane h1{ line-height: .95; }
-  @media (max-width: 991.98px){
-    .welcome-pane{ min-height: 38vh; }
+  .welcome-pane {
+    background: transparent;
   }
+  .welcome-pane h1 {
+    font-family: 'Cabin', sans-serif;
+    font-weight: 700;
+    line-height: .95;
+    text-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .welcome-pane p { opacity: .8; }
+  @media (max-width: 991.98px) {
+    .welcome-pane { min-height: 30vh; }
+  }
+  .login-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,.22);
+    border-top: 4px solid #9D2148;
+  }
+  .login-title {
+    font-family: 'Cabin', sans-serif;
+    font-weight: 700;
+    color: #9D2148;
+    font-size: 1.6rem;
+    margin-bottom: .25rem;
+  }
+  .login-card .form-label {
+    font-family: 'Cabin', sans-serif;
+    font-weight: 600;
+    color: #55585A;
+    font-size: .875rem;
+  }
+  .login-card .form-control {
+    border-color: #d1d5db;
+    border-radius: 8px;
+    padding: .55rem .85rem;
+    font-family: 'Roboto', sans-serif;
+  }
+  .login-card .form-control:focus {
+    border-color: #9D2148;
+    box-shadow: 0 0 0 3px rgba(157,33,72,.15);
+  }
+  .login-submit {
+    display: block;
+    width: 100%;
+    padding: .65rem 1rem;
+    background: #9D2148;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Cabin', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: .03em;
+    transition: background .2s;
+  }
+  .login-submit:hover { background: #7a1935; }
+  .login-card .text-primary { color: #9D2148 !important; }
+  .login-card .text-muted { color: #6b7280 !important; }
+  .topbar { display: none !important; }
+  footer { display: none !important; }
 </style>
 {% endblock %}

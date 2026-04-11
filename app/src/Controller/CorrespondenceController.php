@@ -27,17 +27,19 @@ final class CorrespondenceController extends AbstractController
     public function export(CorrespondenceRepository $correspondenceRepository): Response
     {
         $items = $correspondenceRepository->findAll();
-        $headers = ['ID','Asunto','Mensaje','Remitente','Destinatario','Fecha','Archivo','Creado por','Creado el','Actualizado el'];
+        $headers = ['ID','Num Control','Asunto','Mensaje','Remitente','Destinatario','Fecha','Estado','Archivo','Creado por','Creado el','Actualizado el'];
         $f = fopen('php://temp', 'r+');
         fputcsv($f, $headers);
         foreach ($items as $c) {
             fputcsv($f, [
                 $c->getId(),
+                $c->getNumControl(),
                 $c->getSubject(),
                 $c->getBody(),
                 $c->getSender(),
                 $c->getReceiver(),
                 $c->getDate()? $c->getDate()->format('Y-m-d H:i') : '',
+                $c->getStatus(),
                 $c->getFilePath(),
                 $c->getCreatedBy(),
                 $c->getCreatedAt()? $c->getCreatedAt()->format('Y-m-d') : '',
@@ -54,9 +56,14 @@ final class CorrespondenceController extends AbstractController
     }
 
     #[Route('/new', name: 'app_correspondence_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, CorrespondenceRepository $correspondenceRepository): Response
     {
         $correspondence = new Correspondence();
+
+        // Folio / num_control automático consecutivo
+        $nextNum = $correspondenceRepository->count([]) + 1;
+        $correspondence->setNumControl(str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT));
+
         $form = $this->createForm(CorrespondenceType::class, $correspondence);
         $form->handleRequest($request);
 
@@ -73,6 +80,13 @@ final class CorrespondenceController extends AbstractController
                     $correspondence->setFilePath('');
                 }
             }
+
+            $now = new \DateTime();
+            $correspondence->setFechaRegistro(new \DateTimeImmutable());
+            $correspondence->setCreatedBy($this->getUser()?->getId() ?? 0);
+            $correspondence->setCreatedAt($now);
+            $correspondence->setUpdatedAt($now);
+            $correspondence->setUser($this->getUser());
 
             $entityManager->persist($correspondence);
             $entityManager->flush();
@@ -114,6 +128,7 @@ final class CorrespondenceController extends AbstractController
                 }
             }
 
+            $correspondence->setUpdatedAt(new \DateTime());
             $entityManager->flush();
 
             return $this->redirectToRoute('app_correspondence_index', [], Response::HTTP_SEE_OTHER);
@@ -129,7 +144,7 @@ final class CorrespondenceController extends AbstractController
     #[Route('/{id}', name: 'app_correspondence_delete', methods: ['POST'])]
     public function delete(Request $request, Correspondence $correspondence, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$correspondence->getId(), $request->request->get('_token'))) {
             $entityManager->remove($correspondence);
             $entityManager->flush();
         }

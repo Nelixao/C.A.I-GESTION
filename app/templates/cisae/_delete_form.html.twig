@@ -1,7 +1,9 @@
-<form method="post" action="{{ path('app_cisae_delete', {'id': cisae.id}) }}"
-      onsubmit="return confirm('¿Eliminar este trámite CISAE? Esta acción no se puede deshacer.')">
+<form id="delete-cisae-{{ cisae.id }}" method="post" action="{{ path('app_cisae_delete', {'id': cisae.id}) }}">
   <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cisae.id) }}">
-  <button class="btn btn-outline-danger btn-sm">
-    <i class="bi bi-trash"></i> Eliminar
-  </button>
 </form>
+<button type="button" class="btn btn-outline-danger btn-sm"
+        data-delete-form="delete-cisae-{{ cisae.id }}"
+        data-confirm-msg="¿Eliminar el trámite CISAE {{ cisae.folio ?? '#' ~ cisae.id }}? Esta acción no se puede deshacer."
+        title="Eliminar">
+  <i class="bi bi-trash"></i> Eliminar
+</button>

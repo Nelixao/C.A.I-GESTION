@@ -8,8 +8,8 @@
       <a href="{{ path('app_nota_informativa_edit', {'id': nota.id}) }}" class="glass-btn warning">
         <i class="bi bi-pencil-square"></i> Editar
       </a>
-      <a href="{{ path('app_nota_informativa_index') }}" class="glass-btn">
-        <i class="bi bi-arrow-left"></i> Volver
+      <a href="{{ path('app_nota_informativa_index') }}" class="glass-btn" style="border-color:#B28E5C;color:#B28E5C">
+        <i class="bi bi-arrow-left"></i> Regresar
       </a>
     </div>
   </div>
@@ -41,11 +41,14 @@
 
   {% if is_granted('ROLE_ADMIN') %}
     <div class="mt-3">
-      <form method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}"
-            onsubmit="return confirm('¿Eliminar esta nota informativa?')">
+      <form id="del-nota-show-{{ nota.id }}" method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}" style="display:none">
         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nota.id) }}">
-        <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Eliminar</button>
       </form>
+      <button type="button" class="btn btn-outline-danger btn-sm"
+              data-delete-form="del-nota-show-{{ nota.id }}"
+              data-confirm-msg="¿Eliminar la nota {{ nota.folio ?? '#' ~ nota.id }}? Esta acción no se puede deshacer.">
+        <i class="bi bi-trash"></i> Eliminar
+      </button>
     </div>
   {% endif %}
 </div>

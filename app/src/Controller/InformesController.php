@@ -155,7 +155,10 @@ final class InformesController extends AbstractController
         }
         arsort($globalStatuses);
 
-        return compact('totalesPorModulo', 'estadosPorModulo', 'areasPorModulo', 'globalStatuses');
+        $totalesPorModuloValues = array_values($totalesPorModulo);
+        $globalStatusesValues   = array_values($globalStatuses);
+
+        return compact('totalesPorModulo', 'totalesPorModuloValues', 'estadosPorModulo', 'areasPorModulo', 'globalStatuses', 'globalStatusesValues');
     }
 
     private function rowsToAssoc(array $rows): array

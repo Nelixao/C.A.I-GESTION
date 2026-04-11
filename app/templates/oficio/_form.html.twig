@@ -1,58 +1,58 @@
 {{ form_start(form, { attr: { class: 'form-glass' } }) }}
   <div class="row g-3">
-    <div class="col-md-6">
-      {{ form_label(form.title, 'Título / Asunto') }}
-      {{ form_widget(form.title, { attr: { class: 'form-control' } }) }}
-      {{ form_errors(form.title) }}
+
+    <div class="col-md-3">
+      <label class="form-label">Folio</label>
+      <p class="form-control-plaintext fw-bold ps-2" style="border:1px solid var(--input-border,#ccc);border-radius:.375rem;padding:.375rem .75rem;background:var(--input-bg,rgba(0,0,0,.04))">
+        {{ oficio.folio ?? 'Se generará automáticamente' }}
+      </p>
     </div>
 
-    <div class="col-md-6">
-      {{ form_label(form.date, 'Fecha') }}
-      {{ form_widget(form.date, { attr: { class: 'form-control' } }) }}
+    <div class="col-md-4">
+      {{ form_label(form.date) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.date, { attr: { class: 'form-control', type: 'date' } }) }}
       {{ form_errors(form.date) }}
     </div>
 
+    <div class="col-md-5">
+      {{ form_label(form.status) }}
+      {{ form_widget(form.status, { attr: { class: 'form-select' } }) }}
+      {{ form_errors(form.status) }}
+    </div>
+
     <div class="col-md-6">
-      {{ form_label(form.sender, 'Remitente') }}
-      {{ form_widget(form.sender, { attr: { class: 'form-control' } }) }}
+      {{ form_label(form.sender) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.sender, { attr: { class: 'form-control', placeholder: 'Ej. Dirección de Servicios Urbanos' } }) }}
       {{ form_errors(form.sender) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_label(form.recipient, 'Destinatario') }}
-      {{ form_widget(form.recipient, { attr: { class: 'form-control' } }) }}
+      {{ form_label(form.recipient) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.recipient, { attr: { class: 'form-control', placeholder: 'Ej. Alcaldesa Iztapalapa' } }) }}
       {{ form_errors(form.recipient) }}
     </div>
 
     <div class="col-12">
-      {{ form_label(form.content, 'Contenido') }}
-      {{ form_widget(form.content, { attr: { class: 'form-control', rows: 6 } }) }}
-      {{ form_errors(form.content) }}
+      {{ form_label(form.asunto) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.asunto, { attr: { class: 'form-control', rows: 3, placeholder: 'Ej. Solicitud de mantenimiento de alumbrado público' } }) }}
+      {{ form_errors(form.asunto) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_label(form.file_path, 'Archivo adjunto') }}
+      {{ form_label(form.recibidoPor) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.recibidoPor, { attr: { class: 'form-control', placeholder: 'Ej. Juan García López' } }) }}
+      {{ form_errors(form.recibidoPor) }}
+    </div>
+
+    <div class="col-md-6">
+      {{ form_label(form.file_path) }}
       {{ form_widget(form.file_path, { attr: { class: 'form-control' } }) }}
       {{ form_errors(form.file_path) }}
     </div>
 
-    <div class="col-md-6">
-      {{ form_label(form.user, 'Usuario responsable') }}
-      {{ form_widget(form.user, { attr: { class: 'form-select' } }) }}
-      {{ form_errors(form.user) }}
-    </div>
-
-    {# Metadatos opcionales (si los muestras) #}
-    <div class="col-md-6">
-      {{ form_row(form.created_by) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.created_at) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.updated_at) }}
-    </div>
   </div>
+
+  <p class="text-muted small mt-2"><span class="text-danger">*</span> Campo obligatorio</p>
 
   <div class="form-actions mt-4 text-center">
     <button class="glass-btn primary" type="submit">

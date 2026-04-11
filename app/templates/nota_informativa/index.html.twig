@@ -67,20 +67,23 @@
               <i class="bi bi-pencil-square"></i>
             </a>
             {% if is_granted('ROLE_ADMIN') %}
-              <form method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}"
-                    style="display:inline"
-                    onsubmit="return confirm('¿Eliminar esta nota informativa?')">
+              <form id="del-nota-{{ nota.id }}" method="post" action="{{ path('app_nota_informativa_delete', {'id': nota.id}) }}" style="display:none">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ nota.id) }}">
-                <button class="btn btn-outline-danger btn-sm" title="Eliminar">
-                  <i class="bi bi-trash"></i>
-                </button>
               </form>
+              <button type="button" class="btn btn-outline-danger btn-sm" title="Eliminar"
+                      data-delete-form="del-nota-{{ nota.id }}"
+                      data-confirm-msg="¿Eliminar la nota {{ nota.folio ?? '#' ~ nota.id }}?">
+                <i class="bi bi-trash"></i>
+              </button>
             {% endif %}
           </td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="6" class="text-center text-muted py-4">Sin notas informativas registradas</td>
+          <td colspan="6" class="text-center text-muted py-4">
+            <i class="bi bi-sticky fs-3 d-block mb-2 opacity-50"></i>
+            No hay notas informativas aún. <a href="{{ path('app_nota_informativa_new') }}" class="text-decoration-none">¡Crea la primera!</a>
+          </td>
         </tr>
       {% endfor %}
       </tbody>

@@ -13,14 +13,20 @@ class Circular
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 48)]
-    private ?string $title = null;
+    #[ORM\Column(length: 500, nullable: true, options: ['default' => ''])]
+    private ?string $title = '';
 
-    #[ORM\Column(length: 45)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 78)]
+    #[ORM\Column(length: 200, nullable: true)]
     private ?string $target_group = null;
+
+    #[ORM\Column(length: 10, unique: true, nullable: true)]
+    private ?string $folio = null;
+
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $recibidoPor = null;
 
     #[ORM\Column]
     private ?\DateTime $date = null;
@@ -47,8 +53,8 @@ private ?User $user = null;
     #[ORM\JoinColumn(name: 'id_escaneo', referencedColumnName: 'id', nullable: true)]
     private ?Scanner $scanner = null;
 
-    #[ORM\Column(length: 20, options: ['default' => 'Pendiente'])]
-    private ?string $status = 'Pendiente'; // valores: Pendiente, En trámite, Concluido, Archivado
+    #[ORM\Column(length: 20, options: ['default' => 'Abierta'])]
+    private ?string $status = 'Abierta'; // valores: Abierta, En Trámite, Cerrada, Archivada
 
     // Nuevos campos solicitados por el esquema
     #[ORM\Column(length: 20, unique: true, nullable: true)]
@@ -68,6 +74,17 @@ private ?User $user = null;
 
     #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeImmutable $fecha_registro = null;
+
+    public function __construct()
+    {
+        $now = new \DateTimeImmutable();
+        $this->fecha_registro = $now;
+        $this->created_at     = $now;
+        $this->updated_at     = new \DateTime();
+        $this->created_by     = 0;
+        $this->status         = 'Abierta';
+        $this->title          = '';
+    }
 
     public function getId(): ?int
     {
@@ -91,7 +108,7 @@ private ?User $user = null;
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
         $this->content = $content;
 
@@ -103,12 +120,18 @@ private ?User $user = null;
         return $this->target_group;
     }
 
-    public function setTargetGroup(string $target_group): static
+    public function setTargetGroup(?string $target_group): static
     {
         $this->target_group = $target_group;
 
         return $this;
     }
+
+    public function getFolio(): ?string { return $this->folio; }
+    public function setFolio(?string $folio): static { $this->folio = $folio; return $this; }
+
+    public function getRecibidoPor(): ?string { return $this->recibidoPor; }
+    public function setRecibidoPor(?string $recibidoPor): static { $this->recibidoPor = $recibidoPor; return $this; }
 
     public function getDate(): ?\DateTime
     {

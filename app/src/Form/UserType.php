@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\role;
+use App\Entity\Role;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -16,9 +16,13 @@ class UserType extends AbstractType
         $builder
             ->add('nombre')
             ->add('contrasena')
-            ->add('role_id', EntityType::class, [
-                'class' => role::class,
-                'choice_label' => 'id',
+            ->add('role', EntityType::class, [
+                'class' => Role::class,
+                'choice_label' => 'name',
+                'label' => 'Rol',
+                'required' => false,
+                'placeholder' => '— Sin rol asignado —',
+                'attr' => ['class' => 'form-select'],
             ])
         ;
     }

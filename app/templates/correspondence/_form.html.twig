@@ -1,42 +1,46 @@
 {{ form_start(form, { attr: { class: 'form-glass' } }) }}
   <div class="row g-3">
     <div class="col-md-6">
-      {{ form_row(form.subject) }}
+      {{ form_label(form.subject) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.subject, { attr: { class: 'form-control', placeholder: 'Ej. Solicitud de información' } }) }}
+      {{ form_errors(form.subject) }}
     </div>
-    <div class="col-md-6">
-      {{ form_row(form.date) }}
+    <div class="col-md-3">
+      {{ form_label(form.date) }}
+      {{ form_widget(form.date, { attr: { class: 'form-control', type: 'date' } }) }}
+      {{ form_errors(form.date) }}
+    </div>
+    <div class="col-md-3">
+      {{ form_label(form.status) }}
+      {{ form_widget(form.status, { attr: { class: 'form-select' } }) }}
+      {{ form_errors(form.status) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.sender) }}
+      {{ form_label(form.sender) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.sender, { attr: { class: 'form-control', placeholder: 'Ej. Dirección de Obras Públicas' } }) }}
+      {{ form_errors(form.sender) }}
     </div>
     <div class="col-md-6">
-      {{ form_row(form.receiver) }}
+      {{ form_label(form.receiver) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.receiver, { attr: { class: 'form-control', placeholder: 'Ej. Secretaría de Gobierno' } }) }}
+      {{ form_errors(form.receiver) }}
     </div>
 
     <div class="col-12">
-      {{ form_row(form.body) }}
+      {{ form_label(form.body) }}<span class="text-danger ms-1">*</span>
+      {{ form_widget(form.body, { attr: { class: 'form-control', rows: 6, placeholder: 'Escribe el contenido del mensaje…' } }) }}
+      {{ form_errors(form.body) }}
     </div>
 
     <div class="col-md-6">
-      {{ form_row(form.file_path) }}
-    </div>
-
-    <div class="col-md-6">
-      {{ form_row(form.user) }}
-    </div>
-
-    {# Solo si decidiste mantenerlos visibles #}
-    <div class="col-md-6">
-      {{ form_row(form.created_by) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.created_at) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.updated_at) }}
+      {{ form_label(form.file_path) }}
+      {{ form_widget(form.file_path, { attr: { class: 'form-control' } }) }}
+      {{ form_errors(form.file_path) }}
     </div>
   </div>
+
+  <p class="text-muted small mt-2"><span class="text-danger">*</span> Campo obligatorio</p>
 
   <div class="form-actions mt-3">
     <button class="glass-btn primary" type="submit">

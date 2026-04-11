@@ -167,23 +167,27 @@ final class OficioController extends AbstractController
     }
 
     #[Route('/new', name: 'app_oficio_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, PathNormalizer $normalizer): Response
+    public function new(Request $request, EntityManagerInterface $em, OficioRepository $oficioRepository, PathNormalizer $normalizer): Response
     {
         $oficio = new Oficio();
-        $oficio->setCreatedAt(new \DateTimeImmutable());
-        $oficio->setUpdatedAt(new \DateTimeImmutable());
+        $now = new \DateTimeImmutable();
+        $oficio->setFechaRegistro($now);
+        $oficio->setCreatedAt($now);
+        $oficio->setUpdatedAt($now);
+        $oficio->setCreatedBy($this->getUser()?->getId() ?? 0);
+        $oficio->setUser($this->getUser());
 
-        if ($this->getUser()) {
-            $oficio->setCreatedBy($this->getUser()?->getId() ?? 0);
-            $oficio->setUser($this->getUser());
-        } else {
-            $oficio->setCreatedBy(0);
-        }
+        // Folio automático consecutivo
+        $nextNum = $oficioRepository->count([]) + 1;
+        $oficio->setFolio(str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT));
 
         $form = $this->createForm(OficioType::class, $oficio);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Sincronizar title con asunto para compatibilidad
+            $oficio->setTitle($oficio->getAsunto() ?? '');
+
             // Manejo del archivo (campo mapped=false en el form)
             $file = $form->get('file_path')->getData();
             if ($file) {
@@ -237,6 +241,9 @@ final class OficioController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Sincronizar title con asunto para compatibilidad
+            $oficio->setTitle($oficio->getAsunto() ?? '');
+
             $file = $form->get('file_path')->getData();
             if ($file) {
                 $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);

@@ -24,23 +24,32 @@ final class NotaInformativaController extends AbstractController
     }
 
     #[Route('/new', name: 'app_nota_informativa_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, NotaInformativaRepository $repo): Response
     {
         $nota = new NotaInformativa();
+
+        // Folio automático consecutivo
+        $nextNum = $repo->count([]) + 1;
+        $nota->setFolio(str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT));
+
         $form = $this->createForm(NotaInformativaType::class, $nota);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new  = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $targetDir = $this->getParameter('app.upload_dir');
+                $file->move($targetDir, $new);
+                $nota->setFilePath('uploads/'.$new);
+            }
+
             $now = new \DateTimeImmutable();
             $nota->setCreatedAt($now);
             $nota->setUpdatedAt($now);
-
-            if ($this->getUser()) {
-                $nota->setCreatedBy($this->getUser()?->getId());
-                if ($nota->getUser() === null) {
-                    $nota->setUser($this->getUser());
-                }
-            }
+            $nota->setCreatedBy($this->getUser()?->getId() ?? 0);
 
             $em->persist($nota);
             $em->flush();
@@ -65,6 +74,16 @@ final class NotaInformativaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejo del archivo
+            $file = $form->get('file_path')->getData();
+            if ($file) {
+                $safe = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $new  = $safe.'-'.uniqid().'.'.$file->guessExtension();
+                $targetDir = $this->getParameter('app.upload_dir');
+                $file->move($targetDir, $new);
+                $nota->setFilePath('uploads/'.$new);
+            }
+
             $nota->setUpdatedAt(new \DateTimeImmutable());
             $em->flush();
 
@@ -79,8 +98,7 @@ final class NotaInformativaController extends AbstractController
     #[Route('/{id}', name: 'app_nota_informativa_delete', methods: ['POST'])]
     public function delete(Request $request, NotaInformativa $nota, EntityManagerInterface $em): Response
     {
-        $token = $request->request->get('_token');
-        if ($this->isCsrfTokenValid('delete' . $nota->getId(), $token)) {
+        if ($this->isCsrfTokenValid('delete'.$nota->getId(), $request->request->get('_token'))) {
             $em->remove($nota);
             $em->flush();
             $this->addFlash('success', 'Nota informativa eliminada.');

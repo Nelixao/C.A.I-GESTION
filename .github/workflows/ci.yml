@@ -1,0 +1,19 @@
+name: CI - C.A.I-GESTION
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Verificar sintaxis PHP
+        run: find app/src -name "*.php" -exec php -l {} \;
+
+      - name: Verificar Twig templates
+        run: echo "Twig lint pendiente de configurar con Docker"

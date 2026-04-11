@@ -1,58 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Oficio{% endblock %}
+{% block title %}Oficio {{ oficio.folio ?? oficio.id }}{% endblock %}
 
 {% block body %}
-    <h1>Oficio</h1>
+<div class="container-glass">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Oficio {{ oficio.folio ?? ('#' ~ oficio.id) }}</h1>
+        <span class="pill-badge {{ (oficio.status ?? 'abierto')|lower }}">{{ oficio.status|default('Abierto') }}</span>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ oficio.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ oficio.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ oficio.content }}</td>
-            </tr>
-            <tr>
-                <th>Sender</th>
-                <td>{{ oficio.sender }}</td>
-            </tr>
-            <tr>
-                <th>Recipient</th>
-                <td>{{ oficio.recipient }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ oficio.date ? oficio.date|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>File_path</th>
-                <td>{{ oficio.filePath }}</td>
-            </tr>
-            <tr>
-                <th>Created_by</th>
-                <td>{{ oficio.createdBy }}</td>
-            </tr>
-            <tr>
-                <th>Created_at</th>
-                <td>{{ oficio.createdAt ? oficio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Updated_at</th>
-                <td>{{ oficio.updatedAt ? oficio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Folio</dt>
+                <dd class="col-sm-8"><strong>{{ oficio.folio ?? '—' }}</strong></dd>
 
-    <a href="{{ path('app_oficio_index') }}">back to list</a>
+                <dt class="col-sm-4">Fecha del documento</dt>
+                <dd class="col-sm-8">{{ oficio.date ? oficio.date|date('d/m/Y') : '—' }}</dd>
 
-    <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}">edit</a>
+                <dt class="col-sm-4">Remitente</dt>
+                <dd class="col-sm-8">{{ oficio.sender|default('—') }}</dd>
 
-    {{ include('oficio/_delete_form.html.twig') }}
+                <dt class="col-sm-4">Dirigido a</dt>
+                <dd class="col-sm-8">{{ oficio.recipient|default('—') }}</dd>
+
+                <dt class="col-sm-4">Asunto</dt>
+                <dd class="col-sm-8">{{ oficio.asunto|default(oficio.title)|default('—') }}</dd>
+
+                <dt class="col-sm-4">Recibido por</dt>
+                <dd class="col-sm-8">{{ oficio.recibidoPor|default('—') }}</dd>
+
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">{{ oficio.status|default('Abierto') }}</dd>
+
+                {% if oficio.filePath %}
+                <dt class="col-sm-4">Archivo adjunto</dt>
+                <dd class="col-sm-8">
+                    <a href="{{ asset(oficio.filePath) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-file-earmark"></i> Ver archivo
+                    </a>
+                </dd>
+                {% endif %}
+
+                <dt class="col-sm-4">Registrado por</dt>
+                <dd class="col-sm-8">{{ oficio.user ? (oficio.user.nombre ?? oficio.user.email) : '—' }}</dd>
+
+                <dt class="col-sm-4">Fecha de registro</dt>
+                <dd class="col-sm-8">{{ oficio.createdAt ? oficio.createdAt|date('d/m/Y H:i') : '—' }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_oficio_index') }}" class="glass-btn" style="border-color:#B28E5C;color:#B28E5C">
+          <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+        <div>
+            <a href="{{ path('app_oficio_edit', {'id': oficio.id}) }}" class="glass-btn primary me-2">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+            {{ include('oficio/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
 {% endblock %}

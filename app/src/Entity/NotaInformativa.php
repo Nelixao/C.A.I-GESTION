@@ -16,7 +16,7 @@ class NotaInformativa
     #[ORM\Column(length: 30, unique: true, nullable: true)]
     private ?string $folio = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(length: 500)]
     private ?string $title = null;
 
     #[ORM\Column(length: 500, nullable: true)]

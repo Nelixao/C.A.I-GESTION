@@ -16,18 +16,35 @@ class MainController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
     public function index(
-        OficioRepository $oficioRepo,
-        CorrespondenceRepository $correspondenceRepo,
-        CircularRepository $circularRepo,
-        ScannerRepository $scannerRepo
+        OficioRepository          $oficioRepo,
+        CorrespondenceRepository  $correspondenceRepo,
+        CircularRepository        $circularRepo,
+        ScannerRepository         $scannerRepo,
+        NotaInformativaRepository $notaRepo,
+        CisaeRepository           $cisaeRepo
     ): Response {
+        // Distribución de estados combinada para la gráfica de dona
+        $allStatuses = [];
+        foreach ([
+            $oficioRepo->countByStatus(),
+            $correspondenceRepo->countByStatus(),
+            $circularRepo->countByStatus(),
+        ] as $rows) {
+            foreach ($rows as $r) {
+                $k = $r['estado'] ?? 'Sin estado';
+                $allStatuses[$k] = ($allStatuses[$k] ?? 0) + (int) $r['total'];
+            }
+        }
+        arsort($allStatuses);
+
         return $this->render('main/index.html.twig', [
             'oficiosCount'         => $oficioRepo->countAll(),
             'correspondencesCount' => $correspondenceRepo->count([]),
             'circularesCount'      => $circularRepo->count([]),
             'scansCount'           => $scannerRepo->count([]),
-            'recentOficios'        => $oficioRepo->findRecent(5),
-            'activeCirculares'     => $circularRepo->findBy([], ['id' => 'DESC'], 5),
+            'notasCount'           => $notaRepo->count([]),
+            'cisaeCount'           => $cisaeRepo->count([]),
+            'statusDistribution'   => $allStatuses,
         ]);
     }
 
@@ -89,13 +106,23 @@ class MainController extends AbstractController
         // Próximos vencimientos CISAE (14 días)
         $cisaeProximos = $cisaeRepo->findUpcoming(14);
 
+        $totalesPorModulo = [
+            'Oficios'         => $oficiosCount,
+            'Correspondencia' => $correspondencesCount,
+            'Circulares'      => $circularesCount,
+            'Notas'           => $notasCount,
+            'Escáner'         => $scansCount,
+        ];
+
         return $this->render('main/dashboard.html.twig', [
             // KPIs
-            'oficiosCount'         => $oficiosCount,
-            'correspondencesCount' => $correspondencesCount,
-            'circularesCount'      => $circularesCount,
-            'notasCount'           => $notasCount,
-            'scansCount'           => $scansCount,
+            'oficiosCount'              => $oficiosCount,
+            'correspondencesCount'      => $correspondencesCount,
+            'circularesCount'           => $circularesCount,
+            'notasCount'                => $notasCount,
+            'scansCount'                => $scansCount,
+            'totalesPorModulo'          => $totalesPorModulo,
+            'totalesPorModuloValues'    => array_values($totalesPorModulo),
 
             // Tendencias
             'oficiosTrend'         => $trends['oficios'],
@@ -105,9 +132,10 @@ class MainController extends AbstractController
             'scansTrend'           => $trends['scans'],
 
             // Gráficas
-            'weeklyStats'          => $weeklyStats,
-            'statusDistribution'   => $allStatuses,
-            'areaEfficiency'       => ['labels' => $areaLabels, 'efficiency' => $areaTotals],
+            'weeklyStats'               => $weeklyStats,
+            'statusDistribution'        => $allStatuses,
+            'statusDistributionValues'  => array_values($allStatuses),
+            'areaEfficiency'            => ['labels' => $areaLabels, 'efficiency' => $areaTotals],
 
             // Tablas
             'cisaiProximos'        => $cisaeProximos,

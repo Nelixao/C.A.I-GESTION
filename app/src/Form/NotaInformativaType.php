@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,44 +19,51 @@ class NotaInformativaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('folio', TextType::class, [
-                'label' => 'Folio',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ej. NI-2026-001'],
-            ])
             ->add('title', TextType::class, [
-                'label' => 'Título',
-                'attr' => ['placeholder' => 'Título de la nota informativa'],
+                'label'    => 'Título <span class="text-danger">*</span>',
+                'label_html' => true,
+                'attr'     => ['placeholder' => 'Título de la nota informativa', 'class' => 'form-control'],
             ])
             ->add('content', TextareaType::class, [
-                'label' => 'Contenido',
+                'label'    => 'Contenido',
                 'required' => false,
-                'attr' => ['rows' => 5, 'placeholder' => 'Contenido de la nota'],
+                'attr'     => ['rows' => 5, 'placeholder' => 'Contenido de la nota', 'class' => 'form-control'],
             ])
             ->add('area', TextType::class, [
-                'label' => 'Área / Departamento',
+                'label'    => 'Área / Departamento',
                 'required' => false,
-                'attr' => ['placeholder' => 'Ej. Dirección Académica'],
+                'attr'     => ['placeholder' => 'Ej. Dirección Académica', 'class' => 'form-control'],
             ])
             ->add('fechaLimite', DateType::class, [
-                'label' => 'Fecha límite',
-                'widget' => 'single_text',
+                'label'    => 'Fecha límite',
+                'widget'   => 'single_text',
+                'html5'    => true,
+                'format'   => 'yyyy-MM-dd',
                 'required' => false,
+                'attr'     => ['class' => 'form-control', 'data-provide' => 'datepicker'],
             ])
             ->add('status', ChoiceType::class, [
-                'label' => 'Estado',
+                'label'  => 'Estado',
                 'choices' => [
                     'No revisado' => 'no-revisado',
                     'Pendiente'   => 'pendiente',
                     'Terminado'   => 'terminado',
                 ],
+                'attr' => ['class' => 'form-select'],
             ])
             ->add('user', EntityType::class, [
-                'class' => User::class,
-                'label' => 'Usuario responsable',
+                'class'        => User::class,
+                'label'        => 'Usuario responsable',
                 'choice_label' => fn(User $u) => $u->getNombre() ?? $u->getEmail(),
+                'required'     => false,
+                'placeholder'  => '— Sin asignar —',
+                'attr'         => ['class' => 'form-select'],
+            ])
+            ->add('file_path', FileType::class, [
+                'label'    => 'Archivo adjunto',
+                'mapped'   => false,
                 'required' => false,
-                'placeholder' => '— Sin asignar —',
+                'attr'     => ['class' => 'form-control'],
             ])
         ;
     }

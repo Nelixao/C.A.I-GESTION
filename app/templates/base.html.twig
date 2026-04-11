@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#B2225D">
 
-  {# Fuentes #}
+  {# Fuentes oficiales: Cabin (títulos) + Roboto (cuerpo) #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,600;0,700;1,700&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   {# Favicons / Icons #}
   <link rel="icon" href="{{ asset('images/favicon.ico') }}">
@@ -31,63 +31,60 @@
   {# Dark mode: aplica tema antes del render para evitar flash #}
   <script>
     (function(){
-      var t = localStorage.getItem('cai-theme') || 'light';
+      var t = localStorage.getItem('cai-theme') || 'dark';
       document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Saltar al contenido</a>
-
   <div class="app-wrap">
     <!-- Sidebar lateral (glass) -->
     <aside id="sidebar" class="sidebar" aria-label="Navegación principal">
       <div class="brand">
         <span class="logo-dot" aria-hidden="true"></span>
-        <span class="label">C.A.I.</span>
+        <span class="label">C.A.I-GESTION</span>
       </div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.65);padding:0 12px 8px;font-family:'Cabin',sans-serif;letter-spacing:.04em">Alcaldía</div>
 
       <nav class="nav" role="navigation">
+        {# Inicio — siempre primero #}
         <a href="{{ path('app_home') }}"
            aria-current="{{ app.request.attributes.get('_route') == 'app_home' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">
           <i class="bi bi-house" aria-hidden="true"></i><span class="label">Inicio</span>
         </a>
 
-        <a href="{{ path('app_dashboard') }}"
-           aria-current="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'page' : null }}"
-           class="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
-          <i class="bi bi-speedometer2" aria-hidden="true"></i><span class="label">Dashboard</span>
-        </a>
-
-        <a href="{{ path('app_oficio_index') }}"
-           aria-current="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'page' : null }}"
-           class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">
-          <i class="bi bi-file-earmark-text" aria-hidden="true"></i><span class="label">Oficios</span>
-        </a>
-
-        <a href="{{ path('app_correspondence_index') }}"
-           aria-current="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'page' : null }}"
-           class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">
-          <i class="bi bi-envelope" aria-hidden="true"></i><span class="label">Correspondencia</span>
-        </a>
-
-        <a href="{{ path('app_circular_index') }}"
-           aria-current="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'page' : null }}"
-           class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">
-          <i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="label">Circulares</span>
-        </a>
-
-        <a href="{{ path('app_scanner_index') }}"
-           aria-current="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'page' : null }}"
-           class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">
-          <i class="bi bi-scanner" aria-hidden="true"></i><span class="label">Escáner</span>
-        </a>
+        {# Orden alfabético: Calendario, Circulares, CISAE, Correspondencia,
+           Dashboard, Informes*, Notas Informativas, Oficios, Roles*, Escáner, Usuarios* #}
 
         <a href="{{ path('app_calendario') }}"
            aria-current="{{ app.request.attributes.get('_route') starts with 'app_calendario' ? 'page' : null }}"
            class="{{ app.request.attributes.get('_route') starts with 'app_calendario' ? 'active' : '' }}">
           <i class="bi bi-calendar3" aria-hidden="true"></i><span class="label">Calendario</span>
+        </a>
+
+        <a href="{{ path('app_circular_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">
+          <i class="bi bi-megaphone" aria-hidden="true"></i><span class="label">Circulares</span>
+        </a>
+
+        <a href="{{ path('app_cisae_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_cisae' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_cisae' ? 'active' : '' }}">
+          <i class="bi bi-building" aria-hidden="true"></i><span class="label">CISAE</span>
+        </a>
+
+        <a href="{{ path('app_correspondence_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">
+          <i class="bi bi-inbox" aria-hidden="true"></i><span class="label">Correspondencia</span>
+        </a>
+
+        <a href="{{ path('app_dashboard') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
+          <i class="bi bi-speedometer2" aria-hidden="true"></i><span class="label">Dashboard</span>
         </a>
 
         {% if is_granted('ROLE_ADMIN') %}
@@ -98,17 +95,37 @@
           </a>
         {% endif %}
 
+        <a href="{{ path('app_nota_informativa_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_nota_informativa' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_nota_informativa' ? 'active' : '' }}">
+          <i class="bi bi-sticky" aria-hidden="true"></i><span class="label">Notas Informativas</span>
+        </a>
+
+        <a href="{{ path('app_oficio_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">
+          <i class="bi bi-file-earmark-text" aria-hidden="true"></i><span class="label">Oficios</span>
+        </a>
+
         {% if is_granted('ROLE_ADMIN') %}
-          <div class="mt-2 small text-uppercase opacity-75 px-3">Administración</div>
-          <a href="{{ path('app_user_index') }}"
-             aria-current="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'page' : null }}"
-             class="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
-            <i class="bi bi-people" aria-hidden="true"></i><span class="label">Usuarios</span>
-          </a>
           <a href="{{ path('app_role_index') }}"
              aria-current="{{ app.request.attributes.get('_route') starts with 'app_role' ? 'page' : null }}"
              class="{{ app.request.attributes.get('_route') starts with 'app_role' ? 'active' : '' }}">
             <i class="bi bi-shield-lock" aria-hidden="true"></i><span class="label">Roles</span>
+          </a>
+        {% endif %}
+
+        <a href="{{ path('app_scanner_index') }}"
+           aria-current="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'page' : null }}"
+           class="{{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">
+          <i class="bi bi-printer" aria-hidden="true"></i><span class="label">Escáner</span>
+        </a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+          <a href="{{ path('app_user_index') }}"
+             aria-current="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'page' : null }}"
+             class="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+            <i class="bi bi-people" aria-hidden="true"></i><span class="label">Usuarios</span>
           </a>
         {% endif %}
 
@@ -163,7 +180,7 @@
       </main>
 
       <footer role="contentinfo">
-        &copy; {{ "now"|date("Y") }} Alcaldía – Todos los derechos reservados
+        &copy; {{ "now"|date("Y") }} Alcaldía &mdash; Sistema C.A.I-GESTION &nbsp;|&nbsp; Todos los derechos reservados
       </footer>
     </div>
   </div>
@@ -176,20 +193,63 @@
     </div>
     <div class="offcanvas-body">
       <nav class="nav flex-column gap-1" role="navigation" aria-label="Menú móvil">
-        <a href="{{ path('app_home') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">Inicio</a>
-        <a href="{{ path('app_dashboard') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">Dashboard</a>
-        <a href="{{ path('app_oficio_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">Oficios</a>
-        <a href="{{ path('app_correspondence_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">Correspondencia</a>
-        <a href="{{ path('app_circular_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">Circulares</a>
-        <a href="{{ path('app_scanner_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">Escáner</a>
-        <a href="{{ path('app_calendario') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_calendario' ? 'active' : '' }}">Calendario</a>
+        <a href="{{ path('app_home') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}">
+          <i class="bi bi-house me-2"></i>Inicio</a>
+        <a href="{{ path('app_calendario') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_calendario' ? 'active' : '' }}">
+          <i class="bi bi-calendar3 me-2"></i>Calendario</a>
+        <a href="{{ path('app_circular_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_circular' ? 'active' : '' }}">
+          <i class="bi bi-megaphone me-2"></i>Circulares</a>
+        <a href="{{ path('app_cisae_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_cisae' ? 'active' : '' }}">
+          <i class="bi bi-building me-2"></i>CISAE</a>
+        <a href="{{ path('app_correspondence_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_correspondence' ? 'active' : '' }}">
+          <i class="bi bi-inbox me-2"></i>Correspondencia</a>
+        <a href="{{ path('app_dashboard') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
         {% if is_granted('ROLE_ADMIN') %}
-          <a href="{{ path('app_informes') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_informes' ? 'active' : '' }}">Informes</a>
-          <div class="mt-2 small text-uppercase opacity-75">Administración</div>
-          <a href="{{ path('app_user_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">Usuarios</a>
-          <a href="{{ path('app_role_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_role' ? 'active' : '' }}">Roles</a>
+          <a href="{{ path('app_informes') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_informes' ? 'active' : '' }}">
+            <i class="bi bi-graph-up-arrow me-2"></i>Informes</a>
+        {% endif %}
+        <a href="{{ path('app_nota_informativa_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_nota_informativa' ? 'active' : '' }}">
+          <i class="bi bi-sticky me-2"></i>Notas Informativas</a>
+        <a href="{{ path('app_oficio_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_oficio' ? 'active' : '' }}">
+          <i class="bi bi-file-earmark-text me-2"></i>Oficios</a>
+        {% if is_granted('ROLE_ADMIN') %}
+          <a href="{{ path('app_role_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_role' ? 'active' : '' }}">
+            <i class="bi bi-shield-lock me-2"></i>Roles</a>
+        {% endif %}
+        <a href="{{ path('app_scanner_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_scanner' ? 'active' : '' }}">
+          <i class="bi bi-printer me-2"></i>Escáner</a>
+        {% if is_granted('ROLE_ADMIN') %}
+          <a href="{{ path('app_user_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+            <i class="bi bi-people me-2"></i>Usuarios</a>
         {% endif %}
       </nav>
+    </div>
+  </div>
+
+  {# Modal de confirmación para eliminar #}
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background:var(--bg-card,#1c2128);border:1px solid var(--border-color,rgba(157,33,72,.32));">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="deleteConfirmLabel">
+            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+            Confirmar eliminación
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body" id="deleteConfirmMessage">
+          ¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede deshacer.
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" id="deleteConfirmBtn">
+            <i class="bi bi-trash"></i> Sí, eliminar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -218,14 +278,38 @@
         if (label) label.textContent = theme === 'dark' ? 'Claro' : 'Oscuro';
       }
       // Set correct label on load
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
       const label = dmBtn?.querySelector('.mode-label');
       if (label) label.textContent = currentTheme === 'dark' ? 'Claro' : 'Oscuro';
 
       dmBtn?.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
         applyTheme(current === 'dark' ? 'light' : 'dark');
       });
+
+      // Modal de confirmación de eliminación global
+      const deleteModal = document.getElementById('deleteConfirmModal');
+      if (deleteModal) {
+        let pendingForm = null;
+        const bsDeleteModal = new bootstrap.Modal(deleteModal);
+
+        document.addEventListener('click', function(e) {
+          const btn = e.target.closest('[data-delete-form]');
+          if (!btn) return;
+          e.preventDefault();
+          pendingForm = document.getElementById(btn.getAttribute('data-delete-form'));
+          const msg = btn.getAttribute('data-confirm-msg');
+          if (msg) document.getElementById('deleteConfirmMessage').textContent = msg;
+          bsDeleteModal.show();
+        });
+
+        document.getElementById('deleteConfirmBtn')?.addEventListener('click', function() {
+          if (pendingForm) { pendingForm.submit(); pendingForm = null; }
+          bsDeleteModal.hide();
+        });
+
+        deleteModal.addEventListener('hidden.bs.modal', function() { pendingForm = null; });
+      }
     });
   </script>
 

@@ -1,58 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Correspondence{% endblock %}
+{% block title %}Correspondencia {{ correspondence.numControl ?? correspondence.id }}{% endblock %}
 
 {% block body %}
-    <h1>Correspondence</h1>
+<div class="container-glass">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Correspondencia {{ correspondence.numControl ?? ('#' ~ correspondence.id) }}</h1>
+        <span class="pill-badge {{ (correspondence.status ?? 'pendiente')|lower }}">
+            {{ correspondence.status|default('Pendiente') }}
+        </span>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ correspondence.id }}</td>
-            </tr>
-            <tr>
-                <th>Subject</th>
-                <td>{{ correspondence.subject }}</td>
-            </tr>
-            <tr>
-                <th>Body</th>
-                <td>{{ correspondence.body }}</td>
-            </tr>
-            <tr>
-                <th>Sender</th>
-                <td>{{ correspondence.sender }}</td>
-            </tr>
-            <tr>
-                <th>Receiver</th>
-                <td>{{ correspondence.receiver }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ correspondence.date ? correspondence.date|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>File_path</th>
-                <td>{{ correspondence.filePath }}</td>
-            </tr>
-            <tr>
-                <th>Created_by</th>
-                <td>{{ correspondence.createdBy }}</td>
-            </tr>
-            <tr>
-                <th>Created_at</th>
-                <td>{{ correspondence.createdAt ? correspondence.createdAt|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Updated_at</th>
-                <td>{{ correspondence.updatedAt ? correspondence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Número de control</dt>
+                <dd class="col-sm-8"><strong>{{ correspondence.numControl ?? '—' }}</strong></dd>
 
-    <a href="{{ path('app_correspondence_index') }}">back to list</a>
+                <dt class="col-sm-4">Fecha del documento</dt>
+                <dd class="col-sm-8">{{ correspondence.date ? correspondence.date|date('d/m/Y H:i') : '—' }}</dd>
 
-    <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}">edit</a>
+                <dt class="col-sm-4">Asunto</dt>
+                <dd class="col-sm-8">{{ correspondence.subject|default('—') }}</dd>
 
-    {{ include('correspondence/_delete_form.html.twig') }}
+                <dt class="col-sm-4">Remitente</dt>
+                <dd class="col-sm-8">{{ correspondence.sender|default('—') }}</dd>
+
+                <dt class="col-sm-4">Destinatario</dt>
+                <dd class="col-sm-8">{{ correspondence.receiver|default('—') }}</dd>
+
+                <dt class="col-sm-4">Mensaje</dt>
+                <dd class="col-sm-8">{{ correspondence.body|default('—')|nl2br }}</dd>
+
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">
+                    <span class="pill-badge {{ (correspondence.status ?? 'pendiente')|lower }}">
+                        {{ correspondence.status|default('Pendiente') }}
+                    </span>
+                </dd>
+
+                {% if correspondence.filePath %}
+                <dt class="col-sm-4">Archivo adjunto</dt>
+                <dd class="col-sm-8">
+                    <a href="{{ asset(correspondence.filePath) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-file-earmark"></i> Ver archivo
+                    </a>
+                </dd>
+                {% endif %}
+
+                <dt class="col-sm-4">Registrado por</dt>
+                <dd class="col-sm-8">
+                    {{ correspondence.user ? (correspondence.user.nombre ?? correspondence.user.email) : '—' }}
+                </dd>
+
+                <dt class="col-sm-4">Fecha de registro</dt>
+                <dd class="col-sm-8">{{ correspondence.createdAt ? correspondence.createdAt|date('d/m/Y') : '—' }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_correspondence_index') }}" class="glass-btn" style="border-color:#B28E5C;color:#B28E5C">
+          <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+        <div>
+            <a href="{{ path('app_correspondence_edit', {'id': correspondence.id}) }}" class="glass-btn primary me-2">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+            {{ include('correspondence/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
 {% endblock %}
